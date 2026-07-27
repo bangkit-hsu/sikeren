@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper text-ink font-body antialiased;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(27,42,36,0.07) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.font-display {
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: #bcd6b2;
+}
+
+*:focus-visible {
+  outline: 2px solid #3a6b30;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* radar sweep for the location-check signature element */
+.radar-ring {
+  position: relative;
+}
+.radar-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1px solid rgba(58,107,48,0.35);
+  animation: radar-pulse 2.6s ease-out infinite;
+}
+@keyframes radar-pulse {
+  0% { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(1.9); opacity: 0; }
+}

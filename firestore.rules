@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// CATATAN PENTING:
+// Aplikasi ini memakai sistem login kustom (bukan Firebase Authentication),
+// sehingga Firestore Security Rules TIDAK BISA memverifikasi "siapa yang sedang login"
+// (tidak ada request.auth). Rules di bawah ini hanya membatasi BENTUK data yang boleh
+// ditulis, bukan SIAPA yang menulis — siapa pun yang tahu URL aplikasi tetap bisa
+// membaca/menulis Firestore secara langsung lewat API jika mereka mau.
+//
+// Ini cukup untuk pemakaian internal skala kecil/menengah dengan pengguna yang saling
+// percaya (kantor/instansi). Untuk keamanan tingkat produksi yang lebih ketat, migrasikan
+// login ke Firebase Authentication (custom token / email-password) lalu perbarui rules ini
+// agar memakai request.auth.uid.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['nama', 'username', 'passwordHash', 'role'])
+                    && request.resource.data.role in ['admin', 'pegawai'];
+      allow update, delete: if true;
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /absensi/{docId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['uid', 'tanggal', 'jam', 'status']);
+      allow update, delete: if false; // riwayat absen tidak boleh diubah/dihapus dari client
+    }
+  }
+}
