@@ -148,6 +148,11 @@ export default function PegawaiPage() {
                 <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-ink text-paper' : 'bg-moss-100 text-moss-800'}`}>
                   {u.role === 'admin' ? 'Admin' : 'Pegawai'}
                 </span>
+                {u.role === 'pegawai' && (
+                  <span className={`inline-block mt-1 ml-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${Array.isArray(u.faceDescriptor) ? 'bg-moss-50 text-moss-700 border border-moss-200' : 'bg-clay/10 text-clay border border-clay/30'}`}>
+                    {Array.isArray(u.faceDescriptor) ? 'Wajah terdaftar' : 'Belum rekam wajah'}
+                  </span>
+                )}
               </div>
               <button onClick={() => hapusAkun(u.id)} className="text-sm text-clay font-medium hover:underline">
                 Hapus

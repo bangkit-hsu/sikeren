@@ -43,13 +43,28 @@ export function AuthProvider({ children }) {
     return sessionUser
   }
 
+  // Membuat sesi login langsung dari dokumen pegawai yang cocok lewat pengenalan wajah
+  // (tidak perlu password lagi, karena identitas sudah diverifikasi lewat wajah).
+  function loginDenganWajah(pegawaiDoc) {
+    const sessionUser = {
+      id: pegawaiDoc.id,
+      nip: pegawaiDoc.nip,
+      nama: pegawaiDoc.nama,
+      bagian: pegawaiDoc.bagian || '',
+      role: pegawaiDoc.role,
+    }
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+    setUser(sessionUser)
+    return sessionUser
+  }
+
   function logout() {
     sessionStorage.removeItem(SESSION_KEY)
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginDenganWajah, logout }}>
       {children}
     </AuthContext.Provider>
   )

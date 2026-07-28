@@ -4,6 +4,8 @@ import Layout from './components/Layout.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Login from './pages/Login.jsx'
 import SetupAwal from './pages/SetupAwal.jsx'
+import FaceLogin from './pages/FaceLogin.jsx'
+import DaftarWajah from './pages/DaftarWajah.jsx'
 import AbsensiPage from './pages/pegawai/AbsensiPage.jsx'
 import RiwayatPage from './pages/pegawai/RiwayatPage.jsx'
 import RekapPage from './pages/admin/RekapPage.jsx'
@@ -18,6 +20,8 @@ export default function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<FaceLogin />} />
+      <Route path="/daftar-wajah" element={<DaftarWajah />} />
       <Route path="/login" element={<Login />} />
       <Route path="/setup" element={<SetupAwal />} />
 
@@ -42,7 +46,7 @@ export default function App() {
       } />
 
       <Route path="*" element={
-        <Navigate to={user ? (user.role === 'admin' ? '/admin/rekap' : '/pegawai/absensi') : '/login'} replace />
+        <Navigate to={user ? (user.role === 'admin' ? '/admin/rekap' : '/pegawai/absensi') : '/'} replace />
       } />
     </Routes>
   )
