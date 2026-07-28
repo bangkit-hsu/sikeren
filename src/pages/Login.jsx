@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Login() {
@@ -70,8 +70,7 @@ export default function Login() {
           </button>
         </form>
         <p className="text-xs text-ink/40 text-center mt-6 font-mono">
-          Akun dibuat oleh admin melalui menu Kelola Pegawai ·{' '}
-          <Link to="/setup" className="underline">pertama kali pakai?</Link>
+          Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
         </p>
       </div>
     </div>
