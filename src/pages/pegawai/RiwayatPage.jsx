@@ -47,7 +47,9 @@ export default function RiwayatPage() {
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display font-semibold text-2xl">Riwayat Absensi Saya</h1>
-          <p className="text-ink/60 text-sm">{user.nama}</p>
+          <p className="text-ink/60 text-sm">
+            <span className="font-mono">NIP {user.nip}</span> · {user.bagian}
+          </p>
         </div>
         <div className="flex gap-2">
           <select

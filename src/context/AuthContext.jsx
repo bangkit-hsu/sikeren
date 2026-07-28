@@ -22,19 +22,20 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }, [])
 
-  async function login(username, password) {
+  async function login(nip, password) {
     const usersRef = collection(db, 'users')
-    const q = query(usersRef, where('username', '==', username.trim().toLowerCase()))
+    const q = query(usersRef, where('nip', '==', nip.trim()))
     const snap = await getDocs(q)
-    if (snap.empty) throw new Error('Username tidak ditemukan.')
+    if (snap.empty) throw new Error('NIP tidak ditemukan.')
     const docSnap = snap.docs[0]
     const data = docSnap.data()
     const hashed = await hashPassword(password)
     if (hashed !== data.passwordHash) throw new Error('Password salah.')
     const sessionUser = {
       id: docSnap.id,
+      nip: data.nip,
       nama: data.nama,
-      username: data.username,
+      bagian: data.bagian || '',
       role: data.role, // 'admin' | 'pegawai'
     }
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))

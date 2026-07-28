@@ -72,6 +72,8 @@ export default function AbsensiPage() {
       const data = {
         uid: user.id,
         nama: user.nama,
+        nip: user.nip || '',
+        bagian: user.bagian || '',
         tanggal: formatTanggal(now),
         jam: formatJam(now),
         status: sesuaiLokasi ? 'sesuai' : 'luar',
@@ -126,6 +128,9 @@ export default function AbsensiPage() {
   return (
     <div className="max-w-lg">
       <h1 className="font-display font-semibold text-2xl mb-1">Absensi Apel</h1>
+      <p className="text-ink/60 text-sm mb-1">
+        {user.nama} · <span className="font-mono">NIP {user.nip}</span> · {user.bagian}
+      </p>
       <p className="text-ink/60 text-sm mb-6">
         Lokasi apel: <span className="font-medium text-ink">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
       </p>

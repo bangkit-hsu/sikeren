@@ -10,7 +10,7 @@ export default function SetupAwal() {
   const navigate = useNavigate()
   const [mengecek, setMengecek] = useState(true)
   const [sudahAdaUser, setSudahAdaUser] = useState(true)
-  const [form, setForm] = useState({ nama: '', username: '', password: '' })
+  const [form, setForm] = useState({ nip: '', nama: '', bagian: '', password: '' })
   const [menyimpan, setMenyimpan] = useState(false)
   const [error, setError] = useState('')
 
@@ -30,8 +30,9 @@ export default function SetupAwal() {
     try {
       const passwordHash = await hashPassword(form.password)
       await addDoc(collection(db, 'users'), {
+        nip: form.nip.trim(),
         nama: form.nama,
-        username: form.username.trim().toLowerCase(),
+        bagian: form.bagian,
         passwordHash,
         role: 'admin',
       })
@@ -61,8 +62,17 @@ export default function SetupAwal() {
     <div className="min-h-screen flex items-center justify-center px-5">
       <div className="w-full max-w-sm">
         <h1 className="font-display font-semibold text-2xl mb-1 text-center">Setup Awal</h1>
-        <p className="text-ink/60 text-sm mb-6 text-center">Buat akun admin pertama untuk mengelola aplikasi.</p>
+        <p className="text-ink/60 text-sm mb-6 text-center">Buat akun admin pertama untuk mengelola e-Absen.</p>
         <form onSubmit={buatAdmin} className="bg-white/60 border border-ink/10 rounded-xl2 p-6 space-y-4">
+          <div>
+            <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>
+            <input
+              value={form.nip}
+              onChange={(e) => setForm({ ...form, nip: e.target.value })}
+              required
+              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white font-mono"
+            />
+          </div>
           <div>
             <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Nama Lengkap</label>
             <input
@@ -73,12 +83,13 @@ export default function SetupAwal() {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Username</label>
+            <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bagian</label>
             <input
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              value={form.bagian}
+              onChange={(e) => setForm({ ...form, bagian: e.target.value })}
               required
-              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white font-mono"
+              placeholder="mis. Sekretariat"
+              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white"
             />
           </div>
           <div>

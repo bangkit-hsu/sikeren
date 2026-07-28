@@ -1,4 +1,4 @@
-# Absen Apel Pegawai
+# e-Absen
 
 Aplikasi web absensi apel pegawai berbasis **radius titik koordinat** (geolocation).
 Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, real-time, bisa diakses dari HP semua pegawai).
@@ -59,7 +59,7 @@ Buka `http://localhost:5173`, klik **"pertama kali pakai?"** di halaman login un
 ```bash
 git init
 git add .
-git commit -m "Absen Apel Pegawai - initial commit"
+git commit -m "e-Absen - initial commit"
 git branch -M main
 git remote add origin https://github.com/<username>/<nama-repo>.git
 git push -u origin main
@@ -95,7 +95,7 @@ Firestore biasanya tidak membatasi domain, tapi jika suatu saat menambah Firebas
 ## Struktur data Firestore
 
 ```
-users/{id}        { nama, username, passwordHash, role: 'admin' | 'pegawai' }
+users/{id}        { nip, nama, bagian, passwordHash, role: 'admin' | 'pegawai' }
 settings/lokasi    { nama, lat, lng, radius }
 settings/libur     { tanggal: [ 'YYYY-MM-DD', ... ], detail: [{ tanggal, keterangan }] }
 absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',

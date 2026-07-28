@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 export default function Login() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
+  const [nip, setNip] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,7 +19,7 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const loggedIn = await login(username, password)
+      const loggedIn = await login(nip, password)
       navigate(loggedIn.role === 'admin' ? '/admin/rekap' : '/pegawai/absensi')
     } catch (err) {
       setError(err.message || 'Login gagal.')
@@ -33,20 +33,20 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 mx-auto rounded-full bg-moss-700 text-paper flex items-center justify-center font-display font-semibold text-lg radar-ring">
-            AA
+            eA
           </div>
-          <h1 className="font-display font-semibold text-2xl mt-4">Absen Apel Pegawai</h1>
+          <h1 className="font-display font-semibold text-2xl mt-4">e-Absen</h1>
           <p className="text-ink/60 text-sm mt-1">Masuk untuk mencatat kehadiran apel</p>
         </div>
         <form onSubmit={handleSubmit} className="bg-white/60 border border-ink/10 rounded-xl2 p-6 space-y-4 shadow-sm">
           <div>
-            <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Username</label>
+            <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>
             <input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={nip}
+              onChange={(e) => setNip(e.target.value)}
               required
-              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white focus:border-moss-600 outline-none"
-              placeholder="mis. andi.pratama"
+              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white font-mono focus:border-moss-600 outline-none"
+              placeholder="mis. 198501012010011001"
             />
           </div>
           <div>

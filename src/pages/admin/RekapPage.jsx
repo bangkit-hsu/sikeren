@@ -50,7 +50,11 @@ export default function RekapPage() {
           total: milik.length,
         }
       })
-      .filter((p) => p.nama.toLowerCase().includes(cari.toLowerCase()))
+      .filter((p) =>
+        p.nama.toLowerCase().includes(cari.toLowerCase()) ||
+        (p.nip || '').includes(cari) ||
+        (p.bagian || '').toLowerCase().includes(cari.toLowerCase()),
+      )
   }, [pegawai, absensi, cari])
 
   return (
@@ -73,7 +77,7 @@ export default function RekapPage() {
       <input
         value={cari}
         onChange={(e) => setCari(e.target.value)}
-        placeholder="Cari nama pegawai…"
+        placeholder="Cari NIP, nama, atau bagian…"
         className="mb-4 w-full max-w-xs rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
       />
 
@@ -81,10 +85,12 @@ export default function RekapPage() {
         <p className="text-ink/50 font-mono text-sm">Memuat…</p>
       ) : (
         <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-          <table className="w-full text-sm min-w-[720px]">
+          <table className="w-full text-sm min-w-[860px]">
             <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
               <tr>
+                <th className="px-4 py-3">NIP</th>
                 <th className="px-4 py-3">Nama</th>
+                <th className="px-4 py-3">Bagian</th>
                 <th className="px-4 py-3">Sesuai Lokasi</th>
                 <th className="px-4 py-3">Diluar Lokasi</th>
                 <th className="px-4 py-3">Absen Gabungan</th>
@@ -97,7 +103,9 @@ export default function RekapPage() {
             <tbody className="divide-y divide-ink/10">
               {rekap.map((p) => (
                 <tr key={p.id}>
+                  <td className="px-4 py-3 font-mono">{p.nip}</td>
                   <td className="px-4 py-3 font-medium">{p.nama}</td>
+                  <td className="px-4 py-3">{p.bagian}</td>
                   <td className="px-4 py-3">{p.sesuai}</td>
                   <td className="px-4 py-3">{p.luar}</td>
                   <td className="px-4 py-3">{p.gabungan}</td>
@@ -110,7 +118,7 @@ export default function RekapPage() {
                 </tr>
               ))}
               {rekap.length === 0 && (
-                <tr><td colSpan={8} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
+                <tr><td colSpan={10} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
               )}
             </tbody>
           </table>

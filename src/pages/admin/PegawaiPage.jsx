@@ -6,9 +6,10 @@ import { hashPassword } from '../../utils/hash'
 export default function PegawaiPage() {
   const [daftar, setDaftar] = useState([])
   const [memuat, setMemuat] = useState(true)
-  const [form, setForm] = useState({ nama: '', username: '', password: '', role: 'pegawai' })
+  const [form, setForm] = useState({ nip: '', nama: '', bagian: '', password: '', role: 'pegawai' })
   const [menyimpan, setMenyimpan] = useState(false)
   const [error, setError] = useState('')
+  const [cari, setCari] = useState('')
 
   async function muatUlang() {
     setMemuat(true)
@@ -22,25 +23,26 @@ export default function PegawaiPage() {
   async function tambahAkun(e) {
     e.preventDefault()
     setError('')
-    const username = form.username.trim().toLowerCase()
-    if (!username || !form.password || !form.nama) return
+    const nip = form.nip.trim()
+    if (!nip || !form.password || !form.nama || !form.bagian) return
     setMenyimpan(true)
     try {
-      const cekQ = query(collection(db, 'users'), where('username', '==', username))
+      const cekQ = query(collection(db, 'users'), where('nip', '==', nip))
       const cekSnap = await getDocs(cekQ)
       if (!cekSnap.empty) {
-        setError('Username sudah dipakai, gunakan username lain.')
+        setError('NIP sudah terdaftar, periksa kembali.')
         setMenyimpan(false)
         return
       }
       const passwordHash = await hashPassword(form.password)
       await addDoc(collection(db, 'users'), {
+        nip,
         nama: form.nama,
-        username,
+        bagian: form.bagian,
         passwordHash,
         role: form.role,
       })
-      setForm({ nama: '', username: '', password: '', role: 'pegawai' })
+      setForm({ nip: '', nama: '', bagian: '', password: '', role: 'pegawai' })
       await muatUlang()
     } catch (err) {
       setError('Gagal menambah akun: ' + err.message)
@@ -55,12 +57,28 @@ export default function PegawaiPage() {
     await muatUlang()
   }
 
+  const daftarTersaring = daftar.filter((u) =>
+    u.nama.toLowerCase().includes(cari.toLowerCase()) ||
+    (u.nip || '').includes(cari) ||
+    (u.bagian || '').toLowerCase().includes(cari.toLowerCase()),
+  )
+
   return (
     <div className="max-w-2xl">
       <h1 className="font-display font-semibold text-2xl mb-1">Kelola Pegawai</h1>
       <p className="text-ink/60 text-sm mb-6">Buat akun login untuk pegawai baru atau admin lain.</p>
 
       <form onSubmit={tambahAkun} className="bg-white/60 border border-ink/10 rounded-xl2 p-5 grid sm:grid-cols-2 gap-3 mb-8">
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>
+          <input
+            value={form.nip}
+            onChange={(e) => setForm({ ...form, nip: e.target.value })}
+            required
+            placeholder="mis. 198501012010011001"
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+          />
+        </div>
         <div>
           <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Nama Lengkap</label>
           <input
@@ -71,22 +89,13 @@ export default function PegawaiPage() {
           />
         </div>
         <div>
-          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Username</label>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bagian</label>
           <input
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            value={form.bagian}
+            onChange={(e) => setForm({ ...form, bagian: e.target.value })}
             required
-            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
-          />
-        </div>
-        <div>
-          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Password Awal</label>
-          <input
-            type="text"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+            placeholder="mis. Sub Bagian Umum"
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
           />
         </div>
         <div>
@@ -100,6 +109,16 @@ export default function PegawaiPage() {
             <option value="admin">Admin</option>
           </select>
         </div>
+        <div className="sm:col-span-2">
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Password Awal</label>
+          <input
+            type="text"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+          />
+        </div>
         {error && <p className="sm:col-span-2 text-sm text-clay bg-clay/10 rounded-lg px-3 py-2">{error}</p>}
         <button
           type="submit"
@@ -110,14 +129,22 @@ export default function PegawaiPage() {
         </button>
       </form>
 
+      <input
+        value={cari}
+        onChange={(e) => setCari(e.target.value)}
+        placeholder="Cari NIP, nama, atau bagian…"
+        className="mb-4 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+      />
+
       {memuat ? (
         <p className="text-ink/50 font-mono text-sm">Memuat…</p>
       ) : (
         <ul className="divide-y divide-ink/10 border border-ink/10 rounded-xl2 overflow-hidden">
-          {daftar.map((u) => (
+          {daftarTersaring.map((u) => (
             <li key={u.id} className="flex items-center justify-between px-4 py-3 bg-white/60">
               <div>
-                <p className="font-medium">{u.nama} <span className="text-xs font-mono text-ink/40">@{u.username}</span></p>
+                <p className="font-medium">{u.nama}</p>
+                <p className="text-xs font-mono text-ink/40">NIP {u.nip} · {u.bagian}</p>
                 <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-ink text-paper' : 'bg-moss-100 text-moss-800'}`}>
                   {u.role === 'admin' ? 'Admin' : 'Pegawai'}
                 </span>
@@ -127,6 +154,9 @@ export default function PegawaiPage() {
               </button>
             </li>
           ))}
+          {daftarTersaring.length === 0 && (
+            <li className="px-4 py-6 text-center text-ink/40 text-sm">Belum ada data.</li>
+          )}
         </ul>
       )}
     </div>

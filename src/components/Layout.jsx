@@ -29,10 +29,10 @@ export default function Layout({ children }) {
         <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-moss-700 text-paper flex items-center justify-center font-display font-semibold text-sm">
-              AA
+              eA
             </div>
             <div>
-              <p className="font-display font-semibold leading-tight">Absen Apel Pegawai</p>
+              <p className="font-display font-semibold leading-tight">e-Absen</p>
               <p className="text-xs text-ink/50 font-mono">{user?.role === 'admin' ? 'Panel Admin' : 'Panel Pegawai'}</p>
             </div>
           </div>
