@@ -11,7 +11,7 @@ import RiwayatPage from './pages/pegawai/RiwayatPage.jsx'
 import RekapPage from './pages/admin/RekapPage.jsx'
 import KoreksiPage from './pages/admin/KoreksiPage.jsx'
 import LokasiPage from './pages/admin/LokasiPage.jsx'
-import LiburPage from './pages/admin/LiburPage.jsx'
+import HariAbsenPage from './pages/admin/HariAbsenPage.jsx'
 import PegawaiPage from './pages/admin/PegawaiPage.jsx'
 
 export default function App() {
@@ -42,8 +42,8 @@ export default function App() {
       <Route path="/admin/lokasi" element={
         <ProtectedRoute role="admin"><Layout><LokasiPage /></Layout></ProtectedRoute>
       } />
-      <Route path="/admin/libur" element={
-        <ProtectedRoute role="admin"><Layout><LiburPage /></Layout></ProtectedRoute>
+      <Route path="/admin/hari-absen" element={
+        <ProtectedRoute role="admin"><Layout><HariAbsenPage /></Layout></ProtectedRoute>
       } />
       <Route path="/admin/pegawai" element={
         <ProtectedRoute role="admin"><Layout><PegawaiPage /></Layout></ProtectedRoute>

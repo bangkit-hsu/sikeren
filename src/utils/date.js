@@ -14,31 +14,40 @@ export function namaBulan(bulan) {
   return nama[bulan]
 }
 
-// Menghitung jumlah hari kerja (Senin-Jumat) dalam satu bulan, dikurangi tanggal libur
-export function hitungHariKerja(tahun, bulan, tanggalLiburSet) {
+// Bawaan: Senin-Jumat dianggap Hari Absen, Sabtu-Minggu tidak — kecuali
+// admin mengoverride tanggal tertentu secara manual lewat menu Hari Absen.
+export function hariAbsenBawaan(tanggalIso) {
+  const [t, b, d] = tanggalIso.split('-').map(Number)
+  const hari = new Date(t, b - 1, d).getDay() // 0=Minggu, 6=Sabtu
+  return hari !== 0 && hari !== 6
+}
+
+// overrideHariAbsen: objek { 'YYYY-MM-DD': true|false } — hanya berisi tanggal yang
+// diubah admin dari nilai bawaannya. Tanggal yang tidak ada di objek ini memakai bawaan.
+export function apakahHariAbsen(tanggalIso, overrideHariAbsen = {}) {
+  if (Object.prototype.hasOwnProperty.call(overrideHariAbsen, tanggalIso)) {
+    return overrideHariAbsen[tanggalIso]
+  }
+  return hariAbsenBawaan(tanggalIso)
+}
+
+// Menghitung jumlah Hari Absen dalam satu bulan sesuai pengaturan admin.
+export function hitungHariKerja(tahun, bulan, overrideHariAbsen = {}) {
   const jumlahHari = new Date(tahun, bulan + 1, 0).getDate()
   let total = 0
   for (let d = 1; d <= jumlahHari; d++) {
-    const tgl = new Date(tahun, bulan, d)
-    const hari = tgl.getDay() // 0=Minggu, 6=Sabtu
     const iso = `${tahun}-${String(bulan + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    if (hari !== 0 && hari !== 6 && !tanggalLiburSet.has(iso)) {
-      total += 1
-    }
+    if (apakahHariAbsen(iso, overrideHariAbsen)) total += 1
   }
   return total
 }
 
-export function daftarTanggalKerja(tahun, bulan, tanggalLiburSet) {
+export function daftarTanggalKerja(tahun, bulan, overrideHariAbsen = {}) {
   const jumlahHari = new Date(tahun, bulan + 1, 0).getDate()
   const list = []
   for (let d = 1; d <= jumlahHari; d++) {
-    const tgl = new Date(tahun, bulan, d)
-    const hari = tgl.getDay()
     const iso = `${tahun}-${String(bulan + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    if (hari !== 0 && hari !== 6 && !tanggalLiburSet.has(iso)) {
-      list.push(iso)
-    }
+    if (apakahHariAbsen(iso, overrideHariAbsen)) list.push(iso)
   }
   return list
 }

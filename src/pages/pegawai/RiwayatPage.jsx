@@ -11,7 +11,7 @@ export default function RiwayatPage() {
   const [tahun, setTahun] = useState(now.getFullYear())
   const [bulan, setBulan] = useState(now.getMonth())
   const [absensi, setAbsensi] = useState([])
-  const [hariLibur, setHariLibur] = useState(new Set())
+  const [overrideHariAbsen, setOverrideHariAbsen] = useState({})
   const [memuat, setMemuat] = useState(true)
 
   useEffect(() => {
@@ -29,15 +29,14 @@ export default function RiwayatPage() {
         .sort((a, b) => a.tanggal.localeCompare(b.tanggal))
       setAbsensi(data)
 
-      const liburSnap = await getDoc(doc(db, 'settings', 'libur'))
-      const liburList = liburSnap.exists() ? liburSnap.data().tanggal || [] : []
-      setHariLibur(new Set(liburList))
+      const hariAbsenSnap = await getDoc(doc(db, 'settings', 'hariAbsen'))
+      setOverrideHariAbsen(hariAbsenSnap.exists() ? hariAbsenSnap.data().override || {} : {})
       setMemuat(false)
     }
     load()
   }, [user.id, tahun, bulan])
 
-  const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, hariLibur), [tahun, bulan, hariLibur])
+  const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, overrideHariAbsen), [tahun, bulan, overrideHariAbsen])
   const jumlahSesuai = absensi.filter((a) => a.status === 'sesuai').length
   const jumlahLuar = absensi.filter((a) => a.status === 'luar').length
   const jumlahTidakApel = absensi.filter((a) => a.status === 'tidak_apel').length
@@ -75,7 +74,7 @@ export default function RiwayatPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div className="bg-white/60 border border-ink/10 rounded-xl2 p-4">
-          <p className="text-xs text-ink/50 font-mono">Hari Kerja</p>
+          <p className="text-xs text-ink/50 font-mono">Hari Absen</p>
           <p className="font-display text-2xl mt-1">{hariKerja}</p>
         </div>
         <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-4">

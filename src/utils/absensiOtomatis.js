@@ -2,11 +2,11 @@ import { collection, getDocs, addDoc, query, where, serverTimestamp } from 'fire
 import { db } from '../firebase'
 import { daftarTanggalKerja, sudahLewatBatasApel } from './date'
 
-// Untuk periode (bulan/tahun) yang sedang dilihat admin, cek setiap hari kerja yang
+// Untuk periode (bulan/tahun) yang sedang dilihat admin, cek setiap Hari Absen yang
 // batas absen apel-nya sudah lewat (hari sebelumnya, atau hari ini setelah jam 08:00).
 // Pegawai terdaftar yang tidak punya data absen pada hari itu otomatis dicatat "Tidak Apel".
-export async function pastikanTidakApel(tahun, bulan, tanggalLiburSet) {
-  const tanggalTerdampak = daftarTanggalKerja(tahun, bulan, tanggalLiburSet).filter((tgl) => sudahLewatBatasApel(tgl))
+export async function pastikanTidakApel(tahun, bulan, overrideHariAbsen) {
+  const tanggalTerdampak = daftarTanggalKerja(tahun, bulan, overrideHariAbsen).filter((tgl) => sudahLewatBatasApel(tgl))
   if (tanggalTerdampak.length === 0) return
 
   const usersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'pegawai')))

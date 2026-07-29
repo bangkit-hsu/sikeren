@@ -19,12 +19,12 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Absensi: cek lokasi GPS otomatis dibandingkan dengan titik koordinat kantor → status **"Berada Sesuai Lokasi"** atau **"Berada Diluar Lokasi"**.
 - Jika sesuai lokasi, keterangan otomatis terisi **"Apel Pagi"**. Jika diluar lokasi, wajib pilih keterangan: **Apel Gabungan**, **Apel Hari Besar**, atau **WFH**.
 - Batas absen apel pagi adalah **pukul 08:00**. Pegawai terdaftar yang belum absen setelah jam tersebut otomatis tercatat **"Tidak Apel"** (lihat penjelasan di bawah) — namun tetap bisa absen kapan saja setelahnya untuk menggantikan catatan otomatis tersebut dengan absen yang sesungguhnya.
-- Riwayat Saya: rekap absensi pribadi per periode (bulan/tahun), lengkap dengan jumlah hari kerja.
+- Riwayat Saya: rekap absensi pribadi per periode (bulan/tahun), lengkap dengan jumlah Hari Absen.
 
 **Menu Admin** (login NIP & password di `/login`)
 - Rekap Pegawai: akumulasi kehadiran seluruh pegawai per periode (bulan/tahun).
 - Area Lokasi: atur titik koordinat (latitude/longitude) & radius toleransi lokasi apel.
-- Hari Libur: tentukan tanggal libur/cuti bersama agar tidak dihitung sebagai hari kerja (Sabtu & Minggu otomatis dikecualikan).
+- Hari Absen: cek list tiap tanggal dalam sebulan (bawaan Senin–Jumat) dan ubah langsung mana saja yang dihitung sebagai Hari Absen Apel — misalnya meniadakan tanggal libur nasional, atau menambahkan Sabtu untuk apel khusus. Jumlah ini dipakai untuk menghitung persentase kehadiran di Rekap Pegawai & Riwayat Saya.
 - Kelola Pegawai: tambah/hapus akun pegawai & admin, lihat status rekam wajah tiap pegawai.
 - Koreksi Absensi: ubah, hapus, atau tambahkan data absen pegawai secara manual untuk koreksi.
 - Setiap kali admin membuka **Rekap Pegawai** untuk bulan berjalan, aplikasi otomatis mengecek pegawai terdaftar yang belum absen setelah pukul 08:00 dan mencatatnya sebagai **"Tidak Apel"** — tidak perlu tindakan manual apa pun.
@@ -112,7 +112,7 @@ Firestore biasanya tidak membatasi domain, tapi jika suatu saat menambah Firebas
 users/{id}        { nip, nama, bagian, jabatan, passwordHash, role: 'admin' | 'pegawai',
                       faceDescriptor?: number[128] }
 settings/lokasi    { nama, lat, lng, radius }
-settings/libur     { tanggal: [ 'YYYY-MM-DD', ... ], detail: [{ tanggal, keterangan }] }
+settings/hariAbsen { override: { 'YYYY-MM-DD': true|false, ... } } — hanya tanggal yang beda dari bawaan (Senin-Jumat)
 absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
                       keterangan: 'gabungan' | 'senam' | 'wfh' | null,
                       lat, lng, jarakMeter, dibuat }

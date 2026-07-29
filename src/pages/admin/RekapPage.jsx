@@ -11,7 +11,7 @@ export default function RekapPage() {
   const [bulan, setBulan] = useState(now.getMonth())
   const [pegawai, setPegawai] = useState([])
   const [absensi, setAbsensi] = useState([])
-  const [hariLibur, setHariLibur] = useState(new Set())
+  const [overrideHariAbsen, setOverrideHariAbsen] = useState({})
   const [memuat, setMemuat] = useState(true)
   const [cari, setCari] = useState('')
 
@@ -24,14 +24,14 @@ export default function RekapPage() {
         .filter((u) => u.role === 'pegawai')
       setPegawai(users)
 
-      const liburSnap = await getDoc(doc(db, 'settings', 'libur'))
-      const liburSet = new Set(liburSnap.exists() ? liburSnap.data().tanggal || [] : [])
-      setHariLibur(liburSet)
+      const hariAbsenSnap = await getDoc(doc(db, 'settings', 'hariAbsen'))
+      const override = hariAbsenSnap.exists() ? hariAbsenSnap.data().override || {} : {}
+      setOverrideHariAbsen(override)
 
       // Hanya jalankan backfill "Tidak Apel" otomatis untuk bulan berjalan (bulan/tahun saat ini),
       // supaya tidak menulis ulang data historis saat admin sekadar melihat-lihat bulan lampau.
       if (tahun === now.getFullYear() && bulan === now.getMonth()) {
-        await pastikanTidakApel(tahun, bulan, liburSet)
+        await pastikanTidakApel(tahun, bulan, override)
       }
 
       const bulanStr = `${tahun}-${String(bulan + 1).padStart(2, '0')}`
@@ -45,7 +45,7 @@ export default function RekapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tahun, bulan])
 
-  const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, hariLibur), [tahun, bulan, hariLibur])
+  const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, overrideHariAbsen), [tahun, bulan, overrideHariAbsen])
 
   const rekap = useMemo(() => {
     return pegawai
@@ -76,7 +76,7 @@ export default function RekapPage() {
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display font-semibold text-2xl">Rekap Absensi Pegawai</h1>
-          <p className="text-ink/60 text-sm">Akumulasi kehadiran per periode · {hariKerja} hari kerja bulan ini</p>
+          <p className="text-ink/60 text-sm">Akumulasi kehadiran per periode · {hariKerja} Hari Absen bulan ini</p>
         </div>
         <div className="flex gap-2">
           <select value={bulan} onChange={(e) => setBulan(Number(e.target.value))} className="rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm">
@@ -113,7 +113,7 @@ export default function RekapPage() {
                 <th className="px-4 py-3">Apel Hari Besar</th>
                 <th className="px-4 py-3">WFH</th>
                 <th className="px-4 py-3">Total Hadir</th>
-                <th className="px-4 py-3">% dari Hari Kerja</th>
+                <th className="px-4 py-3">% dari Hari Absen</th>
                 <th className="px-4 py-3">Aksi</th>
               </tr>
             </thead>
