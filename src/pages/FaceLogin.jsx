@@ -211,9 +211,8 @@ export default function FaceLogin() {
             </div>
           )}
           {(tahap === 'dikenali' || tahap === 'mengecek_lokasi' || tahap === 'siap_absen' || tahap === 'mengirim' || tahap === 'sukses' || tahap === 'sudah_absen') && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-moss-700/85 text-paper text-center px-4">
-              <p className="font-display text-lg font-semibold">Wajah dikenali</p>
-              <p className="text-sm mt-1">{pegawaiDikenali?.nama}</p>
+            <div className="absolute inset-x-0 bottom-0 bg-moss-800/80 text-paper text-center px-4 py-3">
+              <p className="font-display font-semibold">Wajah dikenali · {pegawaiDikenali?.nama}</p>
             </div>
           )}
           {tahap === 'tidak_dikenali' && (
@@ -307,6 +306,7 @@ export default function FaceLogin() {
                   <div className="space-y-1 text-sm">
                     <p><span className="text-ink/40">NIP</span> <span className="font-mono ml-1">{pegawaiDikenali.nip}</span></p>
                     <p><span className="text-ink/40">Nama</span> <span className="font-medium ml-1">{pegawaiDikenali.nama}</span></p>
+                    <p><span className="text-ink/40">Bagian</span> <span className="ml-1">{pegawaiDikenali.bagian}</span></p>
                     <p><span className="text-ink/40">Jabatan</span> <span className="ml-1">{pegawaiDikenali.jabatan}</span></p>
                   </div>
                 </div>

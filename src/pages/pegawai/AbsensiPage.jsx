@@ -187,6 +187,7 @@ export default function AbsensiPage() {
             <div className="space-y-1 text-sm">
               <p><span className="text-ink/40">NIP</span> <span className="font-mono ml-1">{user.nip}</span></p>
               <p><span className="text-ink/40">Nama</span> <span className="font-medium ml-1">{user.nama}</span></p>
+              <p><span className="text-ink/40">Bagian</span> <span className="ml-1">{user.bagian}</span></p>
               <p><span className="text-ink/40">Jabatan</span> <span className="ml-1">{user.jabatan}</span></p>
             </div>
           </div>
