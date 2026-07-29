@@ -48,7 +48,7 @@ export default function RiwayatPage() {
         <div>
           <h1 className="font-display font-semibold text-2xl">Riwayat Absensi Saya</h1>
           <p className="text-ink/60 text-sm">
-            <span className="font-mono">NIP {user.nip}</span> · {user.bagian}
+            <span className="font-mono">NIP {user.nip}</span> · {user.bagian} · {user.jabatan}
           </p>
         </div>
         <div className="flex gap-2">

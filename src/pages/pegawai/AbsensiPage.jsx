@@ -177,19 +177,17 @@ export default function AbsensiPage() {
                 {sesuaiLokasi ? 'Berada Sesuai Lokasi' : 'Berada Diluar Lokasi'}
               </span>
             </div>
-            <p className="text-sm text-ink/70 mb-3">
-              <span className="text-ink/40">Keterangan Area:</span>{' '}
+            <p className="text-sm text-ink/70">
               <span className="font-medium">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
             </p>
-            <div className="grid grid-cols-2 gap-3 font-mono text-sm text-ink/70">
-              <div>
-                <p className="text-xs text-ink/40">Jarak dari titik apel</p>
-                <p className="text-ink font-medium">{Math.round(jarak)} m</p>
-              </div>
-              <div>
-                <p className="text-xs text-ink/40">Koordinat kamu</p>
-                <p className="text-ink font-medium">{posisi.lat.toFixed(5)}, {posisi.lng.toFixed(5)}</p>
-              </div>
+          </div>
+
+          <div className="rounded-xl2 border border-ink/10 bg-white/60 p-6">
+            <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Informasi Karyawan</p>
+            <div className="space-y-1 text-sm">
+              <p><span className="text-ink/40">NIP</span> <span className="font-mono ml-1">{user.nip}</span></p>
+              <p><span className="text-ink/40">Nama</span> <span className="font-medium ml-1">{user.nama}</span></p>
+              <p><span className="text-ink/40">Jabatan</span> <span className="ml-1">{user.jabatan}</span></p>
             </div>
           </div>
 

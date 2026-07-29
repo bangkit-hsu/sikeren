@@ -277,7 +277,7 @@ export default function KoreksiPage() {
         <>
           {pegawaiTerpilih && (
             <p className="text-sm text-ink/60 mb-3">
-              <span className="font-medium text-ink">{pegawaiTerpilih.nama}</span> · <span className="font-mono">NIP {pegawaiTerpilih.nip}</span> · {pegawaiTerpilih.bagian}
+              <span className="font-medium text-ink">{pegawaiTerpilih.nama}</span> · <span className="font-mono">NIP {pegawaiTerpilih.nip}</span> · {pegawaiTerpilih.bagian} · {pegawaiTerpilih.jabatan}
             </p>
           )}
           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">

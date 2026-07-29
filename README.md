@@ -12,7 +12,7 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Data wajah yang tersimpan juga dipakai sebagai metode login — begitu wajah dikenali, pegawai otomatis punya sesi penuh untuk melihat **Riwayat Saya**, tidak hanya untuk mencatat absen hari itu.
 
 **Pendaftaran Mandiri (`/daftar-wajah`)**
-- Pegawai baru mengisi NIP, Nama, Bagian, dan password cadangan, lalu merekam wajah lewat kamera (beberapa jepretan dirata-ratakan agar lebih akurat).
+- Pegawai baru mengisi NIP, Nama, Bagian (pilih dari daftar, bisa ketik untuk filter cepat), Jabatan, dan password cadangan, lalu merekam wajah lewat kamera (beberapa jepretan dirata-ratakan agar lebih akurat).
 - Data langsung tersimpan dan bisa dipakai untuk absen wajah saat itu juga.
 
 **Menu Pegawai** (setelah masuk lewat wajah atau NIP/password)
@@ -109,7 +109,7 @@ Firestore biasanya tidak membatasi domain, tapi jika suatu saat menambah Firebas
 ## Struktur data Firestore
 
 ```
-users/{id}        { nip, nama, bagian, passwordHash, role: 'admin' | 'pegawai',
+users/{id}        { nip, nama, bagian, jabatan, passwordHash, role: 'admin' | 'pegawai',
                       faceDescriptor?: number[128] }
 settings/lokasi    { nama, lat, lng, radius }
 settings/libur     { tanggal: [ 'YYYY-MM-DD', ... ], detail: [{ tanggal, keterangan }] }
@@ -119,6 +119,8 @@ absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
 ```
 
 ## Batasan yang perlu diketahui
+
+- Pilihan **Bagian** memakai daftar tetap di `src/utils/bagian.js` (Administrasi Pembangunan, Hukum, Kesra, Organisasi, Pemerintahan, Pengadaan Barang dan Jasa, Perekonomian dan SDA, Protokol dan Komunikasi Pimpinan, Umum). Untuk menambah/mengubah daftar bagian, edit file tersebut lalu deploy ulang.
 
 - "Tidak Apel" otomatis bukan proses cron/server terjadwal (aplikasi ini tidak punya backend) — pencatatannya dipicu saat admin membuka halaman **Rekap Pegawai**. Jika halaman itu tidak pernah dibuka pada suatu hari, pencatatan otomatisnya akan tertunda sampai admin membukanya lagi (dan tetap akan mencatat mundur untuk hari-hari yang terlewat di bulan berjalan).
 - Login memakai hash password sederhana (SHA-256) yang disimpan di Firestore, bukan Firebase Authentication penuh. Cukup untuk pemakaian internal, tapi untuk keamanan tingkat produksi sebaiknya dimigrasikan ke Firebase Authentication + Cloud Functions.

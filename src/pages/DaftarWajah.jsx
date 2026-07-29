@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { collection, getDocs, query, where, addDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { hashPassword } from '../utils/hash'
+import PilihBagian from '../components/PilihBagian.jsx'
 import {
   muatModelWajah, nyalakanKamera, matikanKamera,
   ambilDescriptorDariVideo, rataRataDescriptor,
@@ -20,7 +21,7 @@ export default function DaftarWajah() {
   const [jumlahTertangkap, setJumlahTertangkap] = useState(0)
   const [descriptorRekam, setDescriptorRekam] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
-  const [form, setForm] = useState({ nip: '', nama: '', bagian: '', password: '' })
+  const [form, setForm] = useState({ nip: '', nama: '', bagian: '', jabatan: '', password: '' })
 
   useEffect(() => {
     return () => matikanKamera(streamRef.current)
@@ -28,7 +29,7 @@ export default function DaftarWajah() {
 
   function handleFormSubmit(e) {
     e.preventDefault()
-    if (!form.nip || !form.nama || !form.bagian || !form.password) return
+    if (!form.nip || !form.nama || !form.bagian || !form.jabatan || !form.password) return
     mulaiRekamWajah()
   }
 
@@ -83,6 +84,7 @@ export default function DaftarWajah() {
         nip,
         nama: form.nama.trim(),
         bagian: form.bagian.trim(),
+        jabatan: form.jabatan.trim(),
         passwordHash,
         role: 'pegawai',
         faceDescriptor: descriptorRekam,
@@ -130,10 +132,17 @@ export default function DaftarWajah() {
             </div>
             <div>
               <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bagian</label>
+              <div className="mt-1">
+                <PilihBagian value={form.bagian} onChange={(v) => setForm({ ...form, bagian: v })} required />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Jabatan</label>
               <input
-                value={form.bagian}
-                onChange={(e) => setForm({ ...form, bagian: e.target.value })}
+                value={form.jabatan}
+                onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
                 required
+                placeholder="mis. Staf, Kepala Sub Bagian, dsb."
                 className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white focus:border-moss-600 outline-none"
               />
             </div>
