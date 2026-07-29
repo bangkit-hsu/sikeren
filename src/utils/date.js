@@ -42,3 +42,19 @@ export function daftarTanggalKerja(tahun, bulan, tanggalLiburSet) {
   }
   return list
 }
+
+// Batas waktu absen apel pagi. Setelah jam ini, pegawai terdaftar yang belum
+// absen pada hari itu dianggap "Tidak Apel" secara otomatis.
+export const BATAS_JAM_APEL = '08:00'
+
+// Mengecek apakah batas absen apel untuk tanggal (YYYY-MM-DD) tertentu sudah lewat.
+// Tanggal di masa lalu selalu dianggap sudah lewat; tanggal di masa depan belum.
+export function sudahLewatBatasApel(tanggalIso, sekarang = new Date()) {
+  const hariIniStr = formatTanggal(sekarang)
+  if (tanggalIso < hariIniStr) return true
+  if (tanggalIso > hariIniStr) return false
+  const [jam, menit] = BATAS_JAM_APEL.split(':').map(Number)
+  const batas = new Date(sekarang)
+  batas.setHours(jam, menit, 0, 0)
+  return sekarang >= batas
+}

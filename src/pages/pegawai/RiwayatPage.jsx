@@ -3,8 +3,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db } from '../../firebase'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
-
-const LABEL_KETERANGAN = { gabungan: 'Absen Gabungan', senam: 'Senam', wfh: 'WFH' }
+import { LABEL_KETERANGAN } from '../../utils/keterangan'
 
 export default function RiwayatPage() {
   const { user } = useAuth()
@@ -41,6 +40,7 @@ export default function RiwayatPage() {
   const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, hariLibur), [tahun, bulan, hariLibur])
   const jumlahSesuai = absensi.filter((a) => a.status === 'sesuai').length
   const jumlahLuar = absensi.filter((a) => a.status === 'luar').length
+  const jumlahTidakApel = absensi.filter((a) => a.status === 'tidak_apel').length
 
   return (
     <div>
@@ -73,7 +73,7 @@ export default function RiwayatPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div className="bg-white/60 border border-ink/10 rounded-xl2 p-4">
           <p className="text-xs text-ink/50 font-mono">Hari Kerja</p>
           <p className="font-display text-2xl mt-1">{hariKerja}</p>
@@ -85,6 +85,10 @@ export default function RiwayatPage() {
         <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-4">
           <p className="text-xs text-clay font-mono">Diluar Lokasi</p>
           <p className="font-display text-2xl mt-1 text-clay">{jumlahLuar}</p>
+        </div>
+        <div className="bg-ink/5 border border-ink/10 rounded-xl2 p-4">
+          <p className="text-xs text-ink/50 font-mono">Tidak Apel</p>
+          <p className="font-display text-2xl mt-1 text-ink/70">{jumlahTidakApel}</p>
         </div>
       </div>
 
@@ -107,13 +111,15 @@ export default function RiwayatPage() {
               {absensi.map((a, i) => (
                 <tr key={i}>
                   <td className="px-4 py-3 font-mono">{a.tanggal}</td>
-                  <td className="px-4 py-3 font-mono">{a.jam}</td>
+                  <td className="px-4 py-3 font-mono">{a.jam || '–'}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${a.status === 'sesuai' ? 'bg-moss-700 text-paper' : 'bg-clay text-paper'}`}>
-                      {a.status === 'sesuai' ? 'Sesuai Lokasi' : 'Diluar Lokasi'}
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      a.status === 'sesuai' ? 'bg-moss-700 text-paper' : a.status === 'luar' ? 'bg-clay text-paper' : 'bg-ink/20 text-ink'
+                    }`}>
+                      {a.status === 'sesuai' ? 'Sesuai Lokasi' : a.status === 'luar' ? 'Diluar Lokasi' : 'Tidak Apel'}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{a.keterangan ? LABEL_KETERANGAN[a.keterangan] : '–'}</td>
+                  <td className="px-4 py-3">{a.keterangan ? (LABEL_KETERANGAN[a.keterangan] || a.keterangan) : '–'}</td>
                 </tr>
               ))}
             </tbody>

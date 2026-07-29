@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
 import {
-  doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp,
+  doc, getDoc, collection, query, where, getDocs, addDoc, deleteDoc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { hitungJarakMeter, ambilLokasiSaatIni } from '../../utils/geo'
 import { formatTanggal, formatJam } from '../../utils/date'
-
-const KETERANGAN_LUAR = [
-  { value: 'gabungan', label: 'Absen Gabungan' },
-  { value: 'senam', label: 'Senam' },
-  { value: 'wfh', label: 'WFH' },
-]
+import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI, LABEL_KETERANGAN } from '../../utils/keterangan'
 
 export default function AbsensiPage() {
   const { user } = useAuth()
@@ -22,6 +17,7 @@ export default function AbsensiPage() {
   const [errorMsg, setErrorMsg] = useState('')
   const [keterangan, setKeterangan] = useState('')
   const [sudahAbsenHariIni, setSudahAbsenHariIni] = useState(null)
+  const [placeholderTidakApelId, setPlaceholderTidakApelId] = useState(null)
   const [mengirim, setMengirim] = useState(false)
   const [pesanSukses, setPesanSukses] = useState('')
   const [memuat, setMemuat] = useState(true)
@@ -39,7 +35,16 @@ export default function AbsensiPage() {
         where('tanggal', '==', hariIni),
       )
       const snap = await getDocs(q)
-      setSudahAbsenHariIni(snap.empty ? null : snap.docs[0].data())
+      if (!snap.empty) {
+        const docSnap = snap.docs[0]
+        const data = docSnap.data()
+        // Placeholder "Tidak Apel" otomatis bukan absen sungguhan — biarkan pegawai tetap bisa absen.
+        if (data.status === 'tidak_apel' && data.otomatis) {
+          setPlaceholderTidakApelId(docSnap.id)
+        } else {
+          setSudahAbsenHariIni(data)
+        }
+      }
       setMemuat(false)
     }
     init()
@@ -77,13 +82,16 @@ export default function AbsensiPage() {
         tanggal: formatTanggal(now),
         jam: formatJam(now),
         status: sesuaiLokasi ? 'sesuai' : 'luar',
-        keterangan: sesuaiLokasi ? null : keterangan,
+        keterangan: sesuaiLokasi ? KETERANGAN_OTOMATIS_SESUAI : keterangan,
         lat: posisi.lat,
         lng: posisi.lng,
         jarakMeter: jarak !== null ? Math.round(jarak) : null,
         dibuat: serverTimestamp(),
       }
       await addDoc(collection(db, 'absensi'), data)
+      if (placeholderTidakApelId) {
+        await deleteDoc(doc(db, 'absensi', placeholderTidakApelId))
+      }
       setSudahAbsenHariIni(data)
       setPesanSukses('Absen apel berhasil dicatat.')
     } catch (err) {
@@ -116,7 +124,7 @@ export default function AbsensiPage() {
             </span>
             {sudahAbsenHariIni.keterangan && (
               <span className="px-2.5 py-1 rounded-full bg-sand font-medium">
-                {KETERANGAN_LUAR.find((k) => k.value === sudahAbsenHariIni.keterangan)?.label}
+                {LABEL_KETERANGAN[sudahAbsenHariIni.keterangan] || sudahAbsenHariIni.keterangan}
               </span>
             )}
           </div>
@@ -169,6 +177,10 @@ export default function AbsensiPage() {
                 {sesuaiLokasi ? 'Berada Sesuai Lokasi' : 'Berada Diluar Lokasi'}
               </span>
             </div>
+            <p className="text-sm text-ink/70 mb-3">
+              <span className="text-ink/40">Keterangan Area:</span>{' '}
+              <span className="font-medium">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
+            </p>
             <div className="grid grid-cols-2 gap-3 font-mono text-sm text-ink/70">
               <div>
                 <p className="text-xs text-ink/40">Jarak dari titik apel</p>
@@ -180,6 +192,12 @@ export default function AbsensiPage() {
               </div>
             </div>
           </div>
+
+          {sesuaiLokasi && (
+            <p className="text-sm text-ink/60">
+              Keterangan: <span className="font-medium text-ink">Apel Pagi</span> (otomatis)
+            </p>
+          )}
 
           {!sesuaiLokasi && (
             <div>
@@ -207,13 +225,22 @@ export default function AbsensiPage() {
 
           {errorMsg && <p className="text-sm text-clay">{errorMsg}</p>}
 
-          <button
-            onClick={handleAbsen}
-            disabled={mengirim || (!sesuaiLokasi && !keterangan)}
-            className="w-full bg-moss-700 text-paper font-medium rounded-xl2 py-3.5 hover:bg-moss-800 transition-colors disabled:opacity-50"
-          >
-            {mengirim ? 'Menyimpan…' : 'Catat Absen Apel'}
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={cekLokasi}
+              disabled={mengirim}
+              className="flex-1 border border-ink/15 font-medium rounded-xl2 py-3.5 hover:bg-ink/5 transition-colors disabled:opacity-50"
+            >
+              Sync Lokasi
+            </button>
+            <button
+              onClick={handleAbsen}
+              disabled={mengirim || (!sesuaiLokasi && !keterangan)}
+              className="flex-1 bg-moss-700 text-paper font-medium rounded-xl2 py-3.5 hover:bg-moss-800 transition-colors disabled:opacity-50"
+            >
+              {mengirim ? 'Menyimpan…' : 'Catat Absen Apel'}
+            </button>
+          </div>
         </div>
       )}
 

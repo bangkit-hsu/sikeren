@@ -5,13 +5,35 @@ import {
 } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan } from '../../utils/date'
+import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI } from '../../utils/keterangan'
 
-const OPSI_KETERANGAN = [
-  { value: '', label: '–' },
-  { value: 'gabungan', label: 'Absen Gabungan' },
-  { value: 'senam', label: 'Senam' },
-  { value: 'wfh', label: 'WFH' },
+const OPSI_STATUS = [
+  { value: 'sesuai', label: 'Sesuai Lokasi' },
+  { value: 'luar', label: 'Diluar Lokasi' },
+  { value: 'tidak_apel', label: 'Tidak Apel' },
 ]
+
+function keteranganUntukStatus(status, keteranganLuar) {
+  if (status === 'luar') return keteranganLuar || null
+  if (status === 'sesuai') return KETERANGAN_OTOMATIS_SESUAI
+  return null
+}
+
+function SelectKeterangan({ status, value, onChange }) {
+  return (
+    <select
+      value={status === 'luar' ? value : ''}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={status !== 'luar'}
+      className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white text-sm disabled:opacity-40"
+    >
+      <option value="">
+        {status === 'sesuai' ? 'Apel Pagi (otomatis)' : status === 'tidak_apel' ? '–' : 'Pilih…'}
+      </option>
+      {KETERANGAN_LUAR.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  )
+}
 
 function BarisKosong({ pegawaiId, onTersimpan }) {
   const [tanggal, setTanggal] = useState('')
@@ -29,9 +51,9 @@ function BarisKosong({ pegawaiId, onTersimpan }) {
       await addDoc(collection(db, 'absensi'), {
         uid: pegawaiId,
         tanggal,
-        jam,
+        jam: status === 'tidak_apel' ? null : jam,
         status,
-        keterangan: status === 'luar' ? (keterangan || null) : null,
+        keterangan: keteranganUntukStatus(status, keterangan),
         dikoreksiAdmin: true,
         dibuat: serverTimestamp(),
       })
@@ -53,23 +75,20 @@ function BarisKosong({ pegawaiId, onTersimpan }) {
         <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white font-mono text-sm" />
       </td>
       <td className="px-4 py-2">
-        <input type="time" step="1" value={jam} onChange={(e) => setJam(e.target.value)} className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white font-mono text-sm w-28" />
+        <input
+          type="time" step="1" value={jam}
+          onChange={(e) => setJam(e.target.value)}
+          disabled={status === 'tidak_apel'}
+          className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white font-mono text-sm w-28 disabled:opacity-40"
+        />
       </td>
       <td className="px-4 py-2">
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white text-sm">
-          <option value="sesuai">Sesuai Lokasi</option>
-          <option value="luar">Diluar Lokasi</option>
+          {OPSI_STATUS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </td>
       <td className="px-4 py-2">
-        <select
-          value={keterangan}
-          onChange={(e) => setKeterangan(e.target.value)}
-          disabled={status !== 'luar'}
-          className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white text-sm disabled:opacity-40"
-        >
-          {OPSI_KETERANGAN.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+        <SelectKeterangan status={status} value={keterangan} onChange={setKeterangan} />
       </td>
       <td className="px-4 py-2">
         <button
@@ -87,25 +106,27 @@ function BarisKosong({ pegawaiId, onTersimpan }) {
 
 function BarisAbsensi({ item, onUbah }) {
   const [status, setStatus] = useState(item.status)
-  const [keterangan, setKeterangan] = useState(item.keterangan || '')
+  const [keterangan, setKeterangan] = useState(item.keterangan && item.keterangan !== KETERANGAN_OTOMATIS_SESUAI ? item.keterangan : '')
   const [jam, setJam] = useState(item.jam || '')
   const [menyimpan, setMenyimpan] = useState(false)
   const [menghapus, setMenghapus] = useState(false)
   const [pesan, setPesan] = useState('')
 
-  const adaPerubahan = status !== item.status || (keterangan || '') !== (item.keterangan || '') || jam !== item.jam
+  const adaPerubahan = status !== item.status || keterangan !== (item.keterangan && item.keterangan !== KETERANGAN_OTOMATIS_SESUAI ? item.keterangan : '') || jam !== (item.jam || '')
 
   async function simpan() {
     setMenyimpan(true)
     setPesan('')
     try {
+      const keteranganBaru = keteranganUntukStatus(status, keterangan)
+      const jamBaru = status === 'tidak_apel' ? null : jam
       await updateDoc(doc(db, 'absensi', item.id), {
         status,
-        keterangan: status === 'luar' ? (keterangan || null) : null,
-        jam,
+        keterangan: keteranganBaru,
+        jam: jamBaru,
         dikoreksiAdmin: true,
       })
-      onUbah({ ...item, status, keterangan: status === 'luar' ? keterangan || null : null, jam })
+      onUbah({ ...item, status, keterangan: keteranganBaru, jam: jamBaru })
       setPesan('Tersimpan.')
     } catch (err) {
       setPesan('Gagal: ' + err.message)
@@ -130,23 +151,20 @@ function BarisAbsensi({ item, onUbah }) {
     <tr>
       <td className="px-4 py-2 font-mono">{item.tanggal}</td>
       <td className="px-4 py-2">
-        <input type="time" step="1" value={jam} onChange={(e) => setJam(e.target.value)} className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white font-mono text-sm w-28" />
+        <input
+          type="time" step="1" value={jam || ''}
+          onChange={(e) => setJam(e.target.value)}
+          disabled={status === 'tidak_apel'}
+          className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white font-mono text-sm w-28 disabled:opacity-40"
+        />
       </td>
       <td className="px-4 py-2">
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white text-sm">
-          <option value="sesuai">Sesuai Lokasi</option>
-          <option value="luar">Diluar Lokasi</option>
+          {OPSI_STATUS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </td>
       <td className="px-4 py-2">
-        <select
-          value={keterangan}
-          onChange={(e) => setKeterangan(e.target.value)}
-          disabled={status !== 'luar'}
-          className="rounded-lg border border-ink/15 px-2 py-1.5 bg-white text-sm disabled:opacity-40"
-        >
-          {OPSI_KETERANGAN.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+        <SelectKeterangan status={status} value={keterangan} onChange={setKeterangan} />
       </td>
       <td className="px-4 py-2">
         <div className="flex items-center gap-2">

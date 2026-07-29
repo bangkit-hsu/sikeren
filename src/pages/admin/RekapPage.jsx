@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
+import { pastikanTidakApel } from '../../utils/absensiOtomatis'
 
 export default function RekapPage() {
   const now = new Date()
@@ -23,16 +24,25 @@ export default function RekapPage() {
         .filter((u) => u.role === 'pegawai')
       setPegawai(users)
 
+      const liburSnap = await getDoc(doc(db, 'settings', 'libur'))
+      const liburSet = new Set(liburSnap.exists() ? liburSnap.data().tanggal || [] : [])
+      setHariLibur(liburSet)
+
+      // Hanya jalankan backfill "Tidak Apel" otomatis untuk bulan berjalan (bulan/tahun saat ini),
+      // supaya tidak menulis ulang data historis saat admin sekadar melihat-lihat bulan lampau.
+      if (tahun === now.getFullYear() && bulan === now.getMonth()) {
+        await pastikanTidakApel(tahun, bulan, liburSet)
+      }
+
       const bulanStr = `${tahun}-${String(bulan + 1).padStart(2, '0')}`
       const absensiSnap = await getDocs(collection(db, 'absensi'))
       const data = absensiSnap.docs.map((d) => d.data()).filter((a) => a.tanggal.startsWith(bulanStr))
       setAbsensi(data)
 
-      const liburSnap = await getDoc(doc(db, 'settings', 'libur'))
-      setHariLibur(new Set(liburSnap.exists() ? liburSnap.data().tanggal || [] : []))
       setMemuat(false)
     }
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tahun, bulan])
 
   const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, hariLibur), [tahun, bulan, hariLibur])
@@ -41,14 +51,16 @@ export default function RekapPage() {
     return pegawai
       .map((p) => {
         const milik = absensi.filter((a) => a.uid === p.id)
+        const hadir = milik.filter((a) => a.status !== 'tidak_apel')
         return {
           ...p,
           sesuai: milik.filter((a) => a.status === 'sesuai').length,
           luar: milik.filter((a) => a.status === 'luar').length,
+          tidakApel: milik.filter((a) => a.status === 'tidak_apel').length,
           gabungan: milik.filter((a) => a.keterangan === 'gabungan').length,
-          senam: milik.filter((a) => a.keterangan === 'senam').length,
+          hariBesar: milik.filter((a) => a.keterangan === 'hari_besar').length,
           wfh: milik.filter((a) => a.keterangan === 'wfh').length,
-          total: milik.length,
+          total: hadir.length,
         }
       })
       .filter((p) =>
@@ -86,7 +98,7 @@ export default function RekapPage() {
         <p className="text-ink/50 font-mono text-sm">Memuat…</p>
       ) : (
         <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-          <table className="w-full text-sm min-w-[860px]">
+          <table className="w-full text-sm min-w-[960px]">
             <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
               <tr>
                 <th className="px-4 py-3">NIP</th>
@@ -94,8 +106,9 @@ export default function RekapPage() {
                 <th className="px-4 py-3">Bagian</th>
                 <th className="px-4 py-3">Sesuai Lokasi</th>
                 <th className="px-4 py-3">Diluar Lokasi</th>
-                <th className="px-4 py-3">Absen Gabungan</th>
-                <th className="px-4 py-3">Senam</th>
+                <th className="px-4 py-3">Tidak Apel</th>
+                <th className="px-4 py-3">Apel Gabungan</th>
+                <th className="px-4 py-3">Apel Hari Besar</th>
                 <th className="px-4 py-3">WFH</th>
                 <th className="px-4 py-3">Total Hadir</th>
                 <th className="px-4 py-3">% dari Hari Kerja</th>
@@ -110,8 +123,11 @@ export default function RekapPage() {
                   <td className="px-4 py-3">{p.bagian}</td>
                   <td className="px-4 py-3">{p.sesuai}</td>
                   <td className="px-4 py-3">{p.luar}</td>
+                  <td className="px-4 py-3">
+                    {p.tidakApel > 0 ? <span className="text-clay font-medium">{p.tidakApel}</span> : p.tidakApel}
+                  </td>
                   <td className="px-4 py-3">{p.gabungan}</td>
-                  <td className="px-4 py-3">{p.senam}</td>
+                  <td className="px-4 py-3">{p.hariBesar}</td>
                   <td className="px-4 py-3">{p.wfh}</td>
                   <td className="px-4 py-3 font-semibold">{p.total}</td>
                   <td className="px-4 py-3 font-mono">
@@ -125,12 +141,16 @@ export default function RekapPage() {
                 </tr>
               ))}
               {rekap.length === 0 && (
-                <tr><td colSpan={11} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
+                <tr><td colSpan={12} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
               )}
             </tbody>
           </table>
         </div>
       )}
+
+      <p className="text-xs text-ink/40 mt-4 font-mono">
+        "Tidak Apel" tercatat otomatis untuk pegawai terdaftar yang belum absen setelah pukul 08:00.
+      </p>
     </div>
   )
 }

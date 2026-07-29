@@ -17,7 +17,8 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 
 **Menu Pegawai** (setelah masuk lewat wajah atau NIP/password)
 - Absensi: cek lokasi GPS otomatis dibandingkan dengan titik koordinat kantor → status **"Berada Sesuai Lokasi"** atau **"Berada Diluar Lokasi"**.
-- Jika diluar lokasi, wajib pilih keterangan: **Absen Gabungan**, **Senam**, atau **WFH**.
+- Jika sesuai lokasi, keterangan otomatis terisi **"Apel Pagi"**. Jika diluar lokasi, wajib pilih keterangan: **Apel Gabungan**, **Apel Hari Besar**, atau **WFH**.
+- Batas absen apel pagi adalah **pukul 08:00**. Pegawai terdaftar yang belum absen setelah jam tersebut otomatis tercatat **"Tidak Apel"** (lihat penjelasan di bawah) — namun tetap bisa absen kapan saja setelahnya untuk menggantikan catatan otomatis tersebut dengan absen yang sesungguhnya.
 - Riwayat Saya: rekap absensi pribadi per periode (bulan/tahun), lengkap dengan jumlah hari kerja.
 
 **Menu Admin** (login NIP & password di `/login`)
@@ -25,6 +26,8 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Area Lokasi: atur titik koordinat (latitude/longitude) & radius toleransi lokasi apel.
 - Hari Libur: tentukan tanggal libur/cuti bersama agar tidak dihitung sebagai hari kerja (Sabtu & Minggu otomatis dikecualikan).
 - Kelola Pegawai: tambah/hapus akun pegawai & admin, lihat status rekam wajah tiap pegawai.
+- Koreksi Absensi: ubah, hapus, atau tambahkan data absen pegawai secara manual untuk koreksi.
+- Setiap kali admin membuka **Rekap Pegawai** untuk bulan berjalan, aplikasi otomatis mengecek pegawai terdaftar yang belum absen setelah pukul 08:00 dan mencatatnya sebagai **"Tidak Apel"** — tidak perlu tindakan manual apa pun.
 
 ## 1. Setup Firebase (sekali saja)
 
@@ -117,6 +120,7 @@ absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
 
 ## Batasan yang perlu diketahui
 
+- "Tidak Apel" otomatis bukan proses cron/server terjadwal (aplikasi ini tidak punya backend) — pencatatannya dipicu saat admin membuka halaman **Rekap Pegawai**. Jika halaman itu tidak pernah dibuka pada suatu hari, pencatatan otomatisnya akan tertunda sampai admin membukanya lagi (dan tetap akan mencatat mundur untuk hari-hari yang terlewat di bulan berjalan).
 - Login memakai hash password sederhana (SHA-256) yang disimpan di Firestore, bukan Firebase Authentication penuh. Cukup untuk pemakaian internal, tapi untuk keamanan tingkat produksi sebaiknya dimigrasikan ke Firebase Authentication + Cloud Functions.
 - Akurasi lokasi bergantung pada GPS perangkat pegawai (bisa meleset beberapa meter, terutama di dalam gedung).
 - Radius sebaiknya disesuaikan dengan kondisi lapangan (mis. 50–150 meter) agar tidak terlalu ketat/longgar.
