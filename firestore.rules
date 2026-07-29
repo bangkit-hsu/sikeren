@@ -30,7 +30,10 @@ service cloud.firestore {
     match /absensi/{docId} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasAll(['uid', 'tanggal', 'jam', 'status']);
-      allow update, delete: if false; // riwayat absen tidak boleh diubah/dihapus dari client
+      // Diizinkan agar admin bisa mengoreksi (ubah/hapus) data absen yang sudah tersimpan
+      // lewat menu Koreksi Absensi. Karena tidak ada Firebase Authentication di aplikasi ini,
+      // rules ini tidak bisa membatasi hanya ke admin — lihat catatan keamanan di bagian atas file.
+      allow update, delete: if true;
     }
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
@@ -98,6 +99,7 @@ export default function RekapPage() {
                 <th className="px-4 py-3">WFH</th>
                 <th className="px-4 py-3">Total Hadir</th>
                 <th className="px-4 py-3">% dari Hari Kerja</th>
+                <th className="px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink/10">
@@ -115,10 +117,15 @@ export default function RekapPage() {
                   <td className="px-4 py-3 font-mono">
                     {hariKerja > 0 ? Math.round((p.total / hariKerja) * 100) : 0}%
                   </td>
+                  <td className="px-4 py-3">
+                    <Link to={`/admin/koreksi?uid=${p.id}`} className="text-moss-700 font-medium hover:underline whitespace-nowrap">
+                      Koreksi
+                    </Link>
+                  </td>
                 </tr>
               ))}
               {rekap.length === 0 && (
-                <tr><td colSpan={10} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
+                <tr><td colSpan={11} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
               )}
             </tbody>
           </table>

@@ -8,6 +8,7 @@ const pegawaiNav = [
 
 const adminNav = [
   { to: '/admin/rekap', label: 'Rekap Pegawai' },
+  { to: '/admin/koreksi', label: 'Koreksi Absensi' },
   { to: '/admin/lokasi', label: 'Area Lokasi' },
   { to: '/admin/libur', label: 'Hari Libur' },
   { to: '/admin/pegawai', label: 'Kelola Pegawai' },

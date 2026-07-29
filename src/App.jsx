@@ -9,6 +9,7 @@ import DaftarWajah from './pages/DaftarWajah.jsx'
 import AbsensiPage from './pages/pegawai/AbsensiPage.jsx'
 import RiwayatPage from './pages/pegawai/RiwayatPage.jsx'
 import RekapPage from './pages/admin/RekapPage.jsx'
+import KoreksiPage from './pages/admin/KoreksiPage.jsx'
 import LokasiPage from './pages/admin/LokasiPage.jsx'
 import LiburPage from './pages/admin/LiburPage.jsx'
 import PegawaiPage from './pages/admin/PegawaiPage.jsx'
@@ -34,6 +35,9 @@ export default function App() {
 
       <Route path="/admin/rekap" element={
         <ProtectedRoute role="admin"><Layout><RekapPage /></Layout></ProtectedRoute>
+      } />
+      <Route path="/admin/koreksi" element={
+        <ProtectedRoute role="admin"><Layout><KoreksiPage /></Layout></ProtectedRoute>
       } />
       <Route path="/admin/lokasi" element={
         <ProtectedRoute role="admin"><Layout><LokasiPage /></Layout></ProtectedRoute>
