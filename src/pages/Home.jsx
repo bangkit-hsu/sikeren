@@ -18,50 +18,6 @@ function IkonAdmin() {
   )
 }
 
-function IkonJam() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M12 7v5l3.2 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function IkonKelompok() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-      <circle cx="8" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.6" />
-      <circle cx="16" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M3 19c0-2.8 2.2-5 5-5s5 2.2 5 5M11 19c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function IkonClipboard() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-      <rect x="5" y="4.5" width="14" height="16" rx="2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M9 3.5h6v2.5H9V3.5z" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M8 12.5l2.3 2.2L16.5 9.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function IkonBintang() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-      <path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8L12 3.5z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-const FITUR = [
-  { Ikon: IkonJam, judul: 'Tepat Waktu', teks: 'Absen tercatat otomatis begitu wajah dikenali di jam apel.' },
-  { Ikon: IkonKelompok, judul: 'Radius Lokasi', teks: 'Kehadiran diverifikasi sesuai titik koordinat kantor.' },
-  { Ikon: IkonClipboard, judul: 'Patuh Aturan', teks: 'Absen di luar lokasi tetap tercatat dengan keterangan jelas.' },
-  { Ikon: IkonBintang, judul: 'Rekap Rapi', teks: 'Riwayat & laporan kehadiran tersusun tiap periode.' },
-]
-
 export default function Home() {
   return (
     <div className="min-h-screen">
@@ -129,24 +85,9 @@ export default function Home() {
         </div>
       </div>
 
-      <p className="text-xs text-ink/40 text-center pt-2 pb-6 font-mono px-6">
+      <p className="text-sm text-ink/60 text-center pt-2 pb-10 font-mono px-6">
         Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
       </p>
-
-      {/* Strip fitur */}
-      <div className="max-w-3xl mx-auto px-6 pb-14">
-        <div className="bg-moss-900 text-paper rounded-xl2 p-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {FITUR.map(({ Ikon, judul, teks }) => (
-            <div key={judul} className="text-center sm:text-left">
-              <div className="text-gold-500 mx-auto sm:mx-0 w-fit">
-                <Ikon />
-              </div>
-              <p className="font-display font-semibold mt-2">{judul}</p>
-              <p className="text-paper/60 text-xs mt-1">{teks}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }
