@@ -12,6 +12,7 @@ import {
 import { hitungJarakMeter, ambilLokasiSaatIni } from '../utils/geo'
 import { formatTanggal, formatJam } from '../utils/date'
 import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI, LABEL_KETERANGAN } from '../utils/keterangan'
+import CincinPemindai from '../components/CincinPemindai.jsx'
 
 const BATAS_WAKTU_MS = 3000
 const JEDA_DETEKSI_MS = 350
@@ -195,32 +196,34 @@ export default function FaceLogin() {
     <div className="min-h-screen flex items-center justify-center px-5 py-8">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <h1 className="font-display font-semibold text-2xl">e-Absen</h1>
-          <p className="text-ink/60 text-sm mt-1">Arahkan wajah ke kamera untuk absen otomatis</p>
+          <p className="text-xs font-mono uppercase tracking-wide text-gold-600">e-Absen · Apel Pagi</p>
+          <h1 className="font-display font-semibold text-2xl mt-1">Absensi Wajah</h1>
+          <p className="text-ink/60 text-sm mt-1">Posisikan wajah di dalam bingkai. Kamera mengenali otomatis dalam 3 detik.</p>
         </div>
 
-        {/* Kamera tetap tampil di bagian atas selama proses berlangsung */}
-        <div className="relative aspect-square rounded-xl2 overflow-hidden bg-ink border border-ink/10">
-          <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
+        {/* Kamera bulat, tetap tampil di bagian atas selama proses berlangsung */}
+        <div className="relative aspect-square rounded-full overflow-hidden bg-ink border border-ink/10">
+          <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1] rounded-full" />
           {tahap === 'memindai' && (
-            <div className="absolute inset-6 rounded-full border-2 border-moss-400 radar-ring pointer-events-none" />
+            <CincinPemindai className="absolute inset-0 w-full h-full pointer-events-none" />
           )}
           {tahap === 'menyiapkan' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-paper text-sm font-mono">
+            <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-paper text-sm font-mono rounded-full">
               Menyiapkan kamera…
             </div>
           )}
-          {(tahap === 'dikenali' || tahap === 'mengecek_lokasi' || tahap === 'siap_absen' || tahap === 'mengirim' || tahap === 'sukses' || tahap === 'sudah_absen') && (
-            <div className="absolute inset-x-0 bottom-0 bg-moss-800/80 text-paper text-center px-4 py-3">
-              <p className="font-display font-semibold">Wajah dikenali · {pegawaiDikenali?.nama}</p>
-            </div>
-          )}
           {tahap === 'tidak_dikenali' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-clay/80 text-paper text-sm font-mono text-center px-4">
+            <div className="absolute inset-0 flex items-center justify-center bg-clay/80 text-paper text-sm font-mono text-center px-4 rounded-full">
               Wajah tidak dikenali
             </div>
           )}
         </div>
+
+        {(tahap === 'dikenali' || tahap === 'mengecek_lokasi' || tahap === 'siap_absen' || tahap === 'mengirim' || tahap === 'sukses' || tahap === 'sudah_absen') && pegawaiDikenali && (
+          <p className="text-center font-display font-semibold mt-4">
+            Wajah dikenali : {pegawaiDikenali.nama}
+          </p>
+        )}
 
         {/* Informasi & aksi tampil di bawah kamera */}
         <div className="mt-5">
@@ -295,6 +298,7 @@ export default function FaceLogin() {
                     </span>
                   </div>
                   <p className="text-sm text-ink/70">
+                    <span className="font-semibold text-ink">Lokasi Apel :</span>{' '}
                     <span className="font-medium">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
                   </p>
                 </div>

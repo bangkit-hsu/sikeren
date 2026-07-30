@@ -20,6 +20,11 @@ export default {
         },
         clay: '#c1622d',
         sand: '#e7ddc7',
+        gold: {
+          400: '#d8b84a',
+          500: '#c9a227',
+          600: '#a8841c',
+        },
       },
       fontFamily: {
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],

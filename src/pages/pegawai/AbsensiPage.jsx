@@ -178,6 +178,7 @@ export default function AbsensiPage() {
               </span>
             </div>
             <p className="text-sm text-ink/70">
+              <span className="font-semibold text-ink">Lokasi Apel :</span>{' '}
               <span className="font-medium">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
             </p>
           </div>

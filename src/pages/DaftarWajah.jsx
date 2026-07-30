@@ -8,6 +8,7 @@ import {
   muatModelWajah, nyalakanKamera, matikanKamera,
   ambilDescriptorDariVideo, rataRataDescriptor,
 } from '../utils/face'
+import CincinPemindai from '../components/CincinPemindai.jsx'
 
 const JUMLAH_JEPRETAN = 3
 const JEDA_ANTAR_JEPRETAN_MS = 700
@@ -168,15 +169,15 @@ export default function DaftarWajah() {
 
         {(tahap === 'menyiapkan_kamera' || tahap === 'merekam') && (
           <div>
-            <div className="relative aspect-square rounded-xl2 overflow-hidden bg-ink border border-ink/10">
-              <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
+            <div className="relative aspect-square rounded-full overflow-hidden bg-ink border border-ink/10">
+              <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1] rounded-full" />
               {tahap === 'menyiapkan_kamera' && (
-                <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-paper text-sm font-mono">
+                <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-paper text-sm font-mono rounded-full">
                   Menyiapkan kamera…
                 </div>
               )}
               {tahap === 'merekam' && (
-                <div className="absolute inset-6 rounded-full border-2 border-moss-400 radar-ring pointer-events-none" />
+                <CincinPemindai className="absolute inset-0 w-full h-full pointer-events-none" />
               )}
             </div>
             {tahap === 'merekam' && (
