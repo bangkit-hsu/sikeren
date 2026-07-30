@@ -2,9 +2,37 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
+function IkonAbsensi() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="12" cy="10" r="2.6" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M7.5 17c.7-1.9 2.4-3 4.5-3s3.8 1.1 4.5 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IkonRiwayat() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <rect x="5" y="3.5" width="14" height="17" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M8.5 8h7M8.5 12h7M8.5 16h4.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IkonKeluar() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <path d="M9 4H6a1.5 1.5 0 00-1.5 1.5v13A1.5 1.5 0 006 20h3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M13 8l4 4-4 4M17 12H9.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 const pegawaiNav = [
-  { to: '/pegawai/absensi', label: 'Absensi' },
-  { to: '/pegawai/riwayat', label: 'Riwayat Saya' },
+  { to: '/pegawai/absensi', label: 'Absensi', Ikon: IkonAbsensi },
+  { to: '/pegawai/riwayat', label: 'Riwayat Saya', Ikon: IkonRiwayat },
 ]
 
 const adminNav = [
@@ -19,7 +47,8 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [menuTerbuka, setMenuTerbuka] = useState(false)
-  const nav = user?.role === 'admin' ? adminNav : pegawaiNav
+  const isAdmin = user?.role === 'admin'
+  const nav = isAdmin ? adminNav : pegawaiNav
 
   function handleLogout() {
     logout()
@@ -32,7 +61,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen md:flex">
-      {/* Overlay gelap di belakang menu saat dibuka di layar kecil */}
+      {/* Overlay gelap di belakang menu saat dibuka di layar kecil (khusus admin) */}
       {menuTerbuka && (
         <div
           className="fixed inset-0 bg-ink/40 z-30 md:hidden"
@@ -40,10 +69,11 @@ export default function Layout({ children }) {
         />
       )}
 
-      {/* Menu di sebelah kiri: sidebar tetap di desktop, panel geser di smartphone */}
+      {/* Menu di sebelah kiri: sidebar tetap di desktop. Di smartphone: panel geser untuk admin,
+          bilah bawah selalu terlihat untuk pegawai (lihat <nav> di akhir file). */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-white border-r border-ink/10 flex flex-col transform transition-transform duration-200 md:translate-x-0 ${
-          menuTerbuka ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed md:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
+          isAdmin ? (menuTerbuka ? 'flex translate-x-0' : 'flex -translate-x-full') : 'hidden -translate-x-full'
         }`}
       >
         <div className="px-5 py-5 border-b border-ink/10 flex items-center gap-3">
@@ -52,7 +82,7 @@ export default function Layout({ children }) {
           </div>
           <div>
             <p className="font-display font-semibold leading-tight">e-Absen</p>
-            <p className="text-xs text-ink/50 font-mono">{user?.role === 'admin' ? 'Panel Admin' : 'Panel Pegawai'}</p>
+            <p className="text-xs text-ink/50 font-mono">{isAdmin ? 'Panel Admin' : 'Panel Pegawai'}</p>
           </div>
         </div>
 
@@ -87,23 +117,52 @@ export default function Layout({ children }) {
       {/* Konten utama */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="md:hidden sticky top-0 z-20 bg-paper/90 backdrop-blur border-b border-ink/10 flex items-center gap-3 px-4 py-3">
-          <button
-            onClick={() => setMenuTerbuka(true)}
-            aria-label="Buka menu"
-            className="w-9 h-9 flex items-center justify-center rounded-lg border border-ink/15 shrink-0"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setMenuTerbuka(true)}
+              aria-label="Buka menu"
+              className="w-9 h-9 flex items-center justify-center rounded-lg border border-ink/15 shrink-0"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
           <p className="font-display font-semibold">e-Absen</p>
         </header>
 
-        <main className="flex-1 w-full max-w-5xl mx-auto px-5 py-8">{children}</main>
-        <footer className="text-center text-xs text-ink/40 py-6 font-mono">
+        <main className={`flex-1 w-full max-w-5xl mx-auto px-5 py-8 ${!isAdmin ? 'pb-24 md:pb-8' : ''}`}>{children}</main>
+        <footer className="hidden md:block text-center text-xs text-ink/40 py-6 font-mono">
           absen-apel-pegawai · dibangun dengan Vite + React + Firebase
         </footer>
       </div>
+
+      {/* Bilah menu bawah untuk Pegawai: selalu terlihat di smartphone, tidak perlu dibuka lewat tombol */}
+      {!isAdmin && (
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-moss-900 border-t border-ink/10 flex items-stretch px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          {pegawaiNav.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl mx-1 text-xs font-medium transition-colors ${
+                  isActive ? 'bg-gold-500 text-ink' : 'text-paper/70'
+                }`
+              }
+            >
+              <item.Ikon />
+              {item.label}
+            </NavLink>
+          ))}
+          <button
+            onClick={handleLogout}
+            className="flex-1 flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl mx-1 text-xs font-medium text-paper/70"
+          >
+            <IkonKeluar />
+            Keluar
+          </button>
+        </nav>
+      )}
     </div>
   )
 }
