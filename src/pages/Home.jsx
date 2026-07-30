@@ -129,6 +129,10 @@ export default function Home() {
         </div>
       </div>
 
+      <p className="text-xs text-ink/40 text-center pt-2 pb-6 font-mono px-6">
+        Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
+      </p>
+
       {/* Strip fitur */}
       <div className="max-w-3xl mx-auto px-6 pb-14">
         <div className="bg-moss-900 text-paper rounded-xl2 p-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -143,10 +147,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
-      <p className="text-xs text-ink/40 text-center pb-8 font-mono px-6">
-        Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
-      </p>
     </div>
   )
 }
