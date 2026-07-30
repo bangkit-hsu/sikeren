@@ -131,12 +131,11 @@ export default function FaceLogin() {
     setTahap('mengecek_lokasi')
     setErrorMsg('')
     try {
-      const [lokasiSnap, pos] = await Promise.all([
-        getDoc(doc(db, 'settings', 'lokasi')),
-        ambilLokasiSaatIni(),
-      ])
+      const lokasiSnap = await getDoc(doc(db, 'settings', 'lokasi'))
       const lokasi = lokasiSnap.exists() ? lokasiSnap.data() : null
       setLokasiKantor(lokasi)
+
+      const pos = await ambilLokasiSaatIni()
       setPosisi(pos)
       if (lokasi) {
         setJarak(hitungJarakMeter(pos.lat, pos.lng, lokasi.lat, lokasi.lng))
