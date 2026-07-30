@@ -30,17 +30,17 @@ export default function Home() {
               'radial-gradient(circle at 15% 20%, rgba(216,184,74,0.35), transparent 35%), radial-gradient(circle at 85% 15%, rgba(216,184,74,0.25), transparent 40%)',
           }}
         />
-        <div className="relative max-w-3xl mx-auto px-6 pt-14 pb-16 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-gold-500">
+        <div className="relative max-w-3xl mx-auto px-6 pt-8 pb-8 text-center">
+          <div className="w-12 h-12 mx-auto rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-gold-500">
               <path d="M12 2.5c-3 0-5.5 2.4-5.5 5.5 0 4 5.5 10.5 5.5 10.5S17.5 12 17.5 8c0-3.1-2.5-5.5-5.5-5.5z" stroke="currentColor" strokeWidth="1.6" />
               <circle cx="12" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.6" />
             </svg>
           </div>
-          <h1 className="font-display font-bold text-4xl mt-4">e-Absen</h1>
-          <p className="text-paper/70 mt-2">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">e-Absen</h1>
+          <p className="text-paper/70 text-sm mt-1">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-gold-500/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gold-500/40 to-transparent" />
       </div>
 
       {/* Dua kartu: Pegawai & Admin */}
