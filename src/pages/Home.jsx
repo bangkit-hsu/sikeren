@@ -75,23 +75,25 @@ export default function Home() {
       </div>
 
       {/* Judul */}
-      <div className="bg-moss-900 text-paper text-center px-6 pt-10 pb-4">
-        <p className="font-display font-bold text-xl sm:text-2xl leading-snug max-w-2xl mx-auto">
-          APEL ADALAH <span className="text-gold-500">KEWAJIBAN</span>,<br />
-          BUKTI <span className="text-gold-500">DISIPLIN</span> &amp; <span className="text-gold-500">TANGGUNG JAWAB</span> SEBAGAI ASN.
+      <div className="text-center px-6 pt-10 pb-4">
+        <p className="font-display font-bold text-xl sm:text-2xl leading-snug max-w-2xl mx-auto text-ink">
+          APEL ADALAH <span className="text-gold-600">KEWAJIBAN</span>,<br />
+          BUKTI <span className="text-gold-600">DISIPLIN</span> &amp; <span className="text-gold-600">TANGGUNG JAWAB</span> SEBAGAI ASN.
         </p>
       </div>
 
       {/* Kutipan */}
-      <div className="bg-moss-900 text-paper text-center px-6 pb-10">
-        <p className="italic text-paper/70 text-sm max-w-md mx-auto">
+      <div className="text-center px-6 pb-10">
+        <p className="italic text-ink/60 text-sm max-w-md mx-auto">
           "Disiplin dimulai dari hal kecil, dan apel adalah langkah awal mewujudkan ASN yang profesional dan berintegritas."
         </p>
       </div>
 
-      <p className="text-sm text-ink/60 text-center pt-6 pb-10 font-mono px-6">
-        Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
-      </p>
+      <div className="text-center pb-10 px-6">
+        <p className="inline-block bg-moss-700 text-paper text-xs sm:text-sm rounded-full px-4 py-2 font-mono">
+          Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
+        </p>
+      </div>
     </div>
   )
 }
