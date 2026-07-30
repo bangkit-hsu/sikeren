@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonAbsensi() {
@@ -26,6 +26,14 @@ function IkonKeluar() {
     <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
       <path d="M9 4H6a1.5 1.5 0 00-1.5 1.5v13A1.5 1.5 0 006 20h3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
       <path d="M13 8l4 4-4 4M17 12H9.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function IkonChevron({ terbuka }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={`w-4 h-4 transition-transform ${terbuka ? 'rotate-90' : ''}`}>
+      <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -57,8 +65,30 @@ const adminNavGroups = [
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [menuTerbuka, setMenuTerbuka] = useState(false)
   const isAdmin = user?.role === 'admin'
+
+  const [grupTerbuka, setGrupTerbuka] = useState(() => {
+    const awal = {}
+    adminNavGroups.forEach((group) => {
+      awal[group.label] = group.items.some((item) => location.pathname.startsWith(item.to))
+    })
+    return awal
+  })
+
+  // Kalau navigasi berpindah ke menu di grup lain, buka grup itu otomatis.
+  useEffect(() => {
+    adminNavGroups.forEach((group) => {
+      if (group.items.some((item) => location.pathname.startsWith(item.to))) {
+        setGrupTerbuka((prev) => (prev[group.label] ? prev : { ...prev, [group.label]: true }))
+      }
+    })
+  }, [location.pathname])
+
+  function toggleGrup(label) {
+    setGrupTerbuka((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
 
   function handleLogout() {
     logout()
@@ -98,27 +128,39 @@ export default function Layout({ children }) {
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-4">
           {isAdmin ? (
-            adminNavGroups.map((group) => (
-              <div key={group.label}>
-                <p className="px-3 text-xs font-mono uppercase tracking-wide text-ink/40 mb-1.5">{group.label}</p>
-                <div className="space-y-1">
-                  {group.items.map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      onClick={tutupMenu}
-                      className={({ isActive }) =>
-                        `block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                          isActive ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-                        }`
-                      }
-                    >
-                      {item.label}
-                    </NavLink>
-                  ))}
+            adminNavGroups.map((group) => {
+              const terbuka = !!grupTerbuka[group.label]
+              return (
+                <div key={group.label}>
+                  <button
+                    type="button"
+                    onClick={() => toggleGrup(group.label)}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono uppercase tracking-wide text-ink/50 hover:bg-moss-50 hover:text-ink/70 transition-colors"
+                  >
+                    <span>{group.label}</span>
+                    <IkonChevron terbuka={terbuka} />
+                  </button>
+                  {terbuka && (
+                    <div className="space-y-1 mt-1">
+                      {group.items.map((item) => (
+                        <NavLink
+                          key={item.to}
+                          to={item.to}
+                          onClick={tutupMenu}
+                          className={({ isActive }) =>
+                            `block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                              isActive ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+                            }`
+                          }
+                        >
+                          {item.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))
+              )
+            })
           ) : (
             <div className="space-y-1">
               {pegawaiNav.map((item) => (
