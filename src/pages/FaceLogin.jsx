@@ -13,6 +13,7 @@ import { hitungJarakMeter, ambilLokasiSaatIni } from '../utils/geo'
 import { formatTanggal, formatJam } from '../utils/date'
 import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI, LABEL_KETERANGAN } from '../utils/keterangan'
 import CincinPemindai from '../components/CincinPemindai.jsx'
+import HeroKecil from '../components/HeroKecil.jsx'
 
 const BATAS_WAKTU_MS = 3000
 const JEDA_DETEKSI_MS = 350
@@ -197,14 +198,14 @@ export default function FaceLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 py-8">
+    <div className="min-h-screen bg-paper">
+      <HeroKecil
+        eyebrow="e-Apel · Apel Pagi"
+        title="Absensi Wajah"
+        subtitle="Posisikan wajah di dalam bingkai. Kamera mengenali otomatis dalam 3 detik."
+      />
+      <div className="flex justify-center px-5 py-8">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-6">
-          <p className="text-xs font-mono uppercase tracking-wide text-gold-600">e-Apel · Apel Pagi</p>
-          <h1 className="font-display font-semibold text-2xl mt-1">Absensi Wajah</h1>
-          <p className="text-ink/60 text-sm mt-1">Posisikan wajah di dalam bingkai. Kamera mengenali otomatis dalam 3 detik.</p>
-        </div>
-
         {/* Kamera bulat, tetap tampil di bagian atas selama proses berlangsung */}
         <div className="relative aspect-square w-52 sm:w-60 mx-auto rounded-full overflow-hidden bg-ink border border-ink/10">
           {fotoTertangkap ? (
@@ -383,12 +384,13 @@ export default function FaceLogin() {
           )}
 
           {(tahap === 'menyiapkan' || tahap === 'memindai' || tahap === 'tidak_dikenali' || tahap === 'error') && (
-            <p className="text-xs text-ink/40 text-center mt-4 font-mono">
-              <Link to="/login" className="underline">Masuk pakai NIP &amp; Password</Link>
+            <p className="text-sm text-ink/70 text-center mt-4 font-mono">
+              <Link to="/login" className="underline text-moss-700 font-medium">Masuk pakai NIP &amp; Password</Link>
             </p>
           )}
         </div>
       </div>
+    </div>
     </div>
   )
 }
