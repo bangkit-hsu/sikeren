@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { formatTanggal, apakahHariAbsen } from '../../utils/date'
 import { generateTidakApelUntukTanggal } from '../../utils/absensiOtomatis'
@@ -36,6 +36,14 @@ export default function AbsenHarianPage() {
       const override = hariAbsenSnap.exists() ? hariAbsenSnap.data().override || {} : {}
       const hasilGenerate = await generateTidakApelUntukTanggal(tanggal, override)
       setHasil(hasilGenerate)
+      if (!hasilGenerate.dilewati) {
+        // Generate Absen menandakan sesi absen apel tanggal ini resmi ditutup —
+        // setelah ini pegawai yang belum absen akan melihat "Jam Absen Apel Sudah Selesai".
+        await setDoc(doc(db, 'settings', 'penutupanApel'), {
+          tanggal,
+          ditutupPada: serverTimestamp(),
+        })
+      }
     } catch (err) {
       setError('Gagal memproses: ' + err.message)
     } finally {
@@ -86,7 +94,7 @@ export default function AbsenHarianPage() {
         Tanggal yang bisa di-generate mengikuti pengaturan di menu Hari Absensi Apel.
       </p>
       <p className="text-xs text-ink/40 mb-6 font-mono">
-        Pegawai baru bisa absen mulai pukul 07:50 WITA. Membuka menu Rekap Absen akan menutup sesi absen apel hari ini untuk pegawai.
+        Pegawai baru bisa absen mulai pukul 07:50 WITA. Klik Generate Absen menutup sesi absen apel untuk tanggal yang dipilih — pegawai yang belum absen setelah itu akan melihat "Jam Absen Apel Sudah Selesai".
       </p>
 
       <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 flex flex-wrap items-end gap-3 mb-6">
@@ -131,7 +139,7 @@ export default function AbsenHarianPage() {
 
       {hasil && !hasil.dilewati && hasil.pegawaiDitandai.length === 0 && (
         <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-5 text-moss-800 text-sm">
-          Semua pegawai sudah punya data absen pada tanggal {tanggal}. Tidak ada yang ditandai Tidak Apel.
+          Semua pegawai sudah punya data absen pada tanggal {tanggal}. Tidak ada yang ditandai Tidak Apel. Sesi absen apel tanggal ini sudah ditutup.
         </div>
       )}
 
@@ -139,7 +147,7 @@ export default function AbsenHarianPage() {
         <div>
           <p className="text-sm text-ink/60 mb-3">
             <span className="font-semibold text-clay">{hasil.pegawaiDitandai.length} pegawai</span> ditandai
-            <span className="font-medium text-ink"> Tidak Apel</span> untuk tanggal {tanggal}:
+            <span className="font-medium text-ink"> Tidak Apel</span> untuk tanggal {tanggal}. Sesi absen apel tanggal ini sudah ditutup.
           </p>
           <ul className="border border-ink/10 rounded-xl2 divide-y divide-ink/10 overflow-hidden">
             {hasil.pegawaiDitandai.map((p) => (
