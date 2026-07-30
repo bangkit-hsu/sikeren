@@ -213,7 +213,7 @@ export default function DaftarWajah() {
             <p className="font-display text-lg font-semibold text-moss-800 mb-1">Pendaftaran berhasil</p>
             <p className="text-sm text-ink/60 mb-5">Sekarang kamu bisa absen otomatis lewat pengenalan wajah.</p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/absen')}
               className="w-full bg-moss-700 text-paper font-medium rounded-lg py-2.5 hover:bg-moss-800 transition-colors"
             >
               Ke Halaman Absen
@@ -230,7 +230,7 @@ export default function DaftarWajah() {
 
         {tahap === 'form' && (
           <p className="text-xs text-ink/40 text-center mt-6 font-mono">
-            <Link to="/" className="underline">Kembali ke halaman absen</Link>
+            <Link to="/absen" className="underline">Kembali ke halaman absen</Link>
           </p>
         )}
       </div>

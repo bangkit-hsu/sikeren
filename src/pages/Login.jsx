@@ -70,7 +70,7 @@ export default function Login() {
           </button>
         </form>
         <p className="text-xs text-ink/40 text-center mt-6 font-mono">
-          <Link to="/" className="underline">Masuk pakai pengenalan wajah</Link>
+          <Link to="/absen" className="underline">Masuk pakai pengenalan wajah</Link>
         </p>
         <p className="text-xs text-ink/40 text-center mt-2 font-mono">
           Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara

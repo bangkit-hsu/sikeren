@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext.jsx'
 import Layout from './components/Layout.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Login from './pages/Login.jsx'
+import Home from './pages/Home.jsx'
 import SetupAwal from './pages/SetupAwal.jsx'
 import FaceLogin from './pages/FaceLogin.jsx'
 import DaftarWajah from './pages/DaftarWajah.jsx'
@@ -21,7 +22,8 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<FaceLogin />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/absen" element={<FaceLogin />} />
       <Route path="/daftar-wajah" element={<DaftarWajah />} />
       <Route path="/login" element={<Login />} />
       <Route path="/setup" element={<SetupAwal />} />
