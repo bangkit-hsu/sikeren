@@ -99,32 +99,32 @@ export default function Home() {
       </div>
 
       {/* Dua kartu: Pegawai & Admin */}
-      <div className="max-w-3xl mx-auto px-6 -mt-2 pb-10 grid sm:grid-cols-2 gap-4">
-        <div className="bg-paper rounded-xl2 border border-ink/10 p-6 shadow-sm flex flex-col">
-          <div className="w-11 h-11 rounded-xl bg-moss-700 text-paper flex items-center justify-center mb-4">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 -mt-2 pb-10 grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="bg-moss-50 rounded-xl2 border border-moss-200 p-4 sm:p-6 shadow-sm flex flex-col">
+          <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-moss-700 text-paper flex items-center justify-center mb-3 sm:mb-4">
             <IkonPegawai />
           </div>
-          <h2 className="font-display font-semibold text-xl mb-1">Pegawai</h2>
-          <p className="text-ink/60 text-sm flex-1">Rekam kehadiran apel dengan pemindaian wajah 3 detik.</p>
+          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Pegawai</h2>
+          <p className="text-ink/60 text-xs sm:text-sm flex-1">Rekam kehadiran apel dengan pemindaian wajah 3 detik.</p>
           <Link
             to="/absen"
-            className="mt-5 inline-flex items-center justify-center gap-2 bg-moss-700 text-paper font-medium rounded-lg py-2.5 hover:bg-moss-800 transition-colors"
+            className="mt-4 sm:mt-5 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-moss-700 text-paper text-xs sm:text-base font-medium rounded-lg py-2 sm:py-2.5 px-2 hover:bg-moss-800 transition-colors text-center"
           >
-            Rekam Absensi <span aria-hidden>→</span>
+            <span>Rekam Absensi</span> <span aria-hidden>→</span>
           </Link>
         </div>
 
-        <div className="bg-paper rounded-xl2 border border-ink/10 p-6 shadow-sm flex flex-col">
-          <div className="w-11 h-11 rounded-xl bg-moss-700 text-paper flex items-center justify-center mb-4">
+        <div className="bg-ink rounded-xl2 border border-ink/10 p-4 sm:p-6 shadow-sm flex flex-col text-paper">
+          <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gold-500 text-ink flex items-center justify-center mb-3 sm:mb-4">
             <IkonAdmin />
           </div>
-          <h2 className="font-display font-semibold text-xl mb-1">Administrator</h2>
-          <p className="text-ink/60 text-sm flex-1">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi.</p>
+          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Administrator</h2>
+          <p className="text-paper/60 text-xs sm:text-sm flex-1">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi.</p>
           <Link
             to="/login"
-            className="mt-5 inline-flex items-center justify-center gap-2 bg-ink text-paper font-medium rounded-lg py-2.5 hover:bg-ink/80 transition-colors"
+            className="mt-4 sm:mt-5 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-gold-500 text-ink text-xs sm:text-base font-medium rounded-lg py-2 sm:py-2.5 px-2 hover:bg-gold-400 transition-colors text-center"
           >
-            Masuk Admin <span aria-hidden>→</span>
+            <span>Masuk Admin</span> <span aria-hidden>→</span>
           </Link>
         </div>
       </div>
