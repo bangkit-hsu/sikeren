@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonAbsensi() {
@@ -186,6 +186,14 @@ export default function Layout({ children }) {
         </nav>
 
         <div className="p-4 border-t border-ink/10">
+          {isAdmin && (
+            <Link
+              to="/basedata"
+              className="w-full inline-flex items-center justify-center gap-1 text-xs font-mono px-2 py-1.5 rounded-full border border-ink/15 text-ink/50 hover:bg-ink/5 transition-colors mb-3"
+            >
+              🏗️ Building
+            </Link>
+          )}
           <p className="text-sm text-ink/70 truncate mb-2">{user?.nama}</p>
           <button
             onClick={handleLogout}
