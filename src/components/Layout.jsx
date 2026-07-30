@@ -39,6 +39,7 @@ const adminNavGroups = [
   {
     label: 'Absensi Apel',
     items: [
+      { to: '/admin/absen-harian', label: 'Absen Harian' },
       { to: '/admin/rekap', label: 'Rekap Absen' },
       { to: '/admin/koreksi', label: 'Koreksi Absen' },
     ],

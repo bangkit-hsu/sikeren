@@ -27,7 +27,7 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Hari Absen: cek list tiap tanggal dalam sebulan (bawaan Senin–Jumat) dan ubah langsung mana saja yang dihitung sebagai Hari Absen Apel — misalnya meniadakan tanggal libur nasional, atau menambahkan Sabtu untuk apel khusus. Jumlah ini dipakai untuk menghitung persentase kehadiran di Rekap Pegawai & Riwayat Saya.
 - Kelola Pegawai: tambah/hapus akun pegawai & admin, lihat status rekam wajah tiap pegawai.
 - Koreksi Absensi: ubah, hapus, atau tambahkan data absen pegawai secara manual untuk koreksi.
-- Setiap kali admin membuka **Rekap Pegawai** untuk bulan berjalan, aplikasi otomatis mengecek pegawai terdaftar yang belum absen setelah pukul 08:00 dan mencatatnya sebagai **"Tidak Apel"** — tidak perlu tindakan manual apa pun.
+- Absen Harian: pilih tanggal, lalu klik **Generate Absen** untuk menandai pegawai yang belum absen apel pada tanggal itu sebagai **"Tidak Apel"**. Ini proses manual — admin yang menentukan kapan dijalankan, tidak ada proses otomatis di background.
 
 ## 1. Setup Firebase (sekali saja)
 
@@ -122,7 +122,7 @@ absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
 
 - Pilihan **Bagian** memakai daftar tetap di `src/utils/bagian.js` (Administrasi Pembangunan, Hukum, Kesra, Organisasi, Pemerintahan, Pengadaan Barang dan Jasa, Perekonomian dan SDA, Protokol dan Komunikasi Pimpinan, Umum). Untuk menambah/mengubah daftar bagian, edit file tersebut lalu deploy ulang.
 
-- "Tidak Apel" otomatis bukan proses cron/server terjadwal (aplikasi ini tidak punya backend) — pencatatannya dipicu saat admin membuka halaman **Rekap Pegawai**. Jika halaman itu tidak pernah dibuka pada suatu hari, pencatatan otomatisnya akan tertunda sampai admin membukanya lagi (dan tetap akan mencatat mundur untuk hari-hari yang terlewat di bulan berjalan).
+- Pencatatan "Tidak Apel" sepenuhnya **manual** lewat menu **Absen Harian** — admin memilih tanggal dan klik Generate Absen. Ini sengaja dibuat manual (bukan berjalan sendiri di background) karena aplikasi ini tidak punya server/cron sungguhan.
 - Login memakai hash password sederhana (SHA-256) yang disimpan di Firestore, bukan Firebase Authentication penuh. Cukup untuk pemakaian internal, tapi untuk keamanan tingkat produksi sebaiknya dimigrasikan ke Firebase Authentication + Cloud Functions.
 - Akurasi lokasi bergantung pada GPS perangkat pegawai (bisa meleset beberapa meter, terutama di dalam gedung).
 - Radius sebaiknya disesuaikan dengan kondisi lapangan (mis. 50–150 meter) agar tidak terlalu ketat/longgar.

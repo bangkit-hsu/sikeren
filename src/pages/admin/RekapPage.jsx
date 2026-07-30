@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
-import { pastikanTidakApel } from '../../utils/absensiOtomatis'
 
 export default function RekapPage() {
   const now = new Date()
@@ -27,12 +26,6 @@ export default function RekapPage() {
       const hariAbsenSnap = await getDoc(doc(db, 'settings', 'hariAbsen'))
       const override = hariAbsenSnap.exists() ? hariAbsenSnap.data().override || {} : {}
       setOverrideHariAbsen(override)
-
-      // Hanya jalankan backfill "Tidak Apel" otomatis untuk bulan berjalan (bulan/tahun saat ini),
-      // supaya tidak menulis ulang data historis saat admin sekadar melihat-lihat bulan lampau.
-      if (tahun === now.getFullYear() && bulan === now.getMonth()) {
-        await pastikanTidakApel(tahun, bulan, override)
-      }
 
       const bulanStr = `${tahun}-${String(bulan + 1).padStart(2, '0')}`
       const absensiSnap = await getDocs(collection(db, 'absensi'))
@@ -152,7 +145,7 @@ export default function RekapPage() {
       )}
 
       <p className="text-xs text-ink/40 mt-4 font-mono">
-        "Tidak Apel" tercatat otomatis untuk pegawai terdaftar yang belum absen setelah pukul 08:00.
+        "Tidak Apel" ditandai lewat menu Absen Harian, bukan otomatis.
       </p>
     </div>
   )

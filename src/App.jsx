@@ -11,6 +11,7 @@ import AbsensiPage from './pages/pegawai/AbsensiPage.jsx'
 import RiwayatPage from './pages/pegawai/RiwayatPage.jsx'
 import RekapPage from './pages/admin/RekapPage.jsx'
 import KoreksiPage from './pages/admin/KoreksiPage.jsx'
+import AbsenHarianPage from './pages/admin/AbsenHarianPage.jsx'
 import LokasiPage from './pages/admin/LokasiPage.jsx'
 import HariAbsenPage from './pages/admin/HariAbsenPage.jsx'
 import PegawaiPage from './pages/admin/PegawaiPage.jsx'
@@ -35,6 +36,9 @@ export default function App() {
         <ProtectedRoute role="pegawai"><Layout><RiwayatPage /></Layout></ProtectedRoute>
       } />
 
+      <Route path="/admin/absen-harian" element={
+        <ProtectedRoute role="admin"><Layout><AbsenHarianPage /></Layout></ProtectedRoute>
+      } />
       <Route path="/admin/rekap" element={
         <ProtectedRoute role="admin"><Layout><RekapPage /></Layout></ProtectedRoute>
       } />
