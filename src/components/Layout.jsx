@@ -21,6 +21,15 @@ function IkonRiwayat() {
   )
 }
 
+function IkonProfil() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M5 19c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function IkonKeluar() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
@@ -41,6 +50,7 @@ function IkonChevron({ terbuka }) {
 const pegawaiNav = [
   { to: '/pegawai/absensi', label: 'Absensi', Ikon: IkonAbsensi },
   { to: '/pegawai/riwayat', label: 'Riwayat Saya', Ikon: IkonRiwayat },
+  { to: '/pegawai/profil', label: 'Profil', Ikon: IkonProfil },
 ]
 
 const adminNavGroups = [

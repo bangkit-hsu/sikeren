@@ -9,6 +9,7 @@ import FaceLogin from './pages/FaceLogin.jsx'
 import DaftarWajah from './pages/DaftarWajah.jsx'
 import AbsensiPage from './pages/pegawai/AbsensiPage.jsx'
 import RiwayatPage from './pages/pegawai/RiwayatPage.jsx'
+import ProfilPage from './pages/pegawai/ProfilPage.jsx'
 import RekapPage from './pages/admin/RekapPage.jsx'
 import KoreksiPage from './pages/admin/KoreksiPage.jsx'
 import AbsenHarianPage from './pages/admin/AbsenHarianPage.jsx'
@@ -34,6 +35,9 @@ export default function App() {
       } />
       <Route path="/pegawai/riwayat" element={
         <ProtectedRoute role="pegawai"><Layout><RiwayatPage /></Layout></ProtectedRoute>
+      } />
+      <Route path="/pegawai/profil" element={
+        <ProtectedRoute role="pegawai"><Layout><ProfilPage /></Layout></ProtectedRoute>
       } />
 
       <Route path="/admin/absen-harian" element={

@@ -20,6 +20,7 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Jika sesuai lokasi, keterangan otomatis terisi **"Apel Pagi"**. Jika diluar lokasi, wajib pilih keterangan: **Apel Gabungan**, **Apel Hari Besar**, atau **WFH**.
 - Batas absen apel pagi adalah **pukul 08:00**. Pegawai terdaftar yang belum absen setelah jam tersebut otomatis tercatat **"Tidak Apel"** (lihat penjelasan di bawah) — namun tetap bisa absen kapan saja setelahnya untuk menggantikan catatan otomatis tersebut dengan absen yang sesungguhnya.
 - Riwayat Saya: rekap absensi pribadi per periode (bulan/tahun), lengkap dengan jumlah Hari Absen.
+- Profil: menampilkan Foto, NIP, Nama, Bagian, dan Jabatan pegawai. NIP/Nama/Bagian/Jabatan hanya bisa diubah admin — pegawai hanya bisa mengganti **foto profil** dan **password** sendiri.
 
 **Menu Admin** (login NIP & password di `/login`)
 - Rekap Pegawai: akumulasi kehadiran seluruh pegawai per periode (bulan/tahun).
@@ -110,7 +111,7 @@ Firestore biasanya tidak membatasi domain, tapi jika suatu saat menambah Firebas
 
 ```
 users/{id}        { nip, nama, bagian, jabatan, passwordHash, role: 'admin' | 'pegawai',
-                      faceDescriptor?: number[128] }
+                      faceDescriptor?: number[128], foto?: string (data URL JPEG) }
 settings/lokasi    { nama, lat, lng, radius }
 settings/hariAbsen { override: { 'YYYY-MM-DD': true|false, ... } } — hanya tanggal yang beda dari bawaan (Senin-Jumat)
 absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',

@@ -6,7 +6,7 @@ import { hashPassword } from '../utils/hash'
 import PilihBagian from '../components/PilihBagian.jsx'
 import {
   muatModelWajah, nyalakanKamera, matikanKamera,
-  ambilDescriptorDariVideo, rataRataDescriptor,
+  ambilDescriptorDariVideo, rataRataDescriptor, tangkapFotoDariVideo,
 } from '../utils/face'
 import CincinPemindai from '../components/CincinPemindai.jsx'
 
@@ -21,6 +21,7 @@ export default function DaftarWajah() {
   const [tahap, setTahap] = useState('form') // form | menyiapkan_kamera | merekam | selesai_rekam | menyimpan | sukses | error
   const [jumlahTertangkap, setJumlahTertangkap] = useState(0)
   const [descriptorRekam, setDescriptorRekam] = useState(null)
+  const [fotoRekam, setFotoRekam] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [form, setForm] = useState({ nip: '', nama: '', bagian: '', jabatan: '', password: '' })
 
@@ -61,6 +62,7 @@ export default function DaftarWajah() {
     if (baru.length >= JUMLAH_JEPRETAN) {
       const rataRata = rataRataDescriptor(baru)
       setDescriptorRekam(rataRata)
+      setFotoRekam(tangkapFotoDariVideo(videoRef.current))
       matikanKamera(streamRef.current)
       setTahap('selesai_rekam')
     } else {
@@ -88,6 +90,7 @@ export default function DaftarWajah() {
         jabatan: form.jabatan.trim(),
         passwordHash,
         role: 'pegawai',
+        foto: fotoRekam || null,
         faceDescriptor: descriptorRekam,
       })
       setTahap('sukses')
@@ -99,6 +102,7 @@ export default function DaftarWajah() {
 
   function ulangiRekam() {
     setDescriptorRekam(null)
+    setFotoRekam(null)
     setJumlahTertangkap(0)
     mulaiRekamWajah()
   }

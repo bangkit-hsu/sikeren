@@ -36,6 +36,8 @@ export function AuthProvider({ children }) {
       nip: data.nip,
       nama: data.nama,
       bagian: data.bagian || '',
+      jabatan: data.jabatan || '',
+      foto: data.foto || null,
       role: data.role, // 'admin' | 'pegawai'
     }
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
@@ -51,11 +53,23 @@ export function AuthProvider({ children }) {
       nip: pegawaiDoc.nip,
       nama: pegawaiDoc.nama,
       bagian: pegawaiDoc.bagian || '',
+      jabatan: pegawaiDoc.jabatan || '',
+      foto: pegawaiDoc.foto || null,
       role: pegawaiDoc.role,
     }
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
     setUser(sessionUser)
     return sessionUser
+  }
+
+  // Memperbarui sesi yang sedang berjalan (dipakai setelah pegawai mengubah foto/password sendiri di menu Profil).
+  function perbaruiSesiUser(perubahan) {
+    setUser((prev) => {
+      if (!prev) return prev
+      const baru = { ...prev, ...perubahan }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(baru))
+      return baru
+    })
   }
 
   function logout() {
@@ -64,7 +78,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, loginDenganWajah, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginDenganWajah, logout, perbaruiSesiUser }}>
       {children}
     </AuthContext.Provider>
   )
