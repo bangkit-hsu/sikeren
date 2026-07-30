@@ -11,6 +11,23 @@ export function hitungJarakMeter(lat1, lng1, lat2, lng2) {
   return R * c
 }
 
+// Menerjemahkan error geolokasi browser (GeolocationPositionError) menjadi
+// pesan yang jelas dan actionable dalam Bahasa Indonesia.
+function terjemahkanErrorLokasi(err) {
+  if (err && typeof err.code === 'number') {
+    if (err.code === 1) {
+      return new Error('Akses lokasi ditolak. Izinkan akses lokasi untuk situs ini di pengaturan browser, lalu coba lagi.')
+    }
+    if (err.code === 2) {
+      return new Error('Lokasi tidak dapat dibaca. Pastikan GPS sudah diaktifkan di perangkat, lalu coba lagi.')
+    }
+    if (err.code === 3) {
+      return new Error('Waktu pencarian lokasi habis. Pastikan GPS aktif dan sinyal cukup, lalu coba lagi.')
+    }
+  }
+  return new Error('Gagal mengambil lokasi. Pastikan GPS sudah diaktifkan dan akses lokasi diizinkan, lalu coba lagi.')
+}
+
 export function ambilLokasiSaatIni() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -25,7 +42,7 @@ export function ambilLokasiSaatIni() {
           akurasi: pos.coords.accuracy,
         })
       },
-      (err) => reject(err),
+      (err) => reject(terjemahkanErrorLokasi(err)),
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
     )
   })
