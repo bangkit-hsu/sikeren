@@ -169,7 +169,7 @@ export default function DaftarWajah() {
 
         {(tahap === 'menyiapkan_kamera' || tahap === 'merekam') && (
           <div>
-            <div className="relative aspect-square rounded-full overflow-hidden bg-ink border border-ink/10">
+            <div className="relative aspect-square w-52 sm:w-60 mx-auto rounded-full overflow-hidden bg-ink border border-ink/10">
               <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1] rounded-full" />
               {tahap === 'menyiapkan_kamera' && (
                 <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-paper text-sm font-mono rounded-full">

@@ -6,7 +6,7 @@ import {
 import { db } from '../firebase'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
-  muatModelWajah, nyalakanKamera, matikanKamera,
+  muatModelWajah, nyalakanKamera, matikanKamera, tangkapFotoDariVideo,
   ambilDescriptorDariVideo, cariKecocokanTerbaik,
 } from '../utils/face'
 import { hitungJarakMeter, ambilLokasiSaatIni } from '../utils/geo'
@@ -29,6 +29,7 @@ export default function FaceLogin() {
   // siap_absen | sudah_absen | mengirim | sukses | error
   const [tahap, setTahap] = useState('menyiapkan')
   const [pegawaiDikenali, setPegawaiDikenali] = useState(null)
+  const [fotoTertangkap, setFotoTertangkap] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
 
   const [lokasiKantor, setLokasiKantor] = useState(null)
@@ -55,6 +56,7 @@ export default function FaceLogin() {
     setJarak(null)
     setKeterangan('')
     setPlaceholderTidakApelId(null)
+    setFotoTertangkap(null)
     try {
       const [, snap] = await Promise.all([
         muatModelWajah(),
@@ -84,7 +86,9 @@ export default function FaceLogin() {
       if (descriptor) {
         const cocok = cariKecocokanTerbaik(descriptor, daftarPegawaiRef.current)
         if (cocok) {
+          const foto = tangkapFotoDariVideo(videoRef.current)
           matikanKamera(streamRef.current)
+          setFotoTertangkap(foto)
           setPegawaiDikenali(cocok.pegawai)
           setTahap('dikenali')
           loginDenganWajah(cocok.pegawai)
@@ -202,8 +206,12 @@ export default function FaceLogin() {
         </div>
 
         {/* Kamera bulat, tetap tampil di bagian atas selama proses berlangsung */}
-        <div className="relative aspect-square rounded-full overflow-hidden bg-ink border border-ink/10">
-          <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1] rounded-full" />
+        <div className="relative aspect-square w-52 sm:w-60 mx-auto rounded-full overflow-hidden bg-ink border border-ink/10">
+          {fotoTertangkap ? (
+            <img src={fotoTertangkap} alt="Wajah yang dikenali" className="w-full h-full object-cover rounded-full" />
+          ) : (
+            <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1] rounded-full" />
+          )}
           {tahap === 'memindai' && (
             <CincinPemindai className="absolute inset-0 w-full h-full pointer-events-none" />
           )}

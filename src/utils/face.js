@@ -66,3 +66,19 @@ export async function nyalakanKamera(videoEl) {
 export function matikanKamera(stream) {
   stream?.getTracks().forEach((t) => t.stop())
 }
+
+// Mengambil satu frame dari video sebagai gambar diam (data URL), dipakai untuk
+// menampilkan foto wajah yang berhasil dikenali setelah kamera dimatikan
+// (video akan menghitam begitu track kamera dihentikan).
+export function tangkapFotoDariVideo(videoEl) {
+  if (!videoEl || !videoEl.videoWidth) return null
+  const canvas = document.createElement('canvas')
+  canvas.width = videoEl.videoWidth
+  canvas.height = videoEl.videoHeight
+  const ctx = canvas.getContext('2d')
+  // dibalik horizontal supaya sesuai tampilan video (mirror) di layar
+  ctx.translate(canvas.width, 0)
+  ctx.scale(-1, 1)
+  ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height)
+  return canvas.toDataURL('image/jpeg', 0.85)
+}
