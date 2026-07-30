@@ -140,7 +140,7 @@ export default function AbsensiPage() {
         {user.nama} · <span className="font-mono">NIP {user.nip}</span> · {user.bagian}
       </p>
       <p className="text-ink/60 text-sm mb-6">
-        Lokasi apel: <span className="font-medium text-ink">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
+        Lokasi apel: <span className="font-medium text-ink">{lokasiKantor.nama}</span>
       </p>
 
       {statusLokasi === 'idle' && (
@@ -179,18 +179,8 @@ export default function AbsensiPage() {
             </div>
             <p className="text-sm text-ink/70">
               <span className="font-semibold text-ink">Lokasi Apel :</span>{' '}
-              <span className="font-medium">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
+              <span className="font-medium">{lokasiKantor.nama}</span>
             </p>
-          </div>
-
-          <div className="rounded-xl2 border border-ink/10 bg-white/60 p-6">
-            <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Informasi Karyawan</p>
-            <div className="space-y-1 text-sm">
-              <p><span className="text-ink/40">NIP</span> <span className="font-mono ml-1">{user.nip}</span></p>
-              <p><span className="text-ink/40">Nama</span> <span className="font-medium ml-1">{user.nama}</span></p>
-              <p><span className="text-ink/40">Bagian</span> <span className="ml-1">{user.bagian}</span></p>
-              <p><span className="text-ink/40">Jabatan</span> <span className="ml-1">{user.jabatan}</span></p>
-            </div>
           </div>
 
           {sesuaiLokasi && (

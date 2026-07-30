@@ -299,20 +299,8 @@ export default function FaceLogin() {
                   </div>
                   <p className="text-sm text-ink/70">
                     <span className="font-semibold text-ink">Lokasi Apel :</span>{' '}
-                    <span className="font-medium">{lokasiKantor.nama}</span> · radius {lokasiKantor.radius} m
+                    <span className="font-medium">{lokasiKantor.nama}</span>
                   </p>
-                </div>
-              )}
-
-              {pegawaiDikenali && (
-                <div className="rounded-xl2 border border-ink/10 bg-white/60 p-5">
-                  <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Informasi Karyawan</p>
-                  <div className="space-y-1 text-sm">
-                    <p><span className="text-ink/40">NIP</span> <span className="font-mono ml-1">{pegawaiDikenali.nip}</span></p>
-                    <p><span className="text-ink/40">Nama</span> <span className="font-medium ml-1">{pegawaiDikenali.nama}</span></p>
-                    <p><span className="text-ink/40">Bagian</span> <span className="ml-1">{pegawaiDikenali.bagian}</span></p>
-                    <p><span className="text-ink/40">Jabatan</span> <span className="ml-1">{pegawaiDikenali.jabatan}</span></p>
-                  </div>
                 </div>
               )}
 
