@@ -81,7 +81,7 @@ export default function Layout({ children }) {
             eA
           </div>
           <div>
-            <p className="font-display font-semibold leading-tight">e-Absen</p>
+            <p className="font-display font-semibold leading-tight">e-Apel</p>
             <p className="text-xs text-ink/50 font-mono">{isAdmin ? 'Panel Admin' : 'Panel Pegawai'}</p>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function Layout({ children }) {
               </svg>
             </button>
           )}
-          <p className="font-display font-semibold">e-Absen</p>
+          <p className="font-display font-semibold">e-Apel</p>
         </header>
 
         <main className={`flex-1 w-full max-w-5xl mx-auto px-5 py-8 ${!isAdmin ? 'pb-24 md:pb-8' : ''}`}>{children}</main>

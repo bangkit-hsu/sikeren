@@ -108,7 +108,7 @@ export default function DaftarWajah() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
           <h1 className="font-display font-semibold text-2xl">Pendaftaran Mandiri</h1>
-          <p className="text-ink/60 text-sm mt-1">Daftarkan data & wajah kamu untuk absen otomatis di e-Absen</p>
+          <p className="text-ink/60 text-sm mt-1">Daftarkan data & wajah kamu untuk absen otomatis di e-Apel</p>
         </div>
 
         {tahap === 'form' && (

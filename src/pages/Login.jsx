@@ -35,7 +35,7 @@ export default function Login() {
           <div className="w-14 h-14 mx-auto rounded-full bg-moss-700 text-paper flex items-center justify-center font-display font-semibold text-lg radar-ring">
             eA
           </div>
-          <h1 className="font-display font-semibold text-2xl mt-4">e-Absen</h1>
+          <h1 className="font-display font-semibold text-2xl mt-4">e-Apel</h1>
           <p className="text-ink/60 text-sm mt-1">Masuk untuk mencatat kehadiran apel</p>
         </div>
         <form onSubmit={handleSubmit} className="bg-white/60 border border-ink/10 rounded-xl2 p-6 space-y-4 shadow-sm">
@@ -73,7 +73,7 @@ export default function Login() {
           <Link to="/absen" className="underline">Masuk pakai pengenalan wajah</Link>
         </p>
         <p className="text-xs text-ink/40 text-center mt-2 font-mono">
-          Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
+          Developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
         </p>
       </div>
     </div>

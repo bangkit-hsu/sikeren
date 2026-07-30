@@ -62,7 +62,7 @@ export default function SetupAwal() {
     <div className="min-h-screen flex items-center justify-center px-5">
       <div className="w-full max-w-sm">
         <h1 className="font-display font-semibold text-2xl mb-1 text-center">Setup Awal</h1>
-        <p className="text-ink/60 text-sm mb-6 text-center">Buat akun admin pertama untuk mengelola e-Absen.</p>
+        <p className="text-ink/60 text-sm mb-6 text-center">Buat akun admin pertama untuk mengelola e-Apel.</p>
         <form onSubmit={buatAdmin} className="bg-white/60 border border-ink/10 rounded-xl2 p-6 space-y-4">
           <div>
             <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>

@@ -200,7 +200,7 @@ export default function FaceLogin() {
     <div className="min-h-screen flex items-center justify-center px-5 py-8">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <p className="text-xs font-mono uppercase tracking-wide text-gold-600">e-Absen · Apel Pagi</p>
+          <p className="text-xs font-mono uppercase tracking-wide text-gold-600">e-Apel · Apel Pagi</p>
           <h1 className="font-display font-semibold text-2xl mt-1">Absensi Wajah</h1>
           <p className="text-ink/60 text-sm mt-1">Posisikan wajah di dalam bingkai. Kamera mengenali otomatis dalam 3 detik.</p>
         </div>

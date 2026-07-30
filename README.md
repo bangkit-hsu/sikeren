@@ -1,4 +1,4 @@
-# e-Absen
+# e-Apel
 
 Aplikasi web absensi apel pegawai berbasis **radius titik koordinat** (geolocation).
 Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, real-time, bisa diakses dari HP semua pegawai).
@@ -73,7 +73,7 @@ Buka `http://localhost:5173`, klik **"pertama kali pakai?"** di halaman login un
 ```bash
 git init
 git add .
-git commit -m "e-Absen - initial commit"
+git commit -m "e-Apel - initial commit"
 git branch -M main
 git remote add origin https://github.com/<username>/<nama-repo>.git
 git push -u origin main

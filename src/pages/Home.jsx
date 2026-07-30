@@ -35,7 +35,7 @@ export default function Home() {
               <circle cx="12" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.6" />
             </svg>
           </div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">e-Absen</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">e-Apel</h1>
           <p className="text-paper/70 text-sm mt-1">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gold-500/40 to-transparent" />
@@ -89,7 +89,7 @@ export default function Home() {
 
       <div className="text-center pb-10 px-6">
         <p className="inline-block bg-moss-700 text-paper text-xs sm:text-sm rounded-full px-4 py-2 font-mono">
-          Website developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
+          Developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
         </p>
       </div>
     </div>
