@@ -80,24 +80,18 @@ export default function Layout({ children }) {
   const isAdmin = user?.role === 'admin'
 
   const [grupTerbuka, setGrupTerbuka] = useState(() => {
-    const awal = {}
-    adminNavGroups.forEach((group) => {
-      awal[group.label] = group.items.some((item) => location.pathname.startsWith(item.to))
-    })
-    return awal
+    const aktif = adminNavGroups.find((group) => group.items.some((item) => location.pathname.startsWith(item.to)))
+    return aktif ? aktif.label : adminNavGroups[0]?.label ?? null
   })
 
-  // Kalau navigasi berpindah ke menu di grup lain, buka grup itu otomatis.
+  // Kalau navigasi berpindah ke menu di grup lain, buka grup itu saja (accordion: grup lain otomatis tertutup).
   useEffect(() => {
-    adminNavGroups.forEach((group) => {
-      if (group.items.some((item) => location.pathname.startsWith(item.to))) {
-        setGrupTerbuka((prev) => (prev[group.label] ? prev : { ...prev, [group.label]: true }))
-      }
-    })
+    const aktif = adminNavGroups.find((group) => group.items.some((item) => location.pathname.startsWith(item.to)))
+    if (aktif) setGrupTerbuka(aktif.label)
   }, [location.pathname])
 
   function toggleGrup(label) {
-    setGrupTerbuka((prev) => ({ ...prev, [label]: !prev[label] }))
+    setGrupTerbuka((prev) => (prev === label ? null : label))
   }
 
   function handleLogout() {
@@ -139,7 +133,7 @@ export default function Layout({ children }) {
         <nav className="flex-1 overflow-y-auto p-3 space-y-4">
           {isAdmin ? (
             adminNavGroups.map((group) => {
-              const terbuka = !!grupTerbuka[group.label]
+              const terbuka = grupTerbuka === group.label
               return (
                 <div key={group.label}>
                   <button
