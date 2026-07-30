@@ -16,6 +16,7 @@ import AbsenHarianPage from './pages/admin/AbsenHarianPage.jsx'
 import LokasiPage from './pages/admin/LokasiPage.jsx'
 import HariAbsenPage from './pages/admin/HariAbsenPage.jsx'
 import PegawaiPage from './pages/admin/PegawaiPage.jsx'
+import BasedataPage from './pages/BasedataPage.jsx'
 
 export default function App() {
   const { user, loading } = useAuth()
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/basedata" element={<BasedataPage />} />
       <Route path="/absen" element={<FaceLogin />} />
       <Route path="/daftar-wajah" element={<DaftarWajah />} />
       <Route path="/login" element={<Login />} />

@@ -57,7 +57,13 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="bg-ink rounded-xl2 border border-ink/10 p-4 sm:p-6 shadow-sm flex flex-col text-paper">
+        <div className="bg-ink rounded-xl2 border border-ink/10 p-4 sm:p-6 shadow-sm flex flex-col text-paper relative">
+          <Link
+            to="/basedata"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 inline-flex items-center gap-1 bg-paper/10 hover:bg-paper/20 text-paper/70 text-[10px] sm:text-xs font-mono px-2 py-1 rounded-full border border-paper/20 transition-colors"
+          >
+            🏗️ Building
+          </Link>
           <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gold-500 text-ink flex items-center justify-center mb-3 sm:mb-4">
             <IkonAdmin />
           </div>
