@@ -1,8 +1,131 @@
 import { useEffect, useState } from 'react'
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where } from 'firebase/firestore'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { hashPassword } from '../../utils/hash'
 import PilihBagian from '../../components/PilihBagian.jsx'
+
+function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
+  const [form, setForm] = useState({
+    nip: pegawai.nip || '',
+    nama: pegawai.nama || '',
+    bagian: pegawai.bagian || '',
+    jabatan: pegawai.jabatan || '',
+    role: pegawai.role || 'pegawai',
+    passwordBaru: '',
+  })
+  const [menyimpan, setMenyimpan] = useState(false)
+  const [error, setError] = useState('')
+
+  async function simpan() {
+    setError('')
+    const nip = form.nip.trim()
+    if (!nip || !form.nama || !form.bagian || !form.jabatan) {
+      setError('Semua data wajib diisi.')
+      return
+    }
+    setMenyimpan(true)
+    try {
+      if (nip !== pegawai.nip) {
+        const cekQ = query(collection(db, 'users'), where('nip', '==', nip))
+        const cekSnap = await getDocs(cekQ)
+        if (!cekSnap.empty) {
+          setError('NIP sudah dipakai pegawai lain.')
+          setMenyimpan(false)
+          return
+        }
+      }
+      const perubahan = {
+        nip,
+        nama: form.nama.trim(),
+        bagian: form.bagian.trim(),
+        jabatan: form.jabatan.trim(),
+        role: form.role,
+      }
+      if (form.passwordBaru) {
+        perubahan.passwordHash = await hashPassword(form.passwordBaru)
+      }
+      await updateDoc(doc(db, 'users', pegawai.id), perubahan)
+      onSimpan()
+    } catch (err) {
+      setError('Gagal menyimpan: ' + err.message)
+      setMenyimpan(false)
+    }
+  }
+
+  return (
+    <li className="px-4 py-4 bg-moss-50/60">
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>
+          <input
+            value={form.nip}
+            onChange={(e) => setForm({ ...form, nip: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Nama Lengkap</label>
+          <input
+            value={form.nama}
+            onChange={(e) => setForm({ ...form, nama: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bagian</label>
+          <div className="mt-1">
+            <PilihBagian value={form.bagian} onChange={(v) => setForm({ ...form, bagian: v })} />
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Jabatan</label>
+          <input
+            value={form.jabatan}
+            onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Peran</label>
+          <select
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+          >
+            <option value="pegawai">Pegawai</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Password Baru (kosongkan jika tidak diubah)</label>
+          <input
+            type="text"
+            value={form.passwordBaru}
+            onChange={(e) => setForm({ ...form, passwordBaru: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+          />
+        </div>
+      </div>
+      {error && <p className="text-sm text-clay bg-clay/10 rounded-lg px-3 py-2 mt-3">{error}</p>}
+      <div className="flex gap-2 mt-4">
+        <button
+          onClick={simpan}
+          disabled={menyimpan}
+          className="text-sm font-medium bg-moss-700 text-paper rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
+        >
+          {menyimpan ? 'Menyimpan…' : 'Simpan'}
+        </button>
+        <button
+          onClick={onBatal}
+          disabled={menyimpan}
+          className="text-sm font-medium border border-ink/15 rounded-lg px-4 py-2 hover:bg-ink/5 transition-colors"
+        >
+          Batal
+        </button>
+      </div>
+    </li>
+  )
+}
 
 export default function PegawaiPage() {
   const [daftar, setDaftar] = useState([])
@@ -11,6 +134,7 @@ export default function PegawaiPage() {
   const [menyimpan, setMenyimpan] = useState(false)
   const [error, setError] = useState('')
   const [cari, setCari] = useState('')
+  const [sedangEdit, setSedangEdit] = useState(null)
 
   async function muatUlang() {
     setMemuat(true)
@@ -56,6 +180,11 @@ export default function PegawaiPage() {
   async function hapusAkun(id) {
     if (!confirm('Hapus akun ini?')) return
     await deleteDoc(doc(db, 'users', id))
+    await muatUlang()
+  }
+
+  async function simpanEdit() {
+    setSedangEdit(null)
     await muatUlang()
   }
 
@@ -150,23 +279,32 @@ export default function PegawaiPage() {
       ) : (
         <ul className="divide-y divide-ink/10 border border-ink/10 rounded-xl2 overflow-hidden">
           {daftarTersaring.map((u) => (
-            <li key={u.id} className="flex items-center justify-between px-4 py-3 bg-white/60">
-              <div>
-                <p className="font-medium">{u.nama}</p>
-                <p className="text-xs font-mono text-ink/40">NIP {u.nip} · {u.bagian}{u.jabatan ? ` · ${u.jabatan}` : ''}</p>
-                <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-ink text-paper' : 'bg-moss-100 text-moss-800'}`}>
-                  {u.role === 'admin' ? 'Admin' : 'Pegawai'}
-                </span>
-                {u.role === 'pegawai' && (
-                  <span className={`inline-block mt-1 ml-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${Array.isArray(u.faceDescriptor) ? 'bg-moss-50 text-moss-700 border border-moss-200' : 'bg-clay/10 text-clay border border-clay/30'}`}>
-                    {Array.isArray(u.faceDescriptor) ? 'Wajah terdaftar' : 'Belum rekam wajah'}
+            sedangEdit === u.id ? (
+              <FormEditPegawai key={u.id} pegawai={u} onBatal={() => setSedangEdit(null)} onSimpan={simpanEdit} />
+            ) : (
+              <li key={u.id} className="flex items-center justify-between px-4 py-3 bg-white/60">
+                <div>
+                  <p className="font-medium">{u.nama}</p>
+                  <p className="text-xs font-mono text-ink/40">NIP {u.nip} · {u.bagian}{u.jabatan ? ` · ${u.jabatan}` : ''}</p>
+                  <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-ink text-paper' : 'bg-moss-100 text-moss-800'}`}>
+                    {u.role === 'admin' ? 'Admin' : 'Pegawai'}
                   </span>
-                )}
-              </div>
-              <button onClick={() => hapusAkun(u.id)} className="text-sm text-clay font-medium hover:underline">
-                Hapus
-              </button>
-            </li>
+                  {u.role === 'pegawai' && (
+                    <span className={`inline-block mt-1 ml-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${Array.isArray(u.faceDescriptor) ? 'bg-moss-50 text-moss-700 border border-moss-200' : 'bg-clay/10 text-clay border border-clay/30'}`}>
+                      {Array.isArray(u.faceDescriptor) ? 'Wajah terdaftar' : 'Belum rekam wajah'}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button onClick={() => setSedangEdit(u.id)} className="text-sm text-moss-700 font-medium hover:underline">
+                    Edit
+                  </button>
+                  <button onClick={() => hapusAkun(u.id)} className="text-sm text-clay font-medium hover:underline">
+                    Hapus
+                  </button>
+                </div>
+              </li>
+            )
           ))}
           {daftarTersaring.length === 0 && (
             <li className="px-4 py-6 text-center text-ink/40 text-sm">Belum ada data.</li>

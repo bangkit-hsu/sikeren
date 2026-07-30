@@ -23,12 +23,12 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Profil: menampilkan Foto, NIP, Nama, Bagian, dan Jabatan pegawai. NIP/Nama/Bagian/Jabatan hanya bisa diubah admin — pegawai hanya bisa mengganti **foto profil** dan **password** sendiri.
 
 **Menu Admin** (login NIP & password di `/login`)
-- Rekap Pegawai: akumulasi kehadiran seluruh pegawai per periode (bulan/tahun).
+- Rekap Pegawai: akumulasi kehadiran seluruh pegawai per periode (bulan/tahun), dengan tombol **Download Excel** untuk mengunduh rekap bulan itu.
 - Area Lokasi: atur titik koordinat (latitude/longitude) & radius toleransi lokasi apel.
 - Hari Absen: cek list tiap tanggal dalam sebulan (bawaan Senin–Jumat) dan ubah langsung mana saja yang dihitung sebagai Hari Absen Apel — misalnya meniadakan tanggal libur nasional, atau menambahkan Sabtu untuk apel khusus. Jumlah ini dipakai untuk menghitung persentase kehadiran di Rekap Pegawai & Riwayat Saya.
-- Kelola Pegawai: tambah/hapus akun pegawai & admin, lihat status rekam wajah tiap pegawai.
+- Kelola Pegawai: tambah/**edit**/hapus akun pegawai & admin (NIP, Nama, Bagian, Jabatan, Peran, dan reset password), lihat status rekam wajah tiap pegawai.
 - Koreksi Absensi: ubah, hapus, atau tambahkan data absen pegawai secara manual untuk koreksi.
-- Absen Harian: pilih tanggal, lalu klik **Generate Absen** untuk menandai pegawai yang belum absen apel pada tanggal itu sebagai **"Tidak Apel"**. Ini proses manual — admin yang menentukan kapan dijalankan, tidak ada proses otomatis di background.
+- Absen Harian: pilih tanggal, lalu klik **Generate Absen** untuk menandai pegawai yang belum absen apel pada tanggal itu sebagai **"Tidak Apel"**. Ini proses manual — admin yang menentukan kapan dijalankan, tidak ada proses otomatis di background. Ada juga tombol **Download Excel** untuk mengunduh absensi harian tanggal itu (semua pegawai, termasuk yang belum absen).
 
 ## 1. Setup Firebase (sekali saja)
 

@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { formatTanggal } from '../../utils/date'
 import { generateTidakApelUntukTanggal } from '../../utils/absensiOtomatis'
+import { unduhExcel } from '../../utils/excel'
+import { LABEL_KETERANGAN, LABEL_STATUS } from '../../utils/keterangan'
 
 export default function AbsenHarianPage() {
   const [tanggal, setTanggal] = useState(formatTanggal())
   const [memproses, setMemproses] = useState(false)
+  const [mengunduh, setMengunduh] = useState(false)
   const [hasil, setHasil] = useState(null) // { dilewati, pegawaiDitandai } | null
   const [error, setError] = useState('')
 
@@ -24,6 +27,40 @@ export default function AbsenHarianPage() {
       setError('Gagal memproses: ' + err.message)
     } finally {
       setMemproses(false)
+    }
+  }
+
+  async function downloadExcel() {
+    if (!tanggal) return
+    setMengunduh(true)
+    setError('')
+    try {
+      const usersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'pegawai')))
+      const pegawai = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+
+      const absensiSnap = await getDocs(query(collection(db, 'absensi'), where('tanggal', '==', tanggal)))
+      const absensiPerUid = new Map(absensiSnap.docs.map((d) => [d.data().uid, d.data()]))
+
+      const baris = pegawai
+        .sort((a, b) => a.nama.localeCompare(b.nama))
+        .map((p) => {
+          const a = absensiPerUid.get(p.id)
+          return {
+            NIP: p.nip,
+            Nama: p.nama,
+            Bagian: p.bagian,
+            Jabatan: p.jabatan,
+            Tanggal: tanggal,
+            Jam: a?.jam || '-',
+            Status: a ? (LABEL_STATUS[a.status] || a.status) : 'Belum Absen',
+            Keterangan: a?.keterangan ? (LABEL_KETERANGAN[a.keterangan] || a.keterangan) : '-',
+          }
+        })
+      unduhExcel(`Absen-Harian-${tanggal}.xlsx`, baris, 'Absen Harian')
+    } catch (err) {
+      setError('Gagal mengunduh: ' + err.message)
+    } finally {
+      setMengunduh(false)
     }
   }
 
@@ -51,6 +88,13 @@ export default function AbsenHarianPage() {
           className="bg-moss-700 text-paper font-medium rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
         >
           {memproses ? 'Memproses…' : 'Generate Absen'}
+        </button>
+        <button
+          onClick={downloadExcel}
+          disabled={mengunduh || !tanggal}
+          className="border border-ink/15 font-medium rounded-lg px-4 py-2 hover:bg-ink/5 transition-colors disabled:opacity-50"
+        >
+          {mengunduh ? 'Mengunduh…' : 'Download Excel'}
         </button>
       </div>
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
+import { unduhExcel } from '../../utils/excel'
 
 export default function RekapPage() {
   const now = new Date()
@@ -64,6 +65,25 @@ export default function RekapPage() {
       )
   }, [pegawai, absensi, cari])
 
+  function downloadExcel() {
+    const baris = rekap.map((p) => ({
+      NIP: p.nip,
+      Nama: p.nama,
+      Bagian: p.bagian,
+      Jabatan: p.jabatan,
+      'Sesuai Lokasi': p.sesuai,
+      'Diluar Lokasi': p.luar,
+      'Tidak Apel': p.tidakApel,
+      'Apel Gabungan': p.gabungan,
+      'Apel Hari Besar': p.hariBesar,
+      WFH: p.wfh,
+      'Total Hadir': p.total,
+      'Hari Absen': hariKerja,
+      '% Kehadiran': hariKerja > 0 ? Math.round((p.total / hariKerja) * 100) : 0,
+    }))
+    unduhExcel(`Rekap-Absen-${namaBulan(bulan)}-${tahun}.xlsx`, baris, 'Rekap Absen')
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
@@ -78,6 +98,13 @@ export default function RekapPage() {
           <select value={tahun} onChange={(e) => setTahun(Number(e.target.value))} className="rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm">
             {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
+          <button
+            onClick={downloadExcel}
+            disabled={memuat || rekap.length === 0}
+            className="rounded-lg bg-moss-700 text-paper text-sm font-medium px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
+          >
+            Download Excel
+          </button>
         </div>
       </div>
 
