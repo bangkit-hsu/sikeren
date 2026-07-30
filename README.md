@@ -18,7 +18,7 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 **Menu Pegawai** (setelah masuk lewat wajah atau NIP/password)
 - Absensi: cek lokasi GPS otomatis dibandingkan dengan titik koordinat kantor → status **"Berada Sesuai Lokasi"** atau **"Berada Diluar Lokasi"**.
 - Jika sesuai lokasi, keterangan otomatis terisi **"Apel Pagi"**. Jika diluar lokasi, wajib pilih keterangan: **Apel Gabungan**, **Apel Hari Besar**, atau **WFH**.
-- Batas absen apel pagi adalah **pukul 08:00**. Pegawai terdaftar yang belum absen setelah jam tersebut otomatis tercatat **"Tidak Apel"** (lihat penjelasan di bawah) — namun tetap bisa absen kapan saja setelahnya untuk menggantikan catatan otomatis tersebut dengan absen yang sesungguhnya.
+- Absen apel hanya bisa dilakukan mulai pukul **07:50 WITA** (UTC+8) — sebelum itu muncul keterangan **"Jam Absen Apel Belum Dimulai"**. Begitu admin membuka menu **Rekap Absen**, sesi absen hari itu otomatis ditutup dan pegawai yang belum sempat absen akan melihat **"Jam Absen Apel Sudah Selesai"**.
 - Riwayat Saya: rekap absensi pribadi per periode (bulan/tahun), lengkap dengan jumlah Hari Absen.
 - Profil: menampilkan Foto, NIP, Nama, Bagian, dan Jabatan pegawai. NIP/Nama/Bagian/Jabatan hanya bisa diubah admin — pegawai hanya bisa mengganti **foto profil** dan **password** sendiri.
 
@@ -28,7 +28,7 @@ Dibangun dengan React + Vite, data disimpan di **Firebase Firestore** (cloud, re
 - Hari Absen: cek list tiap tanggal dalam sebulan (bawaan Senin–Jumat) dan ubah langsung mana saja yang dihitung sebagai Hari Absen Apel — misalnya meniadakan tanggal libur nasional, atau menambahkan Sabtu untuk apel khusus. Jumlah ini dipakai untuk menghitung persentase kehadiran di Rekap Pegawai & Riwayat Saya.
 - Kelola Pegawai: tambah/**edit**/hapus akun pegawai & admin (NIP, Nama, Bagian, Jabatan, Peran, dan reset password), lihat status rekam wajah tiap pegawai.
 - Koreksi Absensi: ubah, hapus, atau tambahkan data absen pegawai secara manual untuk koreksi.
-- Absen Harian: pilih tanggal, lalu klik **Generate Absen** untuk menandai pegawai yang belum absen apel pada tanggal itu sebagai **"Tidak Apel"**. Ini proses manual — admin yang menentukan kapan dijalankan, tidak ada proses otomatis di background. Ada juga tombol **Download Excel** untuk mengunduh absensi harian tanggal itu (semua pegawai, termasuk yang belum absen).
+- Absen Harian: pilih tanggal, lalu klik **Generate Absen** untuk menandai pegawai yang belum absen apel pada tanggal itu sebagai **"Tidak Apel"**. Ini proses manual — admin yang menentukan kapan dijalankan, tidak ada proses otomatis di background. Tanggal yang bisa di-generate mengikuti pengaturan Hari Absensi Apel (tombol Generate nonaktif untuk tanggal yang bukan Hari Absen). Ada juga tombol **Download Excel** untuk mengunduh absensi harian tanggal itu (semua pegawai, termasuk yang belum absen).
 
 ## 1. Setup Firebase (sekali saja)
 
@@ -114,6 +114,7 @@ users/{id}        { nip, nama, bagian, jabatan, passwordHash, role: 'admin' | 'p
                       faceDescriptor?: number[128], foto?: string (data URL JPEG) }
 settings/lokasi    { nama, lat, lng, radius }
 settings/hariAbsen { override: { 'YYYY-MM-DD': true|false, ... } } — hanya tanggal yang beda dari bawaan (Senin-Jumat)
+settings/penutupanApel { tanggal: 'YYYY-MM-DD' } — tanggal terakhir sesi absen apel ditutup (ditulis otomatis saat admin membuka Rekap Absen)
 absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
                       keterangan: 'gabungan' | 'senam' | 'wfh' | null,
                       lat, lng, jarakMeter, dibuat }

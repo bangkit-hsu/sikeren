@@ -1,9 +1,39 @@
+// Zona waktu kantor: WITA (Asia/Makassar, UTC+8) — dipakai supaya jam & tanggal absen
+// konsisten untuk semua pegawai apa pun zona waktu yang tersetel di perangkat mereka.
+const ZONA_WAKTU_KANTOR = 'Asia/Makassar'
+
+function bagianWaktu(date, timeZone) {
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  })
+  const bagian = Object.fromEntries(fmt.formatToParts(date).map((p) => [p.type, p.value]))
+  return {
+    tanggalIso: `${bagian.year}-${bagian.month}-${bagian.day}`,
+    jam: Number(bagian.hour),
+    menit: Number(bagian.minute),
+    detik: Number(bagian.second),
+  }
+}
+
+export function waktuKantorSaatIni(date = new Date()) {
+  return bagianWaktu(date, ZONA_WAKTU_KANTOR)
+}
+
 export function formatTanggal(date = new Date()) {
-  return date.toISOString().slice(0, 10) // YYYY-MM-DD
+  return waktuKantorSaatIni(date).tanggalIso
 }
 
 export function formatJam(date = new Date()) {
-  return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: ZONA_WAKTU_KANTOR })
+}
+
+// Absen apel baru bisa dilakukan mulai jam 07:50 WITA.
+export const JAM_MULAI_APEL = { jam: 7, menit: 50 }
+
+export function apelSudahMulai(date = new Date()) {
+  const { jam, menit } = waktuKantorSaatIni(date)
+  return jam > JAM_MULAI_APEL.jam || (jam === JAM_MULAI_APEL.jam && menit >= JAM_MULAI_APEL.menit)
 }
 
 export function namaBulan(bulan) {
@@ -50,20 +80,4 @@ export function daftarTanggalKerja(tahun, bulan, overrideHariAbsen = {}) {
     if (apakahHariAbsen(iso, overrideHariAbsen)) list.push(iso)
   }
   return list
-}
-
-// Batas waktu absen apel pagi. Setelah jam ini, pegawai terdaftar yang belum
-// absen pada hari itu dianggap "Tidak Apel" secara otomatis.
-export const BATAS_JAM_APEL = '08:00'
-
-// Mengecek apakah batas absen apel untuk tanggal (YYYY-MM-DD) tertentu sudah lewat.
-// Tanggal di masa lalu selalu dianggap sudah lewat; tanggal di masa depan belum.
-export function sudahLewatBatasApel(tanggalIso, sekarang = new Date()) {
-  const hariIniStr = formatTanggal(sekarang)
-  if (tanggalIso < hariIniStr) return true
-  if (tanggalIso > hariIniStr) return false
-  const [jam, menit] = BATAS_JAM_APEL.split(':').map(Number)
-  const batas = new Date(sekarang)
-  batas.setHours(jam, menit, 0, 0)
-  return sekarang >= batas
 }

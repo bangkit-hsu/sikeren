@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../firebase'
-import { namaBulan, hitungHariKerja } from '../../utils/date'
+import { namaBulan, hitungHariKerja, formatTanggal } from '../../utils/date'
 import { unduhExcel } from '../../utils/excel'
 
 export default function RekapPage() {
@@ -38,6 +38,15 @@ export default function RekapPage() {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tahun, bulan])
+
+  useEffect(() => {
+    // Membuka menu Rekap Absen menandakan admin sudah menutup sesi absen apel hari ini —
+    // setelah ini pegawai akan melihat "Jam Absen Apel Sudah Selesai".
+    setDoc(doc(db, 'settings', 'penutupanApel'), {
+      tanggal: formatTanggal(),
+      ditutupPada: serverTimestamp(),
+    }).catch(() => {})
+  }, [])
 
   const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, overrideHariAbsen), [tahun, bulan, overrideHariAbsen])
 
@@ -172,7 +181,7 @@ export default function RekapPage() {
       )}
 
       <p className="text-xs text-ink/40 mt-4 font-mono">
-        "Tidak Apel" ditandai lewat menu Absen Harian, bukan otomatis.
+        "Tidak Apel" ditandai lewat menu Absen Harian, bukan otomatis. Membuka halaman ini menutup sesi Absen Apel hari ini untuk pegawai.
       </p>
     </div>
   )

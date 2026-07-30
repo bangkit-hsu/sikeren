@@ -10,7 +10,7 @@ import {
   ambilDescriptorDariVideo, cariKecocokanTerbaik,
 } from '../utils/face'
 import { hitungJarakMeter, ambilLokasiSaatIni } from '../utils/geo'
-import { formatTanggal, formatJam } from '../utils/date'
+import { formatTanggal, formatJam, apelSudahMulai } from '../utils/date'
 import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI, LABEL_KETERANGAN } from '../utils/keterangan'
 import CincinPemindai from '../components/CincinPemindai.jsx'
 import HeroKecil from '../components/HeroKecil.jsx'
@@ -25,6 +25,7 @@ export default function FaceLogin() {
   const streamRef = useRef(null)
   const daftarPegawaiRef = useRef([])
   const berhentiRef = useRef(false)
+  const timerJadwalRef = useRef(null)
 
   // menyiapkan | memindai | tidak_dikenali | dikenali | mengecek_lokasi |
   // siap_absen | sudah_absen | mengirim | sukses | error
@@ -46,6 +47,7 @@ export default function FaceLogin() {
     return () => {
       berhentiRef.current = true
       matikanKamera(streamRef.current)
+      if (timerJadwalRef.current) clearTimeout(timerJadwalRef.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -58,6 +60,25 @@ export default function FaceLogin() {
     setKeterangan('')
     setPlaceholderTidakApelId(null)
     setFotoTertangkap(null)
+
+    if (!apelSudahMulai()) {
+      setTahap('belum_mulai')
+      timerJadwalRef.current = setTimeout(() => {
+        if (!berhentiRef.current) mulai()
+      }, 15000)
+      return
+    }
+
+    try {
+      const penutupSnap = await getDoc(doc(db, 'settings', 'penutupanApel'))
+      if (penutupSnap.exists() && penutupSnap.data().tanggal === formatTanggal()) {
+        setTahap('sudah_selesai')
+        return
+      }
+    } catch {
+      // kalau gagal cek status penutupan, lanjutkan saja seperti biasa
+    }
+
     try {
       const [, snap] = await Promise.all([
         muatModelWajah(),
@@ -153,6 +174,15 @@ export default function FaceLogin() {
     if (sesuaiLokasi === false && !keterangan) return
     setTahap('mengirim')
     try {
+      const penutupSnap = await getDoc(doc(db, 'settings', 'penutupanApel'))
+      if (penutupSnap.exists() && penutupSnap.data().tanggal === formatTanggal()) {
+        setTahap('sudah_selesai')
+        return
+      }
+    } catch {
+      // kalau gagal cek, lanjutkan saja proses absen
+    }
+    try {
       const now = new Date()
       const data = {
         uid: pegawaiDikenali.id,
@@ -205,6 +235,24 @@ export default function FaceLogin() {
       />
       <div className="flex justify-center px-5 py-8">
       <div className="w-full max-w-sm">
+
+        {tahap === 'belum_mulai' && (
+          <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-6 text-center">
+            <p className="font-display font-semibold text-lg text-moss-800 mb-1">Jam Absen Apel Belum Dimulai</p>
+            <p className="text-sm text-ink/60">Absen apel bisa dilakukan mulai pukul <span className="font-medium text-ink">07:50 WITA</span>. Halaman ini akan otomatis memeriksa ulang secara berkala.</p>
+          </div>
+        )}
+
+        {tahap === 'sudah_selesai' && (
+          <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-6 text-center">
+            <p className="font-display font-semibold text-lg text-clay mb-1">Jam Absen Apel Sudah Selesai</p>
+            <p className="text-sm text-ink/60 mb-4">Admin sudah menutup sesi absen apel hari ini. Kalau ini keliru, hubungi admin.</p>
+            <button onClick={() => navigate('/login')} className="text-sm underline text-moss-700 font-medium">Masuk pakai NIP &amp; Password</button>
+          </div>
+        )}
+
+        {tahap !== 'belum_mulai' && tahap !== 'sudah_selesai' && (
+        <>
         {/* Kamera bulat, tetap tampil di bagian atas selama proses berlangsung */}
         <div className="relative aspect-square w-52 sm:w-60 mx-auto rounded-full overflow-hidden bg-ink border border-ink/10">
           {fotoTertangkap ? (
@@ -388,6 +436,8 @@ export default function FaceLogin() {
             </p>
           )}
         </div>
+        </>
+        )}
       </div>
     </div>
     </div>

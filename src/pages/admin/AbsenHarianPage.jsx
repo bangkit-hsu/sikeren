@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
-import { formatTanggal } from '../../utils/date'
+import { formatTanggal, apakahHariAbsen } from '../../utils/date'
 import { generateTidakApelUntukTanggal } from '../../utils/absensiOtomatis'
 import { unduhExcel } from '../../utils/excel'
 import { LABEL_KETERANGAN, LABEL_STATUS } from '../../utils/keterangan'
@@ -12,6 +12,19 @@ export default function AbsenHarianPage() {
   const [mengunduh, setMengunduh] = useState(false)
   const [hasil, setHasil] = useState(null) // { dilewati, pegawaiDitandai } | null
   const [error, setError] = useState('')
+  const [overrideHariAbsen, setOverrideHariAbsen] = useState(null) // null = belum dimuat
+
+  useEffect(() => {
+    async function muat() {
+      const snap = await getDoc(doc(db, 'settings', 'hariAbsen'))
+      setOverrideHariAbsen(snap.exists() ? snap.data().override || {} : {})
+    }
+    muat()
+  }, [])
+
+  const tanggalAdalahHariAbsen = overrideHariAbsen !== null && tanggal
+    ? apakahHariAbsen(tanggal, overrideHariAbsen)
+    : true // sambil memuat, jangan tampilkan peringatan dulu
 
   async function generate() {
     if (!tanggal) return
@@ -70,6 +83,10 @@ export default function AbsenHarianPage() {
       <p className="text-ink/60 text-sm mb-6">
         Pilih tanggal, lalu klik <span className="font-medium text-ink">Generate Absen</span> untuk menandai pegawai
         yang belum melakukan absen apel pada tanggal itu sebagai <span className="font-medium text-ink">Tidak Apel</span>.
+        Tanggal yang bisa di-generate mengikuti pengaturan di menu Hari Absensi Apel.
+      </p>
+      <p className="text-xs text-ink/40 mb-6 font-mono">
+        Pegawai baru bisa absen mulai pukul 07:50 WITA. Membuka menu Rekap Absen akan menutup sesi absen apel hari ini untuk pegawai.
       </p>
 
       <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 flex flex-wrap items-end gap-3 mb-6">
@@ -84,7 +101,7 @@ export default function AbsenHarianPage() {
         </div>
         <button
           onClick={generate}
-          disabled={memproses || !tanggal}
+          disabled={memproses || !tanggal || !tanggalAdalahHariAbsen}
           className="bg-moss-700 text-paper font-medium rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
         >
           {memproses ? 'Memproses…' : 'Generate Absen'}
@@ -97,6 +114,12 @@ export default function AbsenHarianPage() {
           {mengunduh ? 'Mengunduh…' : 'Download Excel'}
         </button>
       </div>
+
+      {!tanggalAdalahHariAbsen && (
+        <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-4 text-clay text-sm mb-4">
+          Tanggal {tanggal} bukan Hari Absen (cek/atur di menu <span className="font-medium">Hari Absensi Apel</span>), jadi tombol Generate Absen dinonaktifkan untuk tanggal ini.
+        </div>
+      )}
 
       {error && <p className="text-sm text-clay bg-clay/10 rounded-lg px-3 py-2 mb-4">{error}</p>}
 

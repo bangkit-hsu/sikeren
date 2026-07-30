@@ -5,7 +5,7 @@ import {
 import { db } from '../../firebase'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { hitungJarakMeter, ambilLokasiSaatIni } from '../../utils/geo'
-import { formatTanggal, formatJam } from '../../utils/date'
+import { formatTanggal, formatJam, apelSudahMulai } from '../../utils/date'
 import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI, LABEL_KETERANGAN } from '../../utils/keterangan'
 
 export default function AbsensiPage() {
@@ -21,10 +21,30 @@ export default function AbsensiPage() {
   const [mengirim, setMengirim] = useState(false)
   const [pesanSukses, setPesanSukses] = useState('')
   const [memuat, setMemuat] = useState(true)
+  const [statusJadwal, setStatusJadwal] = useState('memeriksa') // memeriksa | ok | belum_mulai | sudah_selesai
 
   useEffect(() => {
+    let timerId = null
+    async function periksaJadwal() {
+      if (!apelSudahMulai()) {
+        setStatusJadwal('belum_mulai')
+        timerId = setTimeout(periksaJadwal, 15000)
+        return
+      }
+      try {
+        const penutupSnap = await getDoc(doc(db, 'settings', 'penutupanApel'))
+        if (penutupSnap.exists() && penutupSnap.data().tanggal === formatTanggal()) {
+          setStatusJadwal('sudah_selesai')
+          return
+        }
+      } catch {
+        // kalau gagal cek, lanjutkan saja
+      }
+      setStatusJadwal('ok')
+    }
     async function init() {
       setMemuat(true)
+      await periksaJadwal()
       const lokasiSnap = await getDoc(doc(db, 'settings', 'lokasi'))
       if (lokasiSnap.exists()) setLokasiKantor(lokasiSnap.data())
 
@@ -48,6 +68,7 @@ export default function AbsensiPage() {
       setMemuat(false)
     }
     init()
+    return () => { if (timerId) clearTimeout(timerId) }
   }, [user.id])
 
   async function cekLokasi() {
@@ -72,6 +93,16 @@ export default function AbsensiPage() {
   async function handleAbsen() {
     if (sesuaiLokasi === false && !keterangan) return
     setMengirim(true)
+    try {
+      const penutupSnap = await getDoc(doc(db, 'settings', 'penutupanApel'))
+      if (penutupSnap.exists() && penutupSnap.data().tanggal === formatTanggal()) {
+        setStatusJadwal('sudah_selesai')
+        setMengirim(false)
+        return
+      }
+    } catch {
+      // kalau gagal cek, lanjutkan saja
+    }
     try {
       const now = new Date()
       const data = {
@@ -102,6 +133,30 @@ export default function AbsensiPage() {
   }
 
   if (memuat) return <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+
+  if (statusJadwal === 'belum_mulai') {
+    return (
+      <div className="max-w-lg">
+        <h1 className="font-display font-semibold text-2xl mb-6">Absensi Apel</h1>
+        <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-6 text-center">
+          <p className="font-display font-semibold text-lg text-moss-800 mb-1">Jam Absen Apel Belum Dimulai</p>
+          <p className="text-sm text-ink/60">Absen apel bisa dilakukan mulai pukul <span className="font-medium text-ink">07:50 WITA</span>. Halaman ini akan otomatis memeriksa ulang secara berkala.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (statusJadwal === 'sudah_selesai') {
+    return (
+      <div className="max-w-lg">
+        <h1 className="font-display font-semibold text-2xl mb-6">Absensi Apel</h1>
+        <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-6 text-center">
+          <p className="font-display font-semibold text-lg text-clay mb-1">Jam Absen Apel Sudah Selesai</p>
+          <p className="text-sm text-ink/60">Admin sudah menutup sesi absen apel hari ini. Kalau ini keliru, hubungi admin.</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!lokasiKantor) {
     return (
