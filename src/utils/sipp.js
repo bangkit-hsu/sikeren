@@ -1,10 +1,10 @@
 import * as XLSX from 'xlsx'
 
 // Membaca file Excel rekapitulasi presensi (format baku: 3 baris header lalu data),
-// mengembalikan array ringkasan per pegawai. Mengikuti struktur kolom baku:
-// Nama, NIP, Pangkat/Gol, Status, Jumlah Hari Kerja, Hadir, Cuti, TL, Perbaikan Presensi,
-// Dianggap Tidak Hadir, Tidak Hadir, [Check In x6], [Check Out x6], Perbaikan Check Out,
-// Alpa, Pengurangan Presensi, Pengurangan Apel, Nilai Akhir, Ket.
+// mengembalikan array ringkasan per pegawai berikut kolom-kolom yang dipakai untuk
+// menghitung ulang Pengurangan Apel (kolom AA): L (CheckIn Tepat Waktu), N (CheckIn
+// Terlambat Diterima), R (CheckOut Tepat Waktu), T (CheckOut Lebih Awal Diterima),
+// X (Perbaikan Check Out), Z (Pengurangan Presensi).
 export async function parseFileSipp(file) {
   const arrayBuffer = await file.arrayBuffer()
   const wb = XLSX.read(arrayBuffer, { type: 'array' })
@@ -41,9 +41,12 @@ export async function parseFileSipp(file) {
       cuti: angka(b[6]),
       tl: angka(b[7]),
       tidakHadir: angka(b[10]),
-      penguranganPresensi: angka(b[25]),
-      penguranganApel: angka(b[26]),
-      nilaiAkhir: angka(b[27]),
+      checkInTepatWaktu: angka(b[11]), // kolom L
+      checkInTerlambatDiterima: angka(b[13]), // kolom N
+      checkOutTepatWaktu: angka(b[17]), // kolom R
+      checkOutLebihAwalDiterima: angka(b[19]), // kolom T
+      perbaikanCheckOut: angka(b[23]), // kolom X
+      penguranganPresensi: angka(b[25]), // kolom Z
     })
   }
   if (hasil.length === 0) {

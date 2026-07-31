@@ -9,9 +9,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 3,
-    "penguranganApel": 0,
-    "nilaiAkhir": 97
+    "checkInTepatWaktu": 4,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 3
   },
   {
     "nama": "AGUS WAHYUDI",
@@ -23,9 +26,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 6,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 4,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 2,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NOR ILHAM",
@@ -37,9 +43,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HERLIYANI",
@@ -51,9 +60,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 2,
+    "penguranganPresensi": 0
   },
   {
     "nama": "M HUSNI THAMRIN",
@@ -65,9 +77,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SAUKANI",
@@ -79,9 +94,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD FAKHRI MULIA HARYANDI",
@@ -93,9 +111,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RAIHANSYAH",
@@ -107,9 +128,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "TABERANI",
@@ -121,9 +145,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 2,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 3,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NELLIA ANNISA",
@@ -135,9 +162,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 7,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 6,
+    "checkInTerlambatDiterima": 3,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "DEWI SEPTIA MAULIDA",
@@ -149,9 +179,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NIA DEWI APRILIANY",
@@ -163,9 +196,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 1,
-    "penguranganPresensi": 5.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 94.5
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 5.5
   },
   {
     "nama": "KHAIRUN NIDA",
@@ -177,9 +213,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 3,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ZAHRATUNNISA",
@@ -191,9 +230,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 9,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SARAH AMANDA",
@@ -205,9 +247,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 3.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 96.5
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 3.5
   },
   {
     "nama": "HERLENA",
@@ -219,9 +264,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "BASUKI",
@@ -233,9 +281,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 6,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 6,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NAILA CITRA",
@@ -247,9 +298,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 2,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 2,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RISA ASTALINA",
@@ -261,9 +315,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ERMA ERIANI",
@@ -275,9 +332,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "LIA AGUSTINA",
@@ -289,9 +349,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "AKHMAD RIJANI",
@@ -303,9 +366,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "WILDA ELYANA",
@@ -317,9 +383,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "AGUS FAHRIADI",
@@ -331,9 +400,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "WINDA FAIZAH",
@@ -345,9 +417,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ADNA MUZALIFAH",
@@ -359,9 +434,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "RUSTINA",
@@ -373,9 +451,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 3,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "BUDI",
@@ -387,9 +468,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MERIYANTI",
@@ -401,9 +485,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "KHAIRIAN NOOR ASFI",
@@ -415,9 +502,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "WAHID LAFI NAIM",
@@ -429,9 +519,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "FATIHANI",
@@ -443,9 +536,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 2,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HERLY IFANSYAH",
@@ -457,9 +553,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 7,
+    "checkInTerlambatDiterima": 2,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "AJIDI NOOR",
@@ -471,9 +570,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ERMA SEPTIANISA",
@@ -485,9 +587,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SYAHRUDIN",
@@ -499,9 +604,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "DIDI SAFARI",
@@ -513,9 +621,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 4,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ASRIANNOOR",
@@ -527,9 +638,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "IMANNUDDIN",
@@ -541,9 +655,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 11,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 5,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 5,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "YURIYDILLAH",
@@ -555,9 +672,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 95
+    "checkInTepatWaktu": 7,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 5
   },
   {
     "nama": "MUHAMMAD IRFANUDDIN",
@@ -569,9 +689,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SUGENG RIYADI",
@@ -583,9 +706,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "BUDI SAPUTRA",
@@ -597,9 +723,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD SHAUFI TAQIYUDDIN",
@@ -611,9 +740,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 5,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 5,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD ROMI",
@@ -625,9 +757,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 8,
-    "penguranganApel": 0,
-    "nilaiAkhir": 92
+    "checkInTepatWaktu": 7,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 8
   },
   {
     "nama": "JAKI DIPA RAMADHANI",
@@ -639,9 +774,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "M. S. ROBY AWALUDIN",
@@ -653,9 +791,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "AHMAD HUZAILI YAMANI",
@@ -667,9 +808,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 2.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 97.5
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 2.5
   },
   {
     "nama": "BUNGSU RAHMADAN",
@@ -681,9 +825,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 4,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 4,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "FAHRIADI",
@@ -695,9 +842,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 2,
-    "penguranganApel": 0,
-    "nilaiAkhir": 98
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 2
   },
   {
     "nama": "RUSNI",
@@ -709,9 +859,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MAHRETA",
@@ -723,9 +876,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "JOKO HARIADI",
@@ -737,9 +893,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ABU MUSYAFA AHMAD",
@@ -751,9 +910,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 8,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 7,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 7,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "YULIA SAFITRI",
@@ -765,9 +927,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 1.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 98.5
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 1.5
   },
   {
     "nama": "RIZAL FAHMI",
@@ -779,9 +944,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NAJERIANSYAH",
@@ -793,9 +961,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HENDRI TISYA",
@@ -807,9 +978,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ADI LESMANA",
@@ -821,9 +995,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 5,
-    "penguranganPresensi": 20,
-    "penguranganApel": 0,
-    "nilaiAkhir": 80
+    "checkInTepatWaktu": 0,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 0,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 20
   },
   {
     "nama": "ZAKY MUBARAK",
@@ -835,9 +1012,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD WAHIDIN NOOR",
@@ -849,9 +1029,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SYAMSIR MUKHTAR",
@@ -863,9 +1046,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ROHAMA",
@@ -877,9 +1063,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 3,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 4,
-    "penguranganApel": 0,
-    "nilaiAkhir": 96
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 4
   },
   {
     "nama": "IWAN",
@@ -891,9 +1080,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 2,
-    "penguranganPresensi": 16,
-    "penguranganApel": 0,
-    "nilaiAkhir": 84
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 9,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 16
   },
   {
     "nama": "MUHAMMAD HUSNI",
@@ -905,9 +1097,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "KHAIRUSSALIM",
@@ -919,9 +1114,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 7,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 9,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SITI MUTTIKAFIANITA",
@@ -933,9 +1131,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 1,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD IQBAL HUSAINI",
@@ -947,9 +1148,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 9,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 6,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 6,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "AHMAD CHAIDIR",
@@ -961,9 +1165,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 6,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 9,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RAHMAT HIDAYAT",
@@ -975,9 +1182,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 1,
-    "penguranganPresensi": 9.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 90.5
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 9.5
   },
   {
     "nama": "RIFANI",
@@ -989,9 +1199,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SYAFRUDINNOR",
@@ -1003,9 +1216,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 3,
-    "penguranganPresensi": 47.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 52.5
+    "checkInTepatWaktu": 1,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 47.5
   },
   {
     "nama": "MUHAMMAD RIJALDI RAISY",
@@ -1017,9 +1233,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 1.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 98.5
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 1.5
   },
   {
     "nama": "NURHIDAYAH",
@@ -1031,9 +1250,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HANDI RIZALI",
@@ -1045,9 +1267,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 1,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ABD ROHIM",
@@ -1059,9 +1284,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 4,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "YATI YUNITA",
@@ -1073,9 +1301,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 8,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 8,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 7,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SHADIKIN",
@@ -1087,9 +1318,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ADI AGUSTIAWAN",
@@ -1101,9 +1335,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 6,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 5,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SAWKI",
@@ -1115,9 +1352,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "HAJJAH MARINA",
@@ -1129,9 +1369,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 7,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 9,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 9,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "KHAIRUNISA",
@@ -1143,9 +1386,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 8,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 8,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 7,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HIDAYATULLAH",
@@ -1157,9 +1403,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "WALID",
@@ -1171,9 +1420,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "JUMIYATI",
@@ -1185,9 +1437,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 11,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 11,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SAID MAHFUZH",
@@ -1199,9 +1454,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 4,
-    "penguranganApel": 0,
-    "nilaiAkhir": 96
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 4
   },
   {
     "nama": "NORHAYANI",
@@ -1213,9 +1471,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 2,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RUBY FRIDAYANTI",
@@ -1227,9 +1488,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "YULIETA AYU MAULIDA",
@@ -1241,9 +1505,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MAHRIKI HIDAYAT",
@@ -1255,9 +1522,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 6,
-    "penguranganApel": 0,
-    "nilaiAkhir": 94
+    "checkInTepatWaktu": 5,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 5,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 6
   },
   {
     "nama": "NIDA ANHAFIA",
@@ -1269,9 +1539,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 2,
-    "penguranganApel": 0,
-    "nilaiAkhir": 98
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 2
   },
   {
     "nama": "ASPA",
@@ -1283,9 +1556,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 7,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 9,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 9,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "DWIENTI TAYUSIE",
@@ -1297,9 +1573,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD BAKRI",
@@ -1311,9 +1590,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RAHMAT NOVEA RAHMAN",
@@ -1325,9 +1607,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NUREL AZIMI",
@@ -1339,9 +1624,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 8,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HASAN BASRI",
@@ -1353,9 +1641,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "HARIYATI",
@@ -1367,9 +1658,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 2,
-    "penguranganApel": 0,
-    "nilaiAkhir": 98
+    "checkInTepatWaktu": 13,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 2
   },
   {
     "nama": "TAUFIK HIDAYAT",
@@ -1381,9 +1675,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 5,
     "tidakHadir": 2,
-    "penguranganPresensi": 15.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 84.5
+    "checkInTepatWaktu": 8,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 7,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 15.5
   },
   {
     "nama": "RUDIANSYAH",
@@ -1395,9 +1692,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 4,
-    "penguranganPresensi": 17,
-    "penguranganApel": 0,
-    "nilaiAkhir": 83
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 12,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 17
   },
   {
     "nama": "MUHAMAD YUSRIL MAHENDRA",
@@ -1409,9 +1709,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 8,
     "tidakHadir": 2,
-    "penguranganPresensi": 16,
-    "penguranganApel": 0,
-    "nilaiAkhir": 84
+    "checkInTepatWaktu": 6,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 5,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 16
   },
   {
     "nama": "H. LISDI",
@@ -1423,9 +1726,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 10,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 2,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 3,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RAHMANI",
@@ -1437,9 +1743,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "TRI AJI SETIAWAN",
@@ -1451,9 +1760,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 3,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SANDI HARIYANTO",
@@ -1465,9 +1777,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 10,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 10,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "AKHMAD RAHMADANI",
@@ -1479,9 +1794,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MILIYANI SUSANTI",
@@ -1493,9 +1811,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MARDHATULLAH",
@@ -1507,9 +1828,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "ERLINDAWATI",
@@ -1521,9 +1845,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "KHAIRRUDIN",
@@ -1535,9 +1862,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0.5,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99.5
+    "checkInTepatWaktu": 14,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0.5
   },
   {
     "nama": "LAMSYAH JULIADY",
@@ -1549,9 +1879,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RUPIYANI",
@@ -1563,9 +1896,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NUZULA EVA MONA",
@@ -1577,9 +1913,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 3,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RABIATUL ADAWIAH",
@@ -1591,9 +1930,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 8,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 7,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 8,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "SELMI AWALIAH",
@@ -1605,9 +1947,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 2,
-    "penguranganApel": 0,
-    "nilaiAkhir": 98
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 15,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 2
   },
   {
     "nama": "ARIES FADILLAH",
@@ -1619,9 +1964,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 1,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 15,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 1,
+    "penguranganPresensi": 0
   },
   {
     "nama": "MUHAMMAD SYAIFULLAH",
@@ -1633,9 +1981,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 2,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 1,
-    "penguranganApel": 0,
-    "nilaiAkhir": 99
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 14,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 1
   },
   {
     "nama": "FACHRI",
@@ -1647,9 +1998,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 7,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 9,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 9,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "NURDIANI",
@@ -1661,9 +2015,12 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 0,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 16,
+    "checkInTerlambatDiterima": 0,
+    "checkOutTepatWaktu": 16,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   },
   {
     "nama": "RIMA HANDAYANI",
@@ -1675,8 +2032,11 @@ export const SIPP_MEI_2026 = [
     "cuti": 0,
     "tl": 2,
     "tidakHadir": 0,
-    "penguranganPresensi": 0,
-    "penguranganApel": 0,
-    "nilaiAkhir": 100
+    "checkInTepatWaktu": 12,
+    "checkInTerlambatDiterima": 1,
+    "checkOutTepatWaktu": 13,
+    "checkOutLebihAwalDiterima": 0,
+    "perbaikanCheckOut": 0,
+    "penguranganPresensi": 0
   }
 ]

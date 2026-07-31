@@ -1,7 +1,7 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
-import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
@@ -220,24 +220,19 @@ export default function BasedataPage() {
     }
   }
 
+  // Kolom AA (Pengurangan Apel) dihitung langsung dari kolom-kolom lain di file yang sama:
+  // (L x 4) + (N x 0,5) + (R x 1,5) + (T x 0,5) + (X x 1,5) + (Z x 2)
   async function hitungUlangPenguranganApel(bulanIdx, tahun, dataPegawai) {
-    const bulanStr = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
-    const awal = `${bulanStr}-01`
-    const akhir = `${bulanStr}-31`
-    const snap = await getDocs(
-      query(collection(db, 'absensi'), where('tanggal', '>=', awal), where('tanggal', '<=', akhir)),
-    )
-    const jumlahTidakApelPerNip = new Map()
-    snap.docs.forEach((d) => {
-      const a = d.data()
-      if (a.status !== 'tidak_apel' || !a.nip) return
-      jumlahTidakApelPerNip.set(a.nip, (jumlahTidakApelPerNip.get(a.nip) || 0) + 1)
-    })
     return dataPegawai.map((p) => {
-      const jumlahTidakApel = jumlahTidakApelPerNip.get(p.nip) || 0
-      const penguranganApel = Math.round(jumlahTidakApel * TARIF_POTONGAN_APEL * 100) / 100
-      const nilaiAkhir = Math.round((100 - (p.penguranganPresensi || 0) - penguranganApel) * 100) / 100
-      return { ...p, jumlahTidakApel, penguranganApel, nilaiAkhir }
+      const L = p.checkInTepatWaktu || 0
+      const N = p.checkInTerlambatDiterima || 0
+      const R = p.checkOutTepatWaktu || 0
+      const T = p.checkOutLebihAwalDiterima || 0
+      const X = p.perbaikanCheckOut || 0
+      const Z = p.penguranganPresensi || 0
+      const penguranganApel = Math.round((L * 4 + N * 0.5 + R * 1.5 + T * 0.5 + X * 1.5 + Z * 2) * 100) / 100
+      const nilaiAkhir = Math.round((100 - Z - penguranganApel) * 100) / 100
+      return { ...p, penguranganApel, nilaiAkhir }
     })
   }
 
@@ -265,7 +260,7 @@ export default function BasedataPage() {
 
       setDataSipp(dihitungUlang)
       setTahapUpload('sukses')
-      setPesanSipp(`Berhasil mengunggah data ${dihitungUlang.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}. Kolom Pengurangan Apel & Nilai Akhir dihitung ulang berdasarkan data Tidak Apel di e-Apel (tarif ${TARIF_POTONGAN_APEL}% per kejadian).`)
+      setPesanSipp(`Berhasil mengunggah data ${dihitungUlang.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}. Kolom Pengurangan Apel (AA) & Nilai Akhir dihitung ulang otomatis dari rumus: (L×4) + (N×0,5) + (R×1,5) + (T×0,5) + (X×1,5) + (Z×2).`)
     } catch (err) {
       setTahapGagalDi(langkahSaatIni)
       setTahapUpload('gagal')
@@ -436,7 +431,6 @@ export default function BasedataPage() {
                         <th className="px-3 py-3">TL</th>
                         <th className="px-3 py-3">Tidak Hadir</th>
                         <th className="px-3 py-3">Pot. Presensi</th>
-                        <th className="px-3 py-3">Tidak Apel</th>
                         <th className="px-3 py-3">Pot. Apel</th>
                         <th className="px-3 py-3">Nilai Akhir</th>
                       </tr>
@@ -454,7 +448,6 @@ export default function BasedataPage() {
                           <td className="px-3 py-2.5">{p.tl}</td>
                           <td className="px-3 py-2.5">{p.tidakHadir}</td>
                           <td className="px-3 py-2.5">{p.penguranganPresensi}%</td>
-                          <td className="px-3 py-2.5">{p.jumlahTidakApel ?? '—'}</td>
                           <td className="px-3 py-2.5">{p.penguranganApel}%</td>
                           <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilaiAkhir}</td>
                         </tr>
