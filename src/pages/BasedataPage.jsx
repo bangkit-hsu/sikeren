@@ -41,6 +41,86 @@ const MENU_ITEMS = [
   { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonMenu, segeraHadir: true },
 ]
 
+const POTONGAN_SIPP = [
+  {
+    huruf: 'a',
+    ketentuan: 'Presensi masuk kerja terlambat tanpa alasan yang jelas/keterangan yang sah',
+    baris: [
+      { kondisi: 'Di dalam titik lokasi', persen: '0,5%' },
+      { kondisi: 'Di luar titik lokasi', persen: '1,5%' },
+    ],
+  },
+  {
+    huruf: 'b',
+    ketentuan: 'Presensi masuk kerja (tidak terlambat tetapi di luar titik lokasi) tanpa alasan yang jelas/keterangan yang sah',
+    baris: [{ kondisi: '—', persen: '1,5%' }],
+  },
+  {
+    huruf: 'c',
+    ketentuan: 'Presensi pulang lebih awal tanpa alasan yang jelas/keterangan yang sah',
+    baris: [
+      { kondisi: 'Di dalam titik lokasi', persen: '0,5%' },
+      { kondisi: 'Di luar titik lokasi', persen: '1,5%' },
+    ],
+  },
+  {
+    huruf: 'd',
+    ketentuan: 'Presensi pulang di luar titik lokasi tanpa alasan yang jelas/keterangan yang sah',
+    baris: [{ kondisi: '—', persen: '1,5%' }],
+  },
+  {
+    huruf: 'e',
+    ketentuan: 'Tidak presensi pulang',
+    baris: [{ kondisi: '—', persen: '2%' }],
+  },
+  {
+    huruf: 'f',
+    ketentuan: 'Tidak masuk kerja tanpa alasan yang jelas/keterangan yang sah',
+    baris: [{ kondisi: '—', persen: '4%' }],
+  },
+]
+
+const POTONGAN_APEL = [
+  {
+    huruf: 'g',
+    ketentuan: 'Tidak mengikuti apel pagi, apel gabungan dan/atau apel hari besar kenegaraan',
+    baris: [{ kondisi: '—', persen: '0,5%' }],
+  },
+]
+
+function TabelPotongan({ data }) {
+  return (
+    <div className="border border-ink/10 rounded-xl2 overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+          <tr>
+            <th className="px-3 py-3 w-10">No</th>
+            <th className="px-3 py-3">Ketentuan</th>
+            <th className="px-3 py-3">Kondisi</th>
+            <th className="px-3 py-3 w-24">Potongan</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-ink/10">
+          {data.map((item) =>
+            item.baris.map((b, i) => (
+              <tr key={`${item.huruf}-${i}`}>
+                {i === 0 && (
+                  <>
+                    <td className="px-3 py-3 align-top font-medium" rowSpan={item.baris.length}>{item.huruf}.</td>
+                    <td className="px-3 py-3 align-top" rowSpan={item.baris.length}>{item.ketentuan}</td>
+                  </>
+                )}
+                <td className="px-3 py-3 text-ink/70">{b.kondisi}</td>
+                <td className="px-3 py-3 font-semibold text-clay">{b.persen}</td>
+              </tr>
+            )),
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export default function BasedataPage() {
   const [menuAktif, setMenuAktif] = useState('penilaian-asn')
   const [konfigurasiTerbuka, setKonfigurasiTerbuka] = useState(false)
@@ -49,7 +129,7 @@ export default function BasedataPage() {
   const semuaItem = [
     ...MENU_ITEMS,
     { key: 'data-pegawai', label: 'Data Pegawai', segeraHadir: true, dalamKonfigurasi: true },
-    { key: 'potongan-tpp', label: 'Potongan TPP', segeraHadir: true, dalamKonfigurasi: true },
+    { key: 'potongan-tpp', label: 'Potongan TPP', segeraHadir: false, dalamKonfigurasi: true },
   ]
   const aktifSaatIni = semuaItem.find((m) => m.key === menuAktif)
 
@@ -147,9 +227,28 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">Basedata</p>
         </header>
 
-        <main className="px-6 py-10 max-w-lg mx-auto">
+        <main className={`px-6 py-10 mx-auto ${menuAktif === 'potongan-tpp' ? 'max-w-3xl' : 'max-w-lg'}`}>
           <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
-          {aktifSaatIni?.segeraHadir ? (
+
+          {menuAktif === 'potongan-tpp' ? (
+            <div className="mt-4 space-y-8">
+              <div>
+                <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan SIPP</h2>
+                <p className="text-ink/60 text-sm mb-3">Ketentuan huruf a s.d. f — pengurangan berdasarkan rekapitulasi presensi bulanan.</p>
+                <TabelPotongan data={POTONGAN_SIPP} />
+              </div>
+
+              <div>
+                <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan Absensi Apel</h2>
+                <p className="text-ink/60 text-sm mb-3">Ketentuan huruf g.</p>
+                <TabelPotongan data={POTONGAN_APEL} />
+              </div>
+
+              <p className="text-xs text-ink/50 bg-white/60 border border-ink/10 rounded-xl2 p-4">
+                <span className="font-semibold text-ink">h.</span> Persentase pengurangan ditiadakan apabila ketentuan sebagaimana dimaksud pada huruf a, huruf b, huruf c, huruf d, huruf e, huruf f, dan huruf g, alasannya diterima dan dapat dipertanggungjawabkan.
+              </p>
+            </div>
+          ) : aktifSaatIni?.segeraHadir ? (
             <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
               <span className="inline-block text-xs px-3 py-1 rounded-full bg-clay/10 text-clay font-medium mb-3">Segera Hadir</span>
               <p className="text-ink/60 text-sm">Modul ini masih dalam pengembangan dan akan tersedia di sini.</p>
