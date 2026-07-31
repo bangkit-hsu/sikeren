@@ -34,7 +34,6 @@ function IkonChevron({ terbuka }) {
 }
 const LANGKAH_UPLOAD = [
   { key: 'membaca', label: 'Membaca file Excel' },
-  { key: 'menghitung', label: 'Menghitung Pengurangan Apel' },
   { key: 'menyimpan', label: 'Menyimpan ke database' },
 ]
 
@@ -203,12 +202,11 @@ export default function BasedataPage() {
         setDataSipp(snap.data().data || [])
       } else if (bulanIdx === 4 && tahun === 2026) {
         // Data bawaan Mei 2026 yang sudah disertakan — otomatis tersimpan begitu pertama kali dibuka,
-        // dengan Pengurangan Apel & Nilai Akhir dihitung ulang seperti data yang diunggah manual.
-        const dihitungUlang = await hitungUlangPenguranganApel(bulanIdx, tahun, SIPP_MEI_2026)
+        // apa adanya dari file, tanpa perhitungan ulang.
         await setDoc(doc(db, 'sipp', id), {
-          bulan: bulanIdx, tahun, data: dihitungUlang, diunggahPada: serverTimestamp(),
+          bulan: bulanIdx, tahun, data: SIPP_MEI_2026, diunggahPada: serverTimestamp(),
         })
-        setDataSipp(dihitungUlang)
+        setDataSipp(SIPP_MEI_2026)
       } else {
         setDataSipp(null)
       }
@@ -218,22 +216,6 @@ export default function BasedataPage() {
     } finally {
       setMemuatSipp(false)
     }
-  }
-
-  // Kolom AA (Pengurangan Apel) dihitung langsung dari kolom-kolom lain di file yang sama:
-  // (L x 4) + (N x 0,5) + (R x 1,5) + (T x 0,5) + (X x 1,5) + (Z x 2)
-  async function hitungUlangPenguranganApel(bulanIdx, tahun, dataPegawai) {
-    return dataPegawai.map((p) => {
-      const L = p.checkInTepatWaktu || 0
-      const N = p.checkInTerlambatDiterima || 0
-      const R = p.checkOutTepatWaktu || 0
-      const T = p.checkOutLebihAwalDiterima || 0
-      const X = p.perbaikanCheckOut || 0
-      const Z = p.penguranganPresensi || 0
-      const penguranganApel = Math.round((L * 4 + N * 0.5 + R * 1.5 + T * 0.5 + X * 1.5 + Z * 2) * 100) / 100
-      const nilaiAkhir = Math.round((100 - Z - penguranganApel) * 100) / 100
-      return { ...p, penguranganApel, nilaiAkhir }
-    })
   }
 
   async function handleUploadSipp(e) {
@@ -247,20 +229,16 @@ export default function BasedataPage() {
     try {
       const diparsing = await parseFileSipp(file)
 
-      langkahSaatIni = 'menghitung'
-      setTahapUpload(langkahSaatIni)
-      const dihitungUlang = await hitungUlangPenguranganApel(sippBulan, sippTahun, diparsing)
-
       langkahSaatIni = 'menyimpan'
       setTahapUpload(langkahSaatIni)
       const id = `${sippTahun}-${String(sippBulan + 1).padStart(2, '0')}`
       await setDoc(doc(db, 'sipp', id), {
-        bulan: sippBulan, tahun: sippTahun, data: dihitungUlang, diunggahPada: serverTimestamp(),
+        bulan: sippBulan, tahun: sippTahun, data: diparsing, diunggahPada: serverTimestamp(),
       })
 
-      setDataSipp(dihitungUlang)
+      setDataSipp(diparsing)
       setTahapUpload('sukses')
-      setPesanSipp(`Berhasil mengunggah data ${dihitungUlang.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}. Kolom Pengurangan Apel (AA) & Nilai Akhir dihitung ulang otomatis dari rumus: (L×4) + (N×0,5) + (R×1,5) + (T×0,5) + (X×1,5) + (Z×2).`)
+      setPesanSipp(`Berhasil mengunggah data ${diparsing.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}.`)
     } catch (err) {
       setTahapGagalDi(langkahSaatIni)
       setTahapUpload('gagal')
