@@ -226,36 +226,12 @@ export default function BasedataPage() {
   const [pesanSipp, setPesanSipp] = useState('')
   const [tahapUpload, setTahapUpload] = useState(null)
   const [tahapGagalDi, setTahapGagalDi] = useState(null)
-  const [statSipp, setStatSipp] = useState(null)
 
   useEffect(() => {
     if (menuAktif !== 'sipp' || subSipp !== 'utama') return
     muatDataSipp(sippBulan, sippTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subSipp, sippBulan, sippTahun])
-
-  useEffect(() => {
-    async function cekStatSipp() {
-      try {
-        const id = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-        let snap = await getDoc(doc(db, 'sipp', id))
-        let bulanCek = now.getMonth()
-        let tahunCek = now.getFullYear()
-        if (!snap.exists()) {
-          snap = await getDoc(doc(db, 'sipp', '2026-05'))
-          bulanCek = 4
-          tahunCek = 2026
-        }
-        if (snap.exists()) {
-          setStatSipp({ bulan: bulanCek, tahun: tahunCek, jumlah: (snap.data().data || []).length })
-        }
-      } catch {
-        // biarkan dashboard tetap tampil tanpa statistik kalau gagal memuat
-      }
-    }
-    cekStatSipp()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   async function muatDataSipp(bulanIdx, tahun) {
     setMemuatSipp(true)
@@ -333,28 +309,6 @@ export default function BasedataPage() {
 
   return (
     <div className="min-h-screen bg-paper">
-      {/* Header — hanya identitas portal, tanpa navbar maupun sidebar */}
-      <header className="border-b border-ink/10 bg-white sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-5 py-4">
-          <button
-            type="button"
-            onClick={() => pilihMenu('dashboard')}
-            className="flex items-center gap-3"
-          >
-            <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gold-500">
-                <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className="text-left">
-              <p className="font-display font-semibold leading-tight">PADUAN</p>
-              <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
-            </div>
-          </button>
-        </div>
-      </header>
-
       <main className={`px-5 sm:px-6 py-10 mx-auto ${menuAktif === 'dashboard' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-2xl'}`}>
         {menuAktif === 'dashboard' ? (
           <div>
@@ -371,12 +325,6 @@ export default function BasedataPage() {
                 <p className="text-paper/80 text-sm sm:text-base mt-2 max-w-lg">
                   Penilaian ASN Digital Terpadu dan Akuntabel — satu portal untuk seluruh modul penilaian, presensi, dan data kepegawaian Sekretariat Daerah.
                 </p>
-                {statSipp && (
-                  <div className="inline-flex items-center gap-2 mt-5 bg-paper/10 border border-paper/20 rounded-full px-4 py-2 text-xs sm:text-sm">
-                    <span className="w-2 h-2 rounded-full bg-gold-500" />
-                    Data SIPP {namaBulan(statSipp.bulan)} {statSipp.tahun} tersedia — {statSipp.jumlah} pegawai
-                  </div>
-                )}
               </div>
             </div>
 
