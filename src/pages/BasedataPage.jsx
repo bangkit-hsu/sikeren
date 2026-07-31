@@ -1,7 +1,7 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
@@ -85,11 +85,15 @@ const POTONGAN_SIPP = [
   },
 ]
 
+// Tarif potongan per satu kali tidak apel (huruf g pada tabel Potongan TPP) — dipakai juga
+// untuk menghitung ulang kolom Pengurangan Apel saat file SIPP diunggah.
+const TARIF_POTONGAN_APEL = 0.5
+
 const POTONGAN_APEL = [
   {
     huruf: 'g',
     ketentuan: 'Tidak mengikuti apel pagi, apel gabungan dan/atau apel hari besar kenegaraan',
-    baris: [{ kondisi: '—', persen: '0,5%' }],
+    baris: [{ kondisi: '—', persen: `${TARIF_POTONGAN_APEL}`.replace('.', ',') + '%' }],
   },
 ]
 
@@ -154,11 +158,13 @@ export default function BasedataPage() {
       if (snap.exists()) {
         setDataSipp(snap.data().data || [])
       } else if (bulanIdx === 4 && tahun === 2026) {
-        // Data bawaan Mei 2026 yang sudah disertakan — otomatis tersimpan begitu pertama kali dibuka.
+        // Data bawaan Mei 2026 yang sudah disertakan — otomatis tersimpan begitu pertama kali dibuka,
+        // dengan Pengurangan Apel & Nilai Akhir dihitung ulang seperti data yang diunggah manual.
+        const dihitungUlang = await hitungUlangPenguranganApel(bulanIdx, tahun, SIPP_MEI_2026)
         await setDoc(doc(db, 'sipp', id), {
-          bulan: bulanIdx, tahun, data: SIPP_MEI_2026, diunggahPada: serverTimestamp(),
+          bulan: bulanIdx, tahun, data: dihitungUlang, diunggahPada: serverTimestamp(),
         })
-        setDataSipp(SIPP_MEI_2026)
+        setDataSipp(dihitungUlang)
       } else {
         setDataSipp(null)
       }
@@ -170,19 +176,41 @@ export default function BasedataPage() {
     }
   }
 
+  async function hitungUlangPenguranganApel(bulanIdx, tahun, dataPegawai) {
+    const bulanStr = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+    const awal = `${bulanStr}-01`
+    const akhir = `${bulanStr}-31`
+    const snap = await getDocs(
+      query(collection(db, 'absensi'), where('tanggal', '>=', awal), where('tanggal', '<=', akhir)),
+    )
+    const jumlahTidakApelPerNip = new Map()
+    snap.docs.forEach((d) => {
+      const a = d.data()
+      if (a.status !== 'tidak_apel' || !a.nip) return
+      jumlahTidakApelPerNip.set(a.nip, (jumlahTidakApelPerNip.get(a.nip) || 0) + 1)
+    })
+    return dataPegawai.map((p) => {
+      const jumlahTidakApel = jumlahTidakApelPerNip.get(p.nip) || 0
+      const penguranganApel = Math.round(jumlahTidakApel * TARIF_POTONGAN_APEL * 100) / 100
+      const nilaiAkhir = Math.round((100 - (p.penguranganPresensi || 0) - penguranganApel) * 100) / 100
+      return { ...p, jumlahTidakApel, penguranganApel, nilaiAkhir }
+    })
+  }
+
   async function handleUploadSipp(e) {
     const file = e.target.files?.[0]
     if (!file) return
     setMengunggahSipp(true)
     setPesanSipp('')
     try {
-      const parsed = await parseFileSipp(file)
+      const diparsing = await parseFileSipp(file)
+      const dihitungUlang = await hitungUlangPenguranganApel(sippBulan, sippTahun, diparsing)
       const id = `${sippTahun}-${String(sippBulan + 1).padStart(2, '0')}`
       await setDoc(doc(db, 'sipp', id), {
-        bulan: sippBulan, tahun: sippTahun, data: parsed, diunggahPada: serverTimestamp(),
+        bulan: sippBulan, tahun: sippTahun, data: dihitungUlang, diunggahPada: serverTimestamp(),
       })
-      setDataSipp(parsed)
-      setPesanSipp(`Berhasil mengunggah data ${parsed.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}.`)
+      setDataSipp(dihitungUlang)
+      setPesanSipp(`Berhasil mengunggah data ${dihitungUlang.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}. Kolom Pengurangan Apel & Nilai Akhir dihitung ulang berdasarkan data Tidak Apel di e-Apel (tarif ${TARIF_POTONGAN_APEL}% per kejadian).`)
     } catch (err) {
       setPesanSipp('Gagal mengunggah: ' + err.message)
     } finally {
@@ -349,6 +377,7 @@ export default function BasedataPage() {
                         <th className="px-3 py-3">TL</th>
                         <th className="px-3 py-3">Tidak Hadir</th>
                         <th className="px-3 py-3">Pot. Presensi</th>
+                        <th className="px-3 py-3">Tidak Apel</th>
                         <th className="px-3 py-3">Pot. Apel</th>
                         <th className="px-3 py-3">Nilai Akhir</th>
                       </tr>
@@ -366,6 +395,7 @@ export default function BasedataPage() {
                           <td className="px-3 py-2.5">{p.tl}</td>
                           <td className="px-3 py-2.5">{p.tidakHadir}</td>
                           <td className="px-3 py-2.5">{p.penguranganPresensi}%</td>
+                          <td className="px-3 py-2.5">{p.jumlahTidakApel ?? '—'}</td>
                           <td className="px-3 py-2.5">{p.penguranganApel}%</td>
                           <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilaiAkhir}</td>
                         </tr>
