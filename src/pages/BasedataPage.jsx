@@ -17,6 +17,58 @@ function IkonMenu() {
     </svg>
   )
 }
+function IkonDashboard() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <rect x="3.5" y="3.5" width="7.5" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+      <rect x="13" y="3.5" width="7.5" height="5.5" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+      <rect x="13" y="11" width="7.5" height="9.5" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+      <rect x="3.5" y="14.5" width="7.5" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+    </svg>
+  )
+}
+function IkonBintang() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <path d="M12 3.5l2.4 5 5.4.7-3.9 3.8.9 5.4L12 15.8l-4.8 2.6.9-5.4-3.9-3.8 5.4-.7L12 3.5z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  )
+}
+function IkonDokumen() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <path d="M6 3.5h8l4.5 4.5V20a1 1 0 01-1 1H6a1 1 0 01-1-1V4.5a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M14 3.5V8h4.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M8 12.5h8M8 16h5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+function IkonOrang() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+function IkonOrangGrup() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <circle cx="8.5" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="16" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M3 19c0-2.8 2.3-5 5.5-5s5.5 2.2 5.5 5M10.5 19c0-2.8 2.3-5 5.5-5s5.5 2.2 5.5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+function IkonPersen() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <circle cx="7" cy="7" r="2.6" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="17" cy="17" r="2.6" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M6 18L18 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
 function IkonKonfigurasi() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
@@ -80,9 +132,9 @@ function IkonHamburger() {
 }
 
 const MENU_ITEMS = [
-  { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonMenu, segeraHadir: true },
-  { key: 'sipp', label: 'SIPP', Ikon: IkonMenu, segeraHadir: false },
-  { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonMenu, segeraHadir: true },
+  { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonBintang, segeraHadir: true },
+  { key: 'sipp', label: 'SIPP', Ikon: IkonDokumen, segeraHadir: false },
+  { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonOrang, segeraHadir: true },
 ]
 
 const POTONGAN_SIPP = [
@@ -170,7 +222,7 @@ function TabelPotongan({ data }) {
 }
 
 export default function BasedataPage() {
-  const [menuAktif, setMenuAktif] = useState('penilaian-asn')
+  const [menuAktif, setMenuAktif] = useState('dashboard')
   const [konfigurasiTerbuka, setKonfigurasiTerbuka] = useState(false)
   const [menuTerbuka, setMenuTerbuka] = useState(false)
 
@@ -189,6 +241,31 @@ export default function BasedataPage() {
     muatDataSipp(sippBulan, sippTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, sippBulan, sippTahun])
+
+  const [statSipp, setStatSipp] = useState(null) // { bulan, tahun, jumlah } | null
+
+  useEffect(() => {
+    async function cekStatSipp() {
+      try {
+        const id = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+        let snap = await getDoc(doc(db, 'sipp', id))
+        let bulanCek = now.getMonth()
+        let tahunCek = now.getFullYear()
+        if (!snap.exists()) {
+          snap = await getDoc(doc(db, 'sipp', '2026-05'))
+          bulanCek = 4
+          tahunCek = 2026
+        }
+        if (snap.exists()) {
+          setStatSipp({ bulan: bulanCek, tahun: tahunCek, jumlah: (snap.data().data || []).length })
+        }
+      } catch {
+        // biarkan dashboard tetap tampil tanpa statistik kalau gagal memuat
+      }
+    }
+    cekStatSipp()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function muatDataSipp(bulanIdx, tahun) {
     setMemuatSipp(true)
@@ -250,15 +327,20 @@ export default function BasedataPage() {
   }
 
   const semuaItem = [
-    ...MENU_ITEMS,
-    { key: 'data-pegawai', label: 'Data Pegawai', segeraHadir: true, dalamKonfigurasi: true },
-    { key: 'potongan-tpp', label: 'Potongan TPP', segeraHadir: false, dalamKonfigurasi: true },
+    { key: 'dashboard', label: 'Dashboard', Ikon: IkonDashboard, segeraHadir: false },
+    { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonBintang, segeraHadir: true, deskripsi: 'Penilaian kinerja dan perilaku kerja ASN secara berkala.' },
+    { key: 'sipp', label: 'SIPP', Ikon: IkonDokumen, segeraHadir: false, deskripsi: 'Rekapitulasi presensi bulanan & perhitungan potongan TPP.' },
+    { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonOrang, segeraHadir: true, deskripsi: 'Catatan penilaian dan capaian kerja per individu pegawai.' },
+    { key: 'data-pegawai', label: 'Data Pegawai', Ikon: IkonOrangGrup, segeraHadir: true, dalamKonfigurasi: true, deskripsi: 'Basis data induk kepegawaian di lingkungan Sekretariat Daerah.' },
+    { key: 'potongan-tpp', label: 'Potongan TPP', Ikon: IkonPersen, segeraHadir: false, dalamKonfigurasi: true, deskripsi: 'Ketentuan & tabel persentase potongan Tunjangan Perbaikan Penghasilan.' },
   ]
   const aktifSaatIni = semuaItem.find((m) => m.key === menuAktif)
+  const modulUtama = semuaItem.filter((m) => m.key !== 'dashboard')
 
   function pilihMenu(key) {
     setMenuAktif(key)
     setMenuTerbuka(false)
+    if (key === 'data-pegawai' || key === 'potongan-tpp') setKonfigurasiTerbuka(true)
   }
 
   return (
@@ -281,12 +363,23 @@ export default function BasedataPage() {
             </svg>
           </div>
           <div>
-            <p className="font-display font-semibold leading-tight">SiKeren</p>
+            <p className="font-display font-semibold leading-tight">PADUAN</p>
             <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
           </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          <button
+            type="button"
+            onClick={() => pilihMenu('dashboard')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+              menuAktif === 'dashboard' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+            }`}
+          >
+            <IkonDashboard />
+            Dashboard
+          </button>
+
           {MENU_ITEMS.map((item) => (
             <button
               key={item.key}
@@ -347,13 +440,64 @@ export default function BasedataPage() {
           >
             <IkonHamburger />
           </button>
-          <p className="font-display font-semibold">SiKeren</p>
+          <p className="font-display font-semibold">PADUAN</p>
         </header>
 
-        <main className={`px-6 py-10 mx-auto ${menuAktif === 'potongan-tpp' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-lg'}`}>
-          <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
+        <main className={`px-6 py-10 mx-auto ${menuAktif === 'dashboard' ? 'max-w-5xl' : menuAktif === 'potongan-tpp' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-lg'}`}>
+          {menuAktif !== 'dashboard' && (
+            <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
+          )}
 
-          {menuAktif === 'sipp' ? (
+          {menuAktif === 'dashboard' ? (
+            <div>
+              {/* Hero */}
+              <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-8 sm:px-10 sm:py-10 mb-8">
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    backgroundImage: 'radial-gradient(circle at 12% 15%, rgba(201,162,39,0.35), transparent 35%), radial-gradient(circle at 88% 85%, rgba(201,162,39,0.25), transparent 40%)',
+                  }}
+                />
+                <div className="relative">
+                  <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
+                  <h1 className="font-display font-bold text-3xl sm:text-4xl">PADUAN</h1>
+                  <p className="text-paper/80 text-sm sm:text-base mt-2 max-w-lg">
+                    Penilaian ASN Digital Terpadu dan Akuntabel — satu portal untuk seluruh modul penilaian, presensi, dan data kepegawaian Sekretariat Daerah.
+                  </p>
+                  {statSipp && (
+                    <div className="inline-flex items-center gap-2 mt-5 bg-paper/10 border border-paper/20 rounded-full px-4 py-2 text-xs sm:text-sm">
+                      <span className="w-2 h-2 rounded-full bg-gold-500" />
+                      Data SIPP {namaBulan(statSipp.bulan)} {statSipp.tahun} tersedia — {statSipp.jumlah} pegawai
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Grid modul */}
+              <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Modul Tersedia</p>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                {modulUtama.map((m) => (
+                  <button
+                    key={m.key}
+                    type="button"
+                    onClick={() => pilihMenu(m.key)}
+                    className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                  >
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${m.segeraHadir ? 'bg-ink/10 text-ink/50' : 'bg-moss-700 text-paper'}`}>
+                      <m.Ikon />
+                    </div>
+                    <p className="font-display font-semibold text-ink">{m.label}</p>
+                    <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">{m.deskripsi}</p>
+                    <span className={`inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium ${
+                      m.segeraHadir ? 'bg-clay/10 text-clay' : 'bg-moss-100 text-moss-800'
+                    }`}>
+                      {m.segeraHadir ? 'Segera Hadir' : 'Aktif'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : menuAktif === 'sipp' ? (
             <div className="mt-4">
               <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file rekapitulasi presensi (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
 
