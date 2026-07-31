@@ -35,5 +35,12 @@ service cloud.firestore {
       // rules ini tidak bisa membatasi hanya ke admin — lihat catatan keamanan di bagian atas file.
       allow update, delete: if true;
     }
+
+    // Dipakai oleh halaman Basedata (menu SIPP) untuk menyimpan rekap presensi bulanan
+    // yang diunggah dari file Excel. Halaman ini terpisah dari aplikasi e-Apel utama.
+    match /sipp/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

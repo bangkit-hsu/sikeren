@@ -118,8 +118,16 @@ settings/penutupanApel { tanggal: 'YYYY-MM-DD' } — tanggal terakhir sesi absen
 absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
                       keterangan: 'gabungan' | 'senam' | 'wfh' | null,
                       lat, lng, jarakMeter, dibuat }
+sipp/{tahun-bulan}  { bulan (0-11), tahun, data: [{ nama, nip, pangkatGolongan, statusKepegawaian,
+                      jumlahHariKerja, hadir, cuti, tl, tidakHadir, penguranganPresensi,
+                      penguranganApel, nilaiAkhir }], diunggahPada } — dipakai halaman Basedata
 ```
 
+### Halaman Basedata (`/basedata`)
+
+Halaman terpisah dari aplikasi e-Apel utama (tidak memakai Layout/AuthContext), dengan menu sidebar sendiri: Penilaian ASN, SIPP, Penilaian Individu, dan Konfigurasi (Data Pegawai, Potongan TPP). Saat ini menu **SIPP** dan **Konfigurasi → Potongan TPP** sudah aktif; sisanya masih "Segera Hadir".
+
+**SIPP** — pilih bulan & tahun, lalu unggah file Excel rekapitulasi presensi (format baku: 3 baris header, kolom Nama/NIP/Pangkat.../Status/Jumlah Hari Kerja/Hadir/Cuti/TL/.../Pengurangan Presensi/Pengurangan Apel/Nilai Akhir). Data tersimpan per bulan-tahun dan langsung tampil lagi begitu bulan yang sama dipilih ulang. Data Mei 2026 sudah disertakan sebagai data awal.
 ## Batasan yang perlu diketahui
 
 - Pilihan **Bagian** memakai daftar tetap di `src/utils/bagian.js` (Administrasi Pembangunan, Hukum, Kesra, Organisasi, Pemerintahan, Pengadaan Barang dan Jasa, Perekonomian dan SDA, Protokol dan Komunikasi Pimpinan, Umum). Untuk menambah/mengubah daftar bagian, edit file tersebut lalu deploy ulang.

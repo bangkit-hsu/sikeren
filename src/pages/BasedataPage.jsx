@@ -1,6 +1,11 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../firebase'
+import { namaBulan } from '../utils/date'
+import { parseFileSipp } from '../utils/sipp'
+import { SIPP_MEI_2026 } from '../data/sippMei2026'
 
 function IkonMenu() {
   return (
@@ -37,7 +42,7 @@ function IkonHamburger() {
 
 const MENU_ITEMS = [
   { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonMenu, segeraHadir: true },
-  { key: 'sipp', label: 'SIPP', Ikon: IkonMenu, segeraHadir: true },
+  { key: 'sipp', label: 'SIPP', Ikon: IkonMenu, segeraHadir: false },
   { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonMenu, segeraHadir: true },
 ]
 
@@ -125,6 +130,66 @@ export default function BasedataPage() {
   const [menuAktif, setMenuAktif] = useState('penilaian-asn')
   const [konfigurasiTerbuka, setKonfigurasiTerbuka] = useState(false)
   const [menuTerbuka, setMenuTerbuka] = useState(false)
+
+  const now = new Date()
+  const [sippBulan, setSippBulan] = useState(now.getMonth())
+  const [sippTahun, setSippTahun] = useState(now.getFullYear())
+  const [dataSipp, setDataSipp] = useState(null)
+  const [memuatSipp, setMemuatSipp] = useState(false)
+  const [mengunggahSipp, setMengunggahSipp] = useState(false)
+  const [pesanSipp, setPesanSipp] = useState('')
+
+  useEffect(() => {
+    if (menuAktif !== 'sipp') return
+    muatDataSipp(sippBulan, sippTahun)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, sippBulan, sippTahun])
+
+  async function muatDataSipp(bulanIdx, tahun) {
+    setMemuatSipp(true)
+    setPesanSipp('')
+    const id = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+    try {
+      const snap = await getDoc(doc(db, 'sipp', id))
+      if (snap.exists()) {
+        setDataSipp(snap.data().data || [])
+      } else if (bulanIdx === 4 && tahun === 2026) {
+        // Data bawaan Mei 2026 yang sudah disertakan — otomatis tersimpan begitu pertama kali dibuka.
+        await setDoc(doc(db, 'sipp', id), {
+          bulan: bulanIdx, tahun, data: SIPP_MEI_2026, diunggahPada: serverTimestamp(),
+        })
+        setDataSipp(SIPP_MEI_2026)
+      } else {
+        setDataSipp(null)
+      }
+    } catch (err) {
+      setPesanSipp('Gagal memuat data: ' + err.message)
+      setDataSipp(null)
+    } finally {
+      setMemuatSipp(false)
+    }
+  }
+
+  async function handleUploadSipp(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setMengunggahSipp(true)
+    setPesanSipp('')
+    try {
+      const parsed = await parseFileSipp(file)
+      const id = `${sippTahun}-${String(sippBulan + 1).padStart(2, '0')}`
+      await setDoc(doc(db, 'sipp', id), {
+        bulan: sippBulan, tahun: sippTahun, data: parsed, diunggahPada: serverTimestamp(),
+      })
+      setDataSipp(parsed)
+      setPesanSipp(`Berhasil mengunggah data ${parsed.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}.`)
+    } catch (err) {
+      setPesanSipp('Gagal mengunggah: ' + err.message)
+    } finally {
+      setMengunggahSipp(false)
+      e.target.value = ''
+    }
+  }
 
   const semuaItem = [
     ...MENU_ITEMS,
@@ -227,10 +292,94 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">Basedata</p>
         </header>
 
-        <main className={`px-6 py-10 mx-auto ${menuAktif === 'potongan-tpp' ? 'max-w-3xl' : 'max-w-lg'}`}>
+        <main className={`px-6 py-10 mx-auto ${menuAktif === 'potongan-tpp' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-lg'}`}>
           <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
 
-          {menuAktif === 'potongan-tpp' ? (
+          {menuAktif === 'sipp' ? (
+            <div className="mt-4">
+              <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file rekapitulasi presensi (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
+
+              <div className="flex flex-wrap items-end gap-3 mb-5">
+                <div>
+                  <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                  <select
+                    value={sippBulan}
+                    onChange={(e) => setSippBulan(Number(e.target.value))}
+                    className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                  >
+                    {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                  <select
+                    value={sippTahun}
+                    onChange={(e) => setSippTahun(Number(e.target.value))}
+                    className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                  >
+                    {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
+                <label className="inline-flex items-center gap-2 bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 cursor-pointer hover:bg-moss-800 transition-colors">
+                  {mengunggahSipp ? 'Mengunggah…' : 'Upload Data'}
+                  <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadSipp} disabled={mengunggahSipp} />
+                </label>
+              </div>
+
+              {pesanSipp && (
+                <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanSipp.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
+                  {pesanSipp}
+                </p>
+              )}
+
+              {memuatSipp ? (
+                <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+              ) : dataSipp && dataSipp.length > 0 ? (
+                <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                  <table className="w-full text-sm min-w-[900px]">
+                    <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                      <tr>
+                        <th className="px-3 py-3">Nama</th>
+                        <th className="px-3 py-3">NIP</th>
+                        <th className="px-3 py-3">Pangkat/Gol</th>
+                        <th className="px-3 py-3">Status</th>
+                        <th className="px-3 py-3">Hari Kerja</th>
+                        <th className="px-3 py-3">Hadir</th>
+                        <th className="px-3 py-3">Cuti</th>
+                        <th className="px-3 py-3">TL</th>
+                        <th className="px-3 py-3">Tidak Hadir</th>
+                        <th className="px-3 py-3">Pot. Presensi</th>
+                        <th className="px-3 py-3">Pot. Apel</th>
+                        <th className="px-3 py-3">Nilai Akhir</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-ink/10">
+                      {dataSipp.map((p, i) => (
+                        <tr key={`${p.nip}-${i}`}>
+                          <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                          <td className="px-3 py-2.5 font-mono">{p.nip}</td>
+                          <td className="px-3 py-2.5">{p.pangkatGolongan}</td>
+                          <td className="px-3 py-2.5">{p.statusKepegawaian}</td>
+                          <td className="px-3 py-2.5">{p.jumlahHariKerja}</td>
+                          <td className="px-3 py-2.5">{p.hadir}</td>
+                          <td className="px-3 py-2.5">{p.cuti}</td>
+                          <td className="px-3 py-2.5">{p.tl}</td>
+                          <td className="px-3 py-2.5">{p.tidakHadir}</td>
+                          <td className="px-3 py-2.5">{p.penguranganPresensi}%</td>
+                          <td className="px-3 py-2.5">{p.penguranganApel}%</td>
+                          <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilaiAkhir}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                  <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(sippBulan)} {sippTahun}. Unggah file rekapitulasi presensi untuk periode ini.</p>
+                </div>
+              )}
+            </div>
+          ) : menuAktif === 'potongan-tpp' ? (
             <div className="mt-4 space-y-8">
               <div>
                 <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan SIPP</h2>
