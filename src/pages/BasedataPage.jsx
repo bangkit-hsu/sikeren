@@ -32,6 +32,46 @@ function IkonChevron({ terbuka }) {
     </svg>
   )
 }
+const LANGKAH_UPLOAD = [
+  { key: 'membaca', label: 'Membaca file Excel' },
+  { key: 'menghitung', label: 'Menghitung Pengurangan Apel' },
+  { key: 'menyimpan', label: 'Menyimpan ke database' },
+]
+
+function ProgresUpload({ tahap, tahapGagalDi }) {
+  if (!tahap) return null
+  const indeksSaatIni = LANGKAH_UPLOAD.findIndex((l) => l.key === (tahap === 'gagal' ? tahapGagalDi : tahap))
+
+  return (
+    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-4 mb-4 space-y-2.5">
+      {LANGKAH_UPLOAD.map((langkah, i) => {
+        let status = 'menunggu'
+        if (tahap === 'gagal' && i === indeksSaatIni) status = 'gagal'
+        else if (tahap === 'gagal' && i < indeksSaatIni) status = 'selesai'
+        else if (tahap === 'sukses' || i < indeksSaatIni) status = 'selesai'
+        else if (i === indeksSaatIni) status = 'berjalan'
+
+        return (
+          <div key={langkah.key} className="flex items-center gap-2.5 text-sm">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+              status === 'selesai' ? 'bg-moss-700 text-paper'
+                : status === 'berjalan' ? 'bg-gold-500 text-ink animate-pulse'
+                : status === 'gagal' ? 'bg-clay text-paper'
+                : 'bg-ink/10 text-ink/40'
+            }`}>
+              {status === 'selesai' ? '✓' : status === 'gagal' ? '✕' : i + 1}
+            </span>
+            <span className={status === 'menunggu' ? 'text-ink/40' : status === 'gagal' ? 'text-clay font-medium' : 'text-ink'}>
+              {langkah.label}
+              {status === 'berjalan' && '…'}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function IkonHamburger() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -142,6 +182,8 @@ export default function BasedataPage() {
   const [memuatSipp, setMemuatSipp] = useState(false)
   const [mengunggahSipp, setMengunggahSipp] = useState(false)
   const [pesanSipp, setPesanSipp] = useState('')
+  const [tahapUpload, setTahapUpload] = useState(null) // null | 'membaca' | 'menghitung' | 'menyimpan' | 'sukses' | 'gagal'
+  const [tahapGagalDi, setTahapGagalDi] = useState(null)
 
   useEffect(() => {
     if (menuAktif !== 'sipp') return
@@ -152,6 +194,8 @@ export default function BasedataPage() {
   async function muatDataSipp(bulanIdx, tahun) {
     setMemuatSipp(true)
     setPesanSipp('')
+    setTahapUpload(null)
+    setTahapGagalDi(null)
     const id = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
     try {
       const snap = await getDoc(doc(db, 'sipp', id))
@@ -202,16 +246,29 @@ export default function BasedataPage() {
     if (!file) return
     setMengunggahSipp(true)
     setPesanSipp('')
+    setTahapGagalDi(null)
+    let langkahSaatIni = 'membaca'
+    setTahapUpload(langkahSaatIni)
     try {
       const diparsing = await parseFileSipp(file)
+
+      langkahSaatIni = 'menghitung'
+      setTahapUpload(langkahSaatIni)
       const dihitungUlang = await hitungUlangPenguranganApel(sippBulan, sippTahun, diparsing)
+
+      langkahSaatIni = 'menyimpan'
+      setTahapUpload(langkahSaatIni)
       const id = `${sippTahun}-${String(sippBulan + 1).padStart(2, '0')}`
       await setDoc(doc(db, 'sipp', id), {
         bulan: sippBulan, tahun: sippTahun, data: dihitungUlang, diunggahPada: serverTimestamp(),
       })
+
       setDataSipp(dihitungUlang)
+      setTahapUpload('sukses')
       setPesanSipp(`Berhasil mengunggah data ${dihitungUlang.length} pegawai untuk ${namaBulan(sippBulan)} ${sippTahun}. Kolom Pengurangan Apel & Nilai Akhir dihitung ulang berdasarkan data Tidak Apel di e-Apel (tarif ${TARIF_POTONGAN_APEL}% per kejadian).`)
     } catch (err) {
+      setTahapGagalDi(langkahSaatIni)
+      setTahapUpload('gagal')
       setPesanSipp('Gagal mengunggah: ' + err.message)
     } finally {
       setMengunggahSipp(false)
@@ -353,6 +410,8 @@ export default function BasedataPage() {
                   <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadSipp} disabled={mengunggahSipp} />
                 </label>
               </div>
+
+              <ProgresUpload tahap={tahapUpload} tahapGagalDi={tahapGagalDi} />
 
               {pesanSipp && (
                 <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanSipp.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
