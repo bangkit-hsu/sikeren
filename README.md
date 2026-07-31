@@ -119,8 +119,11 @@ absensi/{id}       { uid, nama, tanggal, jam, status: 'sesuai' | 'luar',
                       keterangan: 'gabungan' | 'senam' | 'wfh' | null,
                       lat, lng, jarakMeter, dibuat }
 sipp/{tahun-bulan}  { bulan (0-11), tahun, data: [{ nama, nip, pangkatGolongan, statusKepegawaian,
-                      jumlahHariKerja, hadir, cuti, tl, tidakHadir, penguranganPresensi,
-                      penguranganApel, nilaiAkhir }], diunggahPada } — dipakai halaman Basedata
+                      jumlahHariKerja, hadir, cuti, tl, perbaikanPresensi, dianggapTidakHadir,
+                      tidakHadir, checkIn{TepatWaktu,Terlambat,TerlambatDiterima,DalamArea,
+                      LuarAreaDiterima,LuarAreaDitolak}, checkOut{...sama}, perbaikanCheckOut,
+                      alpa, penguranganPresensi, penguranganApel, nilaiAkhir, keterangan }],
+                      diunggahPada } — semua kolom apa adanya dari file, dipakai halaman Basedata
 ```
 
 ### Halaman Basedata (`/basedata`)

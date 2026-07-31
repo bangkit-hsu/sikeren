@@ -396,21 +396,42 @@ export default function BasedataPage() {
                 <p className="text-ink/50 font-mono text-sm">Memuat…</p>
               ) : dataSipp && dataSipp.length > 0 ? (
                 <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                  <table className="w-full text-sm min-w-[900px]">
+                  <table className="w-full text-sm min-w-[2200px]">
                     <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                       <tr>
-                        <th className="px-3 py-3">Nama</th>
-                        <th className="px-3 py-3">NIP</th>
-                        <th className="px-3 py-3">Pangkat/Gol</th>
-                        <th className="px-3 py-3">Status</th>
-                        <th className="px-3 py-3">Hari Kerja</th>
-                        <th className="px-3 py-3">Hadir</th>
-                        <th className="px-3 py-3">Cuti</th>
-                        <th className="px-3 py-3">TL</th>
-                        <th className="px-3 py-3">Tidak Hadir</th>
-                        <th className="px-3 py-3">Pot. Presensi</th>
-                        <th className="px-3 py-3">Pot. Apel</th>
-                        <th className="px-3 py-3">Nilai Akhir</th>
+                        <th className="px-3 py-2" rowSpan={2}>Nama</th>
+                        <th className="px-3 py-2" rowSpan={2}>NIP</th>
+                        <th className="px-3 py-2" rowSpan={2}>Pangkat/Gol</th>
+                        <th className="px-3 py-2" rowSpan={2}>Status</th>
+                        <th className="px-3 py-2" rowSpan={2}>Hari Kerja</th>
+                        <th className="px-3 py-2" rowSpan={2}>Hadir</th>
+                        <th className="px-3 py-2" rowSpan={2}>Cuti</th>
+                        <th className="px-3 py-2" rowSpan={2}>TL</th>
+                        <th className="px-3 py-2" rowSpan={2}>Perbaikan Presensi</th>
+                        <th className="px-3 py-2" rowSpan={2}>Dianggap Tidak Hadir</th>
+                        <th className="px-3 py-2" rowSpan={2}>Tidak Hadir</th>
+                        <th className="px-3 py-2 text-center border-l border-ink/10" colSpan={6}>Check In</th>
+                        <th className="px-3 py-2 text-center border-l border-ink/10" colSpan={6}>Check Out</th>
+                        <th className="px-3 py-2 border-l border-ink/10" rowSpan={2}>Perbaikan Check Out</th>
+                        <th className="px-3 py-2" rowSpan={2}>Alpa</th>
+                        <th className="px-3 py-2 border-l border-ink/10" rowSpan={2}>Pot. Presensi</th>
+                        <th className="px-3 py-2" rowSpan={2}>Pot. Apel</th>
+                        <th className="px-3 py-2" rowSpan={2}>Nilai Akhir</th>
+                        <th className="px-3 py-2" rowSpan={2}>Ket.</th>
+                      </tr>
+                      <tr>
+                        <th className="px-2 py-2 border-l border-ink/10">Tepat Waktu</th>
+                        <th className="px-2 py-2">Terlambat</th>
+                        <th className="px-2 py-2">Terlambat (diterima)</th>
+                        <th className="px-2 py-2">Dalam Area</th>
+                        <th className="px-2 py-2">Luar Area (diterima)</th>
+                        <th className="px-2 py-2">Luar Area (ditolak)</th>
+                        <th className="px-2 py-2 border-l border-ink/10">Tepat Waktu</th>
+                        <th className="px-2 py-2">Lebih Awal</th>
+                        <th className="px-2 py-2">Lebih Awal (diterima)</th>
+                        <th className="px-2 py-2">Dalam Area</th>
+                        <th className="px-2 py-2">Luar Area (diterima)</th>
+                        <th className="px-2 py-2">Luar Area (ditolak)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-ink/10">
@@ -418,16 +439,33 @@ export default function BasedataPage() {
                         <tr key={`${p.nip}-${i}`}>
                           <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
                           <td className="px-3 py-2.5 font-mono">{p.nip}</td>
-                          <td className="px-3 py-2.5">{p.pangkatGolongan}</td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">{p.pangkatGolongan}</td>
                           <td className="px-3 py-2.5">{p.statusKepegawaian}</td>
                           <td className="px-3 py-2.5">{p.jumlahHariKerja}</td>
                           <td className="px-3 py-2.5">{p.hadir}</td>
                           <td className="px-3 py-2.5">{p.cuti}</td>
                           <td className="px-3 py-2.5">{p.tl}</td>
+                          <td className="px-3 py-2.5">{p.perbaikanPresensi ?? 0}</td>
+                          <td className="px-3 py-2.5">{p.dianggapTidakHadir ?? 0}</td>
                           <td className="px-3 py-2.5">{p.tidakHadir}</td>
-                          <td className="px-3 py-2.5">{p.penguranganPresensi}%</td>
+                          <td className="px-2 py-2.5 border-l border-ink/10">{p.checkInTepatWaktu ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkInTerlambat ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkInTerlambatDiterima ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkInDalamArea ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkInLuarAreaDiterima ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkInLuarAreaDitolak ?? '—'}</td>
+                          <td className="px-2 py-2.5 border-l border-ink/10">{p.checkOutTepatWaktu ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkOutLebihAwal ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkOutLebihAwalDiterima ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkOutDalamArea ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkOutLuarAreaDiterima ?? '—'}</td>
+                          <td className="px-2 py-2.5">{p.checkOutLuarAreaDitolak ?? '—'}</td>
+                          <td className="px-3 py-2.5 border-l border-ink/10">{p.perbaikanCheckOut ?? 0}</td>
+                          <td className="px-3 py-2.5">{p.alpa ?? 0}</td>
+                          <td className="px-3 py-2.5 border-l border-ink/10">{p.penguranganPresensi}%</td>
                           <td className="px-3 py-2.5">{p.penguranganApel}%</td>
                           <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilaiAkhir}</td>
+                          <td className="px-3 py-2.5">{p.keterangan || '—'}</td>
                         </tr>
                       ))}
                     </tbody>

@@ -1,8 +1,13 @@
 import * as XLSX from 'xlsx'
 
 // Membaca file Excel rekapitulasi presensi (format baku: 3 baris header lalu data),
-// mengembalikan array ringkasan per pegawai apa adanya dari file — tanpa perhitungan
-// ulang apa pun, supaya proses upload cepat dan tidak rawan gagal.
+// mengembalikan array LENGKAP per pegawai — semua kolom dari file, apa adanya, tanpa
+// perhitungan ulang apa pun. Urutan kolom baku:
+// A Nama, B NIP, C Pangkat/Gol, D Status, E Jumlah Hari Kerja, F Hadir, G Cuti, H TL,
+// I Perbaikan Presensi, J Dianggap Tidak Hadir, K Tidak Hadir,
+// L-Q Check In (Tepat Waktu, Terlambat, Terlambat Diterima, Dalam Area, Luar Area Diterima, Luar Area Ditolak),
+// R-W Check Out (Tepat Waktu, Lebih Awal, Lebih Awal Diterima, Dalam Area, Luar Area Diterima, Luar Area Ditolak),
+// X Perbaikan Check Out, Y Alpa, Z Pengurangan Presensi, AA Pengurangan Apel, AB Nilai Akhir, AC Ket.
 export async function parseFileSipp(file) {
   const arrayBuffer = await file.arrayBuffer()
   const wb = XLSX.read(arrayBuffer, { type: 'array' })
@@ -38,10 +43,27 @@ export async function parseFileSipp(file) {
       hadir: angka(b[5]),
       cuti: angka(b[6]),
       tl: angka(b[7]),
+      perbaikanPresensi: angka(b[8]),
+      dianggapTidakHadir: angka(b[9]),
       tidakHadir: angka(b[10]),
-      penguranganPresensi: angka(b[25]), // kolom Z
-      penguranganApel: angka(b[26]), // kolom AA
-      nilaiAkhir: angka(b[27]), // kolom AB
+      checkInTepatWaktu: angka(b[11]),
+      checkInTerlambat: angka(b[12]),
+      checkInTerlambatDiterima: angka(b[13]),
+      checkInDalamArea: angka(b[14]),
+      checkInLuarAreaDiterima: angka(b[15]),
+      checkInLuarAreaDitolak: angka(b[16]),
+      checkOutTepatWaktu: angka(b[17]),
+      checkOutLebihAwal: angka(b[18]),
+      checkOutLebihAwalDiterima: angka(b[19]),
+      checkOutDalamArea: angka(b[20]),
+      checkOutLuarAreaDiterima: angka(b[21]),
+      checkOutLuarAreaDitolak: angka(b[22]),
+      perbaikanCheckOut: angka(b[23]),
+      alpa: angka(b[24]),
+      penguranganPresensi: angka(b[25]),
+      penguranganApel: angka(b[26]),
+      nilaiAkhir: angka(b[27]),
+      keterangan: b[28] || '',
     })
   }
   if (hasil.length === 0) {
