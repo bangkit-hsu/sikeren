@@ -7,16 +7,6 @@ import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
 
-function IkonMenu() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-      <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-      <rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-      <rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-      <rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  )
-}
 function IkonDashboard() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
@@ -69,21 +59,7 @@ function IkonPersen() {
     </svg>
   )
 }
-function IkonKonfigurasi() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-      <circle cx="12" cy="12" r="2.8" stroke="currentColor" strokeWidth="1.7" />
-      <path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M17.7 6.3l-1.5 1.5M7.8 16.2l-1.5 1.5M17.7 17.7l-1.5-1.5M7.8 7.8L6.3 6.3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
-  )
-}
-function IkonChevron({ terbuka }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={`w-4 h-4 transition-transform ${terbuka ? 'rotate-90' : ''}`}>
-      <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
+
 const LANGKAH_UPLOAD = [
   { key: 'membaca', label: 'Membaca file Excel' },
   { key: 'menyimpan', label: 'Menyimpan ke database' },
@@ -123,18 +99,13 @@ function ProgresUpload({ tahap, tahapGagalDi }) {
   )
 }
 
-function IkonHamburger() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-      <path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-const MENU_ITEMS = [
-  { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonBintang, segeraHadir: true },
-  { key: 'sipp', label: 'SIPP', Ikon: IkonDokumen, segeraHadir: false },
-  { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonOrang, segeraHadir: true },
+const MODUL = [
+  { key: 'dashboard', label: 'Dashboard', Ikon: IkonDashboard, segeraHadir: false, dashboard: false },
+  { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonBintang, segeraHadir: true, deskripsi: 'Penilaian kinerja dan perilaku kerja ASN secara berkala.' },
+  { key: 'sipp', label: 'SIPP', Ikon: IkonDokumen, segeraHadir: false, deskripsi: 'Rekapitulasi presensi bulanan & perhitungan potongan TPP.' },
+  { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonOrang, segeraHadir: true, deskripsi: 'Catatan penilaian dan capaian kerja per individu pegawai.' },
+  { key: 'data-pegawai', label: 'Data Pegawai', Ikon: IkonOrangGrup, segeraHadir: true, induk: 'penilaian-asn', deskripsi: 'Basis data induk kepegawaian di lingkungan Sekretariat Daerah.' },
+  { key: 'potongan-tpp', label: 'Potongan TPP', Ikon: IkonPersen, segeraHadir: false, induk: 'sipp', deskripsi: 'Ketentuan & tabel persentase potongan Tunjangan Perbaikan Penghasilan.' },
 ]
 
 const POTONGAN_SIPP = [
@@ -176,8 +147,6 @@ const POTONGAN_SIPP = [
   },
 ]
 
-// Tarif potongan per satu kali tidak apel (huruf g pada tabel Potongan TPP) — dipakai juga
-// untuk menghitung ulang kolom Pengurangan Apel saat file SIPP diunggah.
 const TARIF_POTONGAN_APEL = 0.5
 
 const POTONGAN_APEL = [
@@ -221,10 +190,19 @@ function TabelPotongan({ data }) {
   )
 }
 
+function SegeraHadir({ label }) {
+  return (
+    <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+      <span className="inline-block text-xs px-3 py-1 rounded-full bg-clay/10 text-clay font-medium mb-3">Segera Hadir</span>
+      <p className="text-ink/60 text-sm">{label} masih dalam pengembangan dan akan tersedia di sini.</p>
+    </div>
+  )
+}
+
 export default function BasedataPage() {
   const [menuAktif, setMenuAktif] = useState('dashboard')
-  const [konfigurasiTerbuka, setKonfigurasiTerbuka] = useState(false)
-  const [menuTerbuka, setMenuTerbuka] = useState(false)
+  const [subPenilaianAsn, setSubPenilaianAsn] = useState('utama') // 'utama' | 'data-pegawai'
+  const [subSipp, setSubSipp] = useState('utama') // 'utama' | 'potongan-tpp'
 
   const now = new Date()
   const [sippBulan, setSippBulan] = useState(now.getMonth())
@@ -233,16 +211,15 @@ export default function BasedataPage() {
   const [memuatSipp, setMemuatSipp] = useState(false)
   const [mengunggahSipp, setMengunggahSipp] = useState(false)
   const [pesanSipp, setPesanSipp] = useState('')
-  const [tahapUpload, setTahapUpload] = useState(null) // null | 'membaca' | 'menghitung' | 'menyimpan' | 'sukses' | 'gagal'
+  const [tahapUpload, setTahapUpload] = useState(null)
   const [tahapGagalDi, setTahapGagalDi] = useState(null)
+  const [statSipp, setStatSipp] = useState(null)
 
   useEffect(() => {
-    if (menuAktif !== 'sipp') return
+    if (menuAktif !== 'sipp' || subSipp !== 'utama') return
     muatDataSipp(sippBulan, sippTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuAktif, sippBulan, sippTahun])
-
-  const [statSipp, setStatSipp] = useState(null) // { bulan, tahun, jumlah } | null
+  }, [menuAktif, subSipp, sippBulan, sippTahun])
 
   useEffect(() => {
     async function cekStatSipp() {
@@ -278,8 +255,6 @@ export default function BasedataPage() {
       if (snap.exists()) {
         setDataSipp(snap.data().data || [])
       } else if (bulanIdx === 4 && tahun === 2026) {
-        // Data bawaan Mei 2026 yang sudah disertakan — otomatis tersimpan begitu pertama kali dibuka,
-        // apa adanya dari file, tanpa perhitungan ulang.
         await setDoc(doc(db, 'sipp', id), {
           bulan: bulanIdx, tahun, data: SIPP_MEI_2026, diunggahPada: serverTimestamp(),
         })
@@ -326,327 +301,299 @@ export default function BasedataPage() {
     }
   }
 
-  const semuaItem = [
-    { key: 'dashboard', label: 'Dashboard', Ikon: IkonDashboard, segeraHadir: false },
-    { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonBintang, segeraHadir: true, deskripsi: 'Penilaian kinerja dan perilaku kerja ASN secara berkala.' },
-    { key: 'sipp', label: 'SIPP', Ikon: IkonDokumen, segeraHadir: false, deskripsi: 'Rekapitulasi presensi bulanan & perhitungan potongan TPP.' },
-    { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonOrang, segeraHadir: true, deskripsi: 'Catatan penilaian dan capaian kerja per individu pegawai.' },
-    { key: 'data-pegawai', label: 'Data Pegawai', Ikon: IkonOrangGrup, segeraHadir: true, dalamKonfigurasi: true, deskripsi: 'Basis data induk kepegawaian di lingkungan Sekretariat Daerah.' },
-    { key: 'potongan-tpp', label: 'Potongan TPP', Ikon: IkonPersen, segeraHadir: false, dalamKonfigurasi: true, deskripsi: 'Ketentuan & tabel persentase potongan Tunjangan Perbaikan Penghasilan.' },
-  ]
-  const aktifSaatIni = semuaItem.find((m) => m.key === menuAktif)
-  const modulUtama = semuaItem.filter((m) => m.key !== 'dashboard')
+  const modulNavigasi = MODUL.filter((m) => !m.induk) // yang tampil di navbar atas
+  const modulDashboard = MODUL.filter((m) => m.key !== 'dashboard') // yang tampil di grid dashboard
+  const aktifSaatIni = MODUL.find((m) => m.key === menuAktif)
 
   function pilihMenu(key) {
-    setMenuAktif(key)
-    setMenuTerbuka(false)
-    if (key === 'data-pegawai' || key === 'potongan-tpp') setKonfigurasiTerbuka(true)
+    if (key === 'data-pegawai') {
+      setMenuAktif('penilaian-asn')
+      setSubPenilaianAsn('data-pegawai')
+    } else if (key === 'potongan-tpp') {
+      setMenuAktif('sipp')
+      setSubSipp('potongan-tpp')
+    } else {
+      setMenuAktif(key)
+      if (key === 'penilaian-asn') setSubPenilaianAsn('utama')
+      if (key === 'sipp') setSubSipp('utama')
+    }
   }
 
   return (
-    <div className="min-h-screen bg-paper md:flex">
-      {menuTerbuka && (
-        <div className="fixed inset-0 bg-ink/40 z-30 md:hidden" onClick={() => setMenuTerbuka(false)} />
-      )}
-
-      {/* Menu di sebelah kiri */}
-      <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
-          menuTerbuka ? 'flex translate-x-0' : 'hidden -translate-x-full'
-        }`}
-      >
-        <div className="px-5 py-5 border-b border-ink/10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gold-500">
-              <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
+    <div className="min-h-screen bg-paper">
+      {/* Navbar atas — tanpa sidebar/panel geser */}
+      <header className="border-b border-ink/10 bg-white sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gold-500">
+                <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-display font-semibold leading-tight">PADUAN</p>
+              <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
+            </div>
           </div>
-          <div>
-            <p className="font-display font-semibold leading-tight">PADUAN</p>
-            <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
-          </div>
+          <nav className="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
+            {modulNavigasi.map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => pilihMenu(m.key)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                  menuAktif === m.key ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+                }`}
+              >
+                <m.Ikon />
+                {m.label}
+              </button>
+            ))}
+          </nav>
         </div>
+      </header>
 
-        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-          <button
-            type="button"
-            onClick={() => pilihMenu('dashboard')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-              menuAktif === 'dashboard' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-            }`}
-          >
-            <IkonDashboard />
-            Dashboard
-          </button>
-
-          {MENU_ITEMS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => pilihMenu(item.key)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-                menuAktif === item.key ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-              }`}
-            >
-              <item.Ikon />
-              {item.label}
-            </button>
-          ))}
-
+      <main className={`px-5 sm:px-6 py-10 mx-auto ${menuAktif === 'dashboard' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        {menuAktif === 'dashboard' ? (
           <div>
-            <button
-              type="button"
-              onClick={() => setKonfigurasiTerbuka((v) => !v)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-ink/70 hover:bg-moss-100 transition-colors"
-            >
-              <IkonKonfigurasi />
-              Konfigurasi
-              <span className="ml-auto text-ink/40"><IkonChevron terbuka={konfigurasiTerbuka} /></span>
-            </button>
-            {konfigurasiTerbuka && (
-              <div className="mt-1 space-y-1">
+            <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-8 sm:px-10 sm:py-10 mb-8">
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 12% 15%, rgba(201,162,39,0.35), transparent 35%), radial-gradient(circle at 88% 85%, rgba(201,162,39,0.25), transparent 40%)',
+                }}
+              />
+              <div className="relative">
+                <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
+                <h1 className="font-display font-bold text-3xl sm:text-4xl">PADUAN</h1>
+                <p className="text-paper/80 text-sm sm:text-base mt-2 max-w-lg">
+                  Penilaian ASN Digital Terpadu dan Akuntabel — satu portal untuk seluruh modul penilaian, presensi, dan data kepegawaian Sekretariat Daerah.
+                </p>
+                {statSipp && (
+                  <div className="inline-flex items-center gap-2 mt-5 bg-paper/10 border border-paper/20 rounded-full px-4 py-2 text-xs sm:text-sm">
+                    <span className="w-2 h-2 rounded-full bg-gold-500" />
+                    Data SIPP {namaBulan(statSipp.bulan)} {statSipp.tahun} tersedia — {statSipp.jumlah} pegawai
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Modul Tersedia</p>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              {modulDashboard.map((m) => (
                 <button
+                  key={m.key}
                   type="button"
-                  onClick={() => pilihMenu('data-pegawai')}
-                  className={`w-full flex items-center gap-2.5 pl-10 pr-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-                    menuAktif === 'data-pegawai' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-                  }`}
+                  onClick={() => pilihMenu(m.key)}
+                  className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
                 >
-                  Data Pegawai
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${m.segeraHadir ? 'bg-ink/10 text-ink/50' : 'bg-moss-700 text-paper'}`}>
+                    <m.Ikon />
+                  </div>
+                  <p className="font-display font-semibold text-ink">{m.label}</p>
+                  <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">{m.deskripsi}</p>
+                  <span className={`inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium ${
+                    m.segeraHadir ? 'bg-clay/10 text-clay' : 'bg-moss-100 text-moss-800'
+                  }`}>
+                    {m.segeraHadir ? 'Segera Hadir' : 'Aktif'}
+                  </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => pilihMenu('potongan-tpp')}
-                  className={`w-full flex items-center gap-2.5 pl-10 pr-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-                    menuAktif === 'potongan-tpp' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-                  }`}
-                >
-                  Potongan TPP
-                </button>
+              ))}
+            </div>
+          </div>
+        ) : menuAktif === 'penilaian-asn' ? (
+          <div>
+            <h1 className="font-display font-bold text-2xl text-ink mb-4">Penilaian ASN</h1>
+            <div className="inline-flex bg-ink/5 rounded-lg p-1 mb-5">
+              <button
+                type="button"
+                onClick={() => setSubPenilaianAsn('utama')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${subPenilaianAsn === 'utama' ? 'bg-white shadow-sm text-ink' : 'text-ink/60'}`}
+              >
+                Penilaian ASN
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubPenilaianAsn('data-pegawai')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${subPenilaianAsn === 'data-pegawai' ? 'bg-white shadow-sm text-ink' : 'text-ink/60'}`}
+              >
+                Data Pegawai
+              </button>
+            </div>
+            {subPenilaianAsn === 'utama' ? <SegeraHadir label="Penilaian ASN" /> : <SegeraHadir label="Data Pegawai" />}
+          </div>
+        ) : menuAktif === 'sipp' ? (
+          <div>
+            <h1 className="font-display font-bold text-2xl text-ink mb-4">SIPP</h1>
+            <div className="inline-flex bg-ink/5 rounded-lg p-1 mb-5">
+              <button
+                type="button"
+                onClick={() => setSubSipp('utama')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${subSipp === 'utama' ? 'bg-white shadow-sm text-ink' : 'text-ink/60'}`}
+              >
+                Rekap SIPP
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubSipp('potongan-tpp')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${subSipp === 'potongan-tpp' ? 'bg-white shadow-sm text-ink' : 'text-ink/60'}`}
+              >
+                Potongan TPP
+              </button>
+            </div>
+
+            {subSipp === 'utama' ? (
+              <div>
+                <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file rekapitulasi presensi (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
+
+                <div className="flex flex-wrap items-end gap-3 mb-5">
+                  <div>
+                    <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                    <select
+                      value={sippBulan}
+                      onChange={(e) => setSippBulan(Number(e.target.value))}
+                      className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                    >
+                      {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                    <select
+                      value={sippTahun}
+                      onChange={(e) => setSippTahun(Number(e.target.value))}
+                      className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                    >
+                      {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                  <label className="inline-flex items-center gap-2 bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 cursor-pointer hover:bg-moss-800 transition-colors">
+                    {mengunggahSipp ? 'Mengunggah…' : 'Upload Data'}
+                    <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadSipp} disabled={mengunggahSipp} />
+                  </label>
+                </div>
+
+                <ProgresUpload tahap={tahapUpload} tahapGagalDi={tahapGagalDi} />
+
+                {pesanSipp && (
+                  <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanSipp.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
+                    {pesanSipp}
+                  </p>
+                )}
+
+                {memuatSipp ? (
+                  <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                ) : dataSipp && dataSipp.length > 0 ? (
+                  <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                    <table className="w-full text-sm min-w-[2200px]">
+                      <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                        <tr>
+                          <th className="px-3 py-2" rowSpan={2}>Nama</th>
+                          <th className="px-3 py-2" rowSpan={2}>NIP</th>
+                          <th className="px-3 py-2" rowSpan={2}>Pangkat/Gol</th>
+                          <th className="px-3 py-2" rowSpan={2}>Status</th>
+                          <th className="px-3 py-2" rowSpan={2}>Hari Kerja</th>
+                          <th className="px-3 py-2" rowSpan={2}>Hadir</th>
+                          <th className="px-3 py-2" rowSpan={2}>Cuti</th>
+                          <th className="px-3 py-2" rowSpan={2}>TL</th>
+                          <th className="px-3 py-2" rowSpan={2}>Perbaikan Presensi</th>
+                          <th className="px-3 py-2" rowSpan={2}>Dianggap Tidak Hadir</th>
+                          <th className="px-3 py-2" rowSpan={2}>Tidak Hadir</th>
+                          <th className="px-3 py-2 text-center border-l border-ink/10" colSpan={6}>Check In</th>
+                          <th className="px-3 py-2 text-center border-l border-ink/10" colSpan={6}>Check Out</th>
+                          <th className="px-3 py-2 border-l border-ink/10" rowSpan={2}>Perbaikan Check Out</th>
+                          <th className="px-3 py-2" rowSpan={2}>Alpa</th>
+                          <th className="px-3 py-2 border-l border-ink/10" rowSpan={2}>Pot. Presensi</th>
+                          <th className="px-3 py-2" rowSpan={2}>Pot. Apel</th>
+                          <th className="px-3 py-2" rowSpan={2}>Nilai Akhir</th>
+                          <th className="px-3 py-2" rowSpan={2}>Ket.</th>
+                        </tr>
+                        <tr>
+                          <th className="px-2 py-2 border-l border-ink/10">Tepat Waktu</th>
+                          <th className="px-2 py-2">Terlambat</th>
+                          <th className="px-2 py-2">Terlambat (diterima)</th>
+                          <th className="px-2 py-2">Dalam Area</th>
+                          <th className="px-2 py-2">Luar Area (diterima)</th>
+                          <th className="px-2 py-2">Luar Area (ditolak)</th>
+                          <th className="px-2 py-2 border-l border-ink/10">Tepat Waktu</th>
+                          <th className="px-2 py-2">Lebih Awal</th>
+                          <th className="px-2 py-2">Lebih Awal (diterima)</th>
+                          <th className="px-2 py-2">Dalam Area</th>
+                          <th className="px-2 py-2">Luar Area (diterima)</th>
+                          <th className="px-2 py-2">Luar Area (ditolak)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-ink/10">
+                        {dataSipp.map((p, i) => (
+                          <tr key={`${p.nip}-${i}`}>
+                            <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                            <td className="px-3 py-2.5 font-mono">{p.nip}</td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">{p.pangkatGolongan}</td>
+                            <td className="px-3 py-2.5">{p.statusKepegawaian}</td>
+                            <td className="px-3 py-2.5">{p.jumlahHariKerja}</td>
+                            <td className="px-3 py-2.5">{p.hadir}</td>
+                            <td className="px-3 py-2.5">{p.cuti}</td>
+                            <td className="px-3 py-2.5">{p.tl}</td>
+                            <td className="px-3 py-2.5">{p.perbaikanPresensi ?? 0}</td>
+                            <td className="px-3 py-2.5">{p.dianggapTidakHadir ?? 0}</td>
+                            <td className="px-3 py-2.5">{p.tidakHadir}</td>
+                            <td className="px-2 py-2.5 border-l border-ink/10">{p.checkInTepatWaktu ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkInTerlambat ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkInTerlambatDiterima ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkInDalamArea ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkInLuarAreaDiterima ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkInLuarAreaDitolak ?? '—'}</td>
+                            <td className="px-2 py-2.5 border-l border-ink/10">{p.checkOutTepatWaktu ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkOutLebihAwal ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkOutLebihAwalDiterima ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkOutDalamArea ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkOutLuarAreaDiterima ?? '—'}</td>
+                            <td className="px-2 py-2.5">{p.checkOutLuarAreaDitolak ?? '—'}</td>
+                            <td className="px-3 py-2.5 border-l border-ink/10">{p.perbaikanCheckOut ?? 0}</td>
+                            <td className="px-3 py-2.5">{p.alpa ?? 0}</td>
+                            <td className="px-3 py-2.5 border-l border-ink/10">{p.penguranganPresensi}%</td>
+                            <td className="px-3 py-2.5">{p.penguranganApel}%</td>
+                            <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilaiAkhir}</td>
+                            <td className="px-3 py-2.5">{p.keterangan || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                    <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(sippBulan)} {sippTahun}. Unggah file rekapitulasi presensi untuk periode ini.</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div>
+                  <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan SIPP</h2>
+                  <p className="text-ink/60 text-sm mb-3">Ketentuan huruf a s.d. f — pengurangan berdasarkan rekapitulasi presensi bulanan.</p>
+                  <TabelPotongan data={POTONGAN_SIPP} />
+                </div>
+
+                <div>
+                  <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan Absensi Apel</h2>
+                  <p className="text-ink/60 text-sm mb-3">Ketentuan huruf g.</p>
+                  <TabelPotongan data={POTONGAN_APEL} />
+                </div>
+
+                <p className="text-xs text-ink/50 bg-white/60 border border-ink/10 rounded-xl2 p-4">
+                  <span className="font-semibold text-ink">h.</span> Persentase pengurangan ditiadakan apabila ketentuan sebagaimana dimaksud pada huruf a, huruf b, huruf c, huruf d, huruf e, huruf f, dan huruf g, alasannya diterima dan dapat dipertanggungjawabkan.
+                </p>
               </div>
             )}
           </div>
-        </nav>
-      </aside>
-
-      {/* Konten utama */}
-      <div className="flex-1 min-w-0">
-        <header className="md:hidden sticky top-0 z-20 bg-paper/90 backdrop-blur border-b border-ink/10 flex items-center gap-3 px-4 py-3">
-          <button
-            onClick={() => setMenuTerbuka(true)}
-            aria-label="Buka menu"
-            className="w-9 h-9 flex items-center justify-center rounded-lg border border-ink/15 shrink-0"
-          >
-            <IkonHamburger />
-          </button>
-          <p className="font-display font-semibold">PADUAN</p>
-        </header>
-
-        <main className={`px-6 py-10 mx-auto ${menuAktif === 'dashboard' ? 'max-w-5xl' : menuAktif === 'potongan-tpp' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-lg'}`}>
-          {menuAktif !== 'dashboard' && (
+        ) : (
+          <div>
             <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
-          )}
-
-          {menuAktif === 'dashboard' ? (
-            <div>
-              {/* Hero */}
-              <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-8 sm:px-10 sm:py-10 mb-8">
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage: 'radial-gradient(circle at 12% 15%, rgba(201,162,39,0.35), transparent 35%), radial-gradient(circle at 88% 85%, rgba(201,162,39,0.25), transparent 40%)',
-                  }}
-                />
-                <div className="relative">
-                  <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
-                  <h1 className="font-display font-bold text-3xl sm:text-4xl">PADUAN</h1>
-                  <p className="text-paper/80 text-sm sm:text-base mt-2 max-w-lg">
-                    Penilaian ASN Digital Terpadu dan Akuntabel — satu portal untuk seluruh modul penilaian, presensi, dan data kepegawaian Sekretariat Daerah.
-                  </p>
-                  {statSipp && (
-                    <div className="inline-flex items-center gap-2 mt-5 bg-paper/10 border border-paper/20 rounded-full px-4 py-2 text-xs sm:text-sm">
-                      <span className="w-2 h-2 rounded-full bg-gold-500" />
-                      Data SIPP {namaBulan(statSipp.bulan)} {statSipp.tahun} tersedia — {statSipp.jumlah} pegawai
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Grid modul */}
-              <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Modul Tersedia</p>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {modulUtama.map((m) => (
-                  <button
-                    key={m.key}
-                    type="button"
-                    onClick={() => pilihMenu(m.key)}
-                    className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
-                  >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${m.segeraHadir ? 'bg-ink/10 text-ink/50' : 'bg-moss-700 text-paper'}`}>
-                      <m.Ikon />
-                    </div>
-                    <p className="font-display font-semibold text-ink">{m.label}</p>
-                    <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">{m.deskripsi}</p>
-                    <span className={`inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium ${
-                      m.segeraHadir ? 'bg-clay/10 text-clay' : 'bg-moss-100 text-moss-800'
-                    }`}>
-                      {m.segeraHadir ? 'Segera Hadir' : 'Aktif'}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : menuAktif === 'sipp' ? (
-            <div className="mt-4">
-              <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file rekapitulasi presensi (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
-
-              <div className="flex flex-wrap items-end gap-3 mb-5">
-                <div>
-                  <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
-                  <select
-                    value={sippBulan}
-                    onChange={(e) => setSippBulan(Number(e.target.value))}
-                    className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
-                  >
-                    {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
-                  <select
-                    value={sippTahun}
-                    onChange={(e) => setSippTahun(Number(e.target.value))}
-                    className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
-                  >
-                    {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
-                  </select>
-                </div>
-                <label className="inline-flex items-center gap-2 bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 cursor-pointer hover:bg-moss-800 transition-colors">
-                  {mengunggahSipp ? 'Mengunggah…' : 'Upload Data'}
-                  <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadSipp} disabled={mengunggahSipp} />
-                </label>
-              </div>
-
-              <ProgresUpload tahap={tahapUpload} tahapGagalDi={tahapGagalDi} />
-
-              {pesanSipp && (
-                <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanSipp.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
-                  {pesanSipp}
-                </p>
-              )}
-
-              {memuatSipp ? (
-                <p className="text-ink/50 font-mono text-sm">Memuat…</p>
-              ) : dataSipp && dataSipp.length > 0 ? (
-                <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                  <table className="w-full text-sm min-w-[2200px]">
-                    <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
-                      <tr>
-                        <th className="px-3 py-2" rowSpan={2}>Nama</th>
-                        <th className="px-3 py-2" rowSpan={2}>NIP</th>
-                        <th className="px-3 py-2" rowSpan={2}>Pangkat/Gol</th>
-                        <th className="px-3 py-2" rowSpan={2}>Status</th>
-                        <th className="px-3 py-2" rowSpan={2}>Hari Kerja</th>
-                        <th className="px-3 py-2" rowSpan={2}>Hadir</th>
-                        <th className="px-3 py-2" rowSpan={2}>Cuti</th>
-                        <th className="px-3 py-2" rowSpan={2}>TL</th>
-                        <th className="px-3 py-2" rowSpan={2}>Perbaikan Presensi</th>
-                        <th className="px-3 py-2" rowSpan={2}>Dianggap Tidak Hadir</th>
-                        <th className="px-3 py-2" rowSpan={2}>Tidak Hadir</th>
-                        <th className="px-3 py-2 text-center border-l border-ink/10" colSpan={6}>Check In</th>
-                        <th className="px-3 py-2 text-center border-l border-ink/10" colSpan={6}>Check Out</th>
-                        <th className="px-3 py-2 border-l border-ink/10" rowSpan={2}>Perbaikan Check Out</th>
-                        <th className="px-3 py-2" rowSpan={2}>Alpa</th>
-                        <th className="px-3 py-2 border-l border-ink/10" rowSpan={2}>Pot. Presensi</th>
-                        <th className="px-3 py-2" rowSpan={2}>Pot. Apel</th>
-                        <th className="px-3 py-2" rowSpan={2}>Nilai Akhir</th>
-                        <th className="px-3 py-2" rowSpan={2}>Ket.</th>
-                      </tr>
-                      <tr>
-                        <th className="px-2 py-2 border-l border-ink/10">Tepat Waktu</th>
-                        <th className="px-2 py-2">Terlambat</th>
-                        <th className="px-2 py-2">Terlambat (diterima)</th>
-                        <th className="px-2 py-2">Dalam Area</th>
-                        <th className="px-2 py-2">Luar Area (diterima)</th>
-                        <th className="px-2 py-2">Luar Area (ditolak)</th>
-                        <th className="px-2 py-2 border-l border-ink/10">Tepat Waktu</th>
-                        <th className="px-2 py-2">Lebih Awal</th>
-                        <th className="px-2 py-2">Lebih Awal (diterima)</th>
-                        <th className="px-2 py-2">Dalam Area</th>
-                        <th className="px-2 py-2">Luar Area (diterima)</th>
-                        <th className="px-2 py-2">Luar Area (ditolak)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-ink/10">
-                      {dataSipp.map((p, i) => (
-                        <tr key={`${p.nip}-${i}`}>
-                          <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
-                          <td className="px-3 py-2.5 font-mono">{p.nip}</td>
-                          <td className="px-3 py-2.5 whitespace-nowrap">{p.pangkatGolongan}</td>
-                          <td className="px-3 py-2.5">{p.statusKepegawaian}</td>
-                          <td className="px-3 py-2.5">{p.jumlahHariKerja}</td>
-                          <td className="px-3 py-2.5">{p.hadir}</td>
-                          <td className="px-3 py-2.5">{p.cuti}</td>
-                          <td className="px-3 py-2.5">{p.tl}</td>
-                          <td className="px-3 py-2.5">{p.perbaikanPresensi ?? 0}</td>
-                          <td className="px-3 py-2.5">{p.dianggapTidakHadir ?? 0}</td>
-                          <td className="px-3 py-2.5">{p.tidakHadir}</td>
-                          <td className="px-2 py-2.5 border-l border-ink/10">{p.checkInTepatWaktu ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkInTerlambat ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkInTerlambatDiterima ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkInDalamArea ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkInLuarAreaDiterima ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkInLuarAreaDitolak ?? '—'}</td>
-                          <td className="px-2 py-2.5 border-l border-ink/10">{p.checkOutTepatWaktu ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkOutLebihAwal ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkOutLebihAwalDiterima ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkOutDalamArea ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkOutLuarAreaDiterima ?? '—'}</td>
-                          <td className="px-2 py-2.5">{p.checkOutLuarAreaDitolak ?? '—'}</td>
-                          <td className="px-3 py-2.5 border-l border-ink/10">{p.perbaikanCheckOut ?? 0}</td>
-                          <td className="px-3 py-2.5">{p.alpa ?? 0}</td>
-                          <td className="px-3 py-2.5 border-l border-ink/10">{p.penguranganPresensi}%</td>
-                          <td className="px-3 py-2.5">{p.penguranganApel}%</td>
-                          <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilaiAkhir}</td>
-                          <td className="px-3 py-2.5">{p.keterangan || '—'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
-                  <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(sippBulan)} {sippTahun}. Unggah file rekapitulasi presensi untuk periode ini.</p>
-                </div>
-              )}
-            </div>
-          ) : menuAktif === 'potongan-tpp' ? (
-            <div className="mt-4 space-y-8">
-              <div>
-                <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan SIPP</h2>
-                <p className="text-ink/60 text-sm mb-3">Ketentuan huruf a s.d. f — pengurangan berdasarkan rekapitulasi presensi bulanan.</p>
-                <TabelPotongan data={POTONGAN_SIPP} />
-              </div>
-
-              <div>
-                <h2 className="font-display font-semibold text-lg text-moss-800 mb-1">Potongan Absensi Apel</h2>
-                <p className="text-ink/60 text-sm mb-3">Ketentuan huruf g.</p>
-                <TabelPotongan data={POTONGAN_APEL} />
-              </div>
-
-              <p className="text-xs text-ink/50 bg-white/60 border border-ink/10 rounded-xl2 p-4">
-                <span className="font-semibold text-ink">h.</span> Persentase pengurangan ditiadakan apabila ketentuan sebagaimana dimaksud pada huruf a, huruf b, huruf c, huruf d, huruf e, huruf f, dan huruf g, alasannya diterima dan dapat dipertanggungjawabkan.
-              </p>
-            </div>
-          ) : aktifSaatIni?.segeraHadir ? (
-            <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
-              <span className="inline-block text-xs px-3 py-1 rounded-full bg-clay/10 text-clay font-medium mb-3">Segera Hadir</span>
-              <p className="text-ink/60 text-sm">Modul ini masih dalam pengembangan dan akan tersedia di sini.</p>
-            </div>
-          ) : null}
-        </main>
-      </div>
+            <SegeraHadir label={aktifSaatIni?.label} />
+          </div>
+        )}
+      </main>
     </div>
   )
 }
