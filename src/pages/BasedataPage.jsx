@@ -1,7 +1,6 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 
 function IkonMenu() {
   return (
@@ -10,15 +9,6 @@ function IkonMenu() {
       <rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
       <rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
       <rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  )
-}
-function IkonApel() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.7" />
-      <circle cx="12" cy="10" r="2.6" stroke="currentColor" strokeWidth="1.7" />
-      <path d="M7.5 17c.7-1.9 2.4-3 4.5-3s3.8 1.1 4.5 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -49,7 +39,6 @@ const MENU_ITEMS = [
   { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonMenu, segeraHadir: true },
   { key: 'sipp', label: 'SIPP', Ikon: IkonMenu, segeraHadir: true },
   { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonMenu, segeraHadir: true },
-  { key: 'absensi-apel', label: 'Absensi Apel', Ikon: IkonApel, segeraHadir: false },
 ]
 
 export default function BasedataPage() {
@@ -57,7 +46,11 @@ export default function BasedataPage() {
   const [konfigurasiTerbuka, setKonfigurasiTerbuka] = useState(false)
   const [menuTerbuka, setMenuTerbuka] = useState(false)
 
-  const semuaItem = [...MENU_ITEMS, { key: 'data-pegawai', label: 'Data Pegawai', segeraHadir: true, dalamKonfigurasi: true }]
+  const semuaItem = [
+    ...MENU_ITEMS,
+    { key: 'data-pegawai', label: 'Data Pegawai', segeraHadir: true, dalamKonfigurasi: true },
+    { key: 'potongan-tpp', label: 'Potongan TPP', segeraHadir: true, dalamKonfigurasi: true },
+  ]
   const aktifSaatIni = semuaItem.find((m) => m.key === menuAktif)
 
   function pilihMenu(key) {
@@ -92,28 +85,17 @@ export default function BasedataPage() {
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           {MENU_ITEMS.map((item) => (
-            item.key === 'absensi-apel' ? (
-              <Link
-                key={item.key}
-                to="/"
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-ink/70 hover:bg-moss-100 transition-colors"
-              >
-                <item.Ikon />
-                {item.label}
-              </Link>
-            ) : (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => pilihMenu(item.key)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-                  menuAktif === item.key ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-                }`}
-              >
-                <item.Ikon />
-                {item.label}
-              </button>
-            )
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => pilihMenu(item.key)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+                menuAktif === item.key ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+              }`}
+            >
+              <item.Ikon />
+              {item.label}
+            </button>
           ))}
 
           <div>
@@ -136,6 +118,15 @@ export default function BasedataPage() {
                   }`}
                 >
                   Data Pegawai
+                </button>
+                <button
+                  type="button"
+                  onClick={() => pilihMenu('potongan-tpp')}
+                  className={`w-full flex items-center gap-2.5 pl-10 pr-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+                    menuAktif === 'potongan-tpp' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+                  }`}
+                >
+                  Potongan TPP
                 </button>
               </div>
             )}
