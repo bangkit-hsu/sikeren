@@ -37,81 +37,134 @@ function IkonChevron({ terbuka }) {
     </svg>
   )
 }
+function IkonHamburger() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
 
-const MENU_SEGERA_HADIR = [
-  { label: 'Penilaian ASN', Ikon: IkonMenu },
-  { label: 'SIPP', Ikon: IkonMenu },
-  { label: 'Penilaian Individu', Ikon: IkonMenu },
+const MENU_ITEMS = [
+  { key: 'penilaian-asn', label: 'Penilaian ASN', Ikon: IkonMenu, segeraHadir: true },
+  { key: 'sipp', label: 'SIPP', Ikon: IkonMenu, segeraHadir: true },
+  { key: 'penilaian-individu', label: 'Penilaian Individu', Ikon: IkonMenu, segeraHadir: true },
+  { key: 'absensi-apel', label: 'Absensi Apel', Ikon: IkonApel, segeraHadir: false },
 ]
 
 export default function BasedataPage() {
+  const [menuAktif, setMenuAktif] = useState('penilaian-asn')
   const [konfigurasiTerbuka, setKonfigurasiTerbuka] = useState(false)
+  const [menuTerbuka, setMenuTerbuka] = useState(false)
+
+  const semuaItem = [...MENU_ITEMS, { key: 'data-pegawai', label: 'Data Pegawai', segeraHadir: true, dalamKonfigurasi: true }]
+  const aktifSaatIni = semuaItem.find((m) => m.key === menuAktif)
+
+  function pilihMenu(key) {
+    setMenuAktif(key)
+    setMenuTerbuka(false)
+  }
 
   return (
-    <div className="min-h-screen bg-paper px-5 py-10">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 mx-auto rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center mb-3">
-            <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold-500">
+    <div className="min-h-screen bg-paper md:flex">
+      {menuTerbuka && (
+        <div className="fixed inset-0 bg-ink/40 z-30 md:hidden" onClick={() => setMenuTerbuka(false)} />
+      )}
+
+      {/* Menu di sebelah kiri */}
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
+          menuTerbuka ? 'flex translate-x-0' : 'hidden -translate-x-full'
+        }`}
+      >
+        <div className="px-5 py-5 border-b border-ink/10 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gold-500">
               <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
               <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             </svg>
           </div>
-          <h1 className="font-display font-bold text-2xl text-ink">Basedata</h1>
-          <p className="text-ink/60 text-sm mt-1">Portal modul internal — beberapa menu masih dalam pengembangan.</p>
+          <div>
+            <p className="font-display font-semibold leading-tight">Basedata</p>
+            <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          {MENU_SEGERA_HADIR.map(({ label, Ikon }) => (
-            <div
-              key={label}
-              className="flex items-center justify-between bg-white/60 border border-ink/10 rounded-xl2 px-4 py-3.5 opacity-70"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-ink/10 text-ink/50 flex items-center justify-center">
-                  <Ikon />
-                </div>
-                <span className="font-medium text-ink/70">{label}</span>
-              </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Segera Hadir</span>
-            </div>
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {MENU_ITEMS.map((item) => (
+            item.key === 'absensi-apel' ? (
+              <Link
+                key={item.key}
+                to="/"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-ink/70 hover:bg-moss-100 transition-colors"
+              >
+                <item.Ikon />
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => pilihMenu(item.key)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+                  menuAktif === item.key ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+                }`}
+              >
+                <item.Ikon />
+                {item.label}
+              </button>
+            )
           ))}
 
-          <Link
-            to="/"
-            className="flex items-center gap-3 bg-moss-50 border border-moss-200 rounded-xl2 px-4 py-3.5 hover:bg-moss-100 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-lg bg-moss-700 text-paper flex items-center justify-center">
-              <IkonApel />
-            </div>
-            <span className="font-medium text-ink">Absen Apel</span>
-            <span className="ml-auto text-moss-700" aria-hidden>→</span>
-          </Link>
-
-          <div className="bg-white/60 border border-ink/10 rounded-xl2 overflow-hidden">
+          <div>
             <button
               type="button"
               onClick={() => setKonfigurasiTerbuka((v) => !v)}
-              className="w-full flex items-center gap-3 px-4 py-3.5"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-ink/70 hover:bg-moss-100 transition-colors"
             >
-              <div className="w-9 h-9 rounded-lg bg-ink/10 text-ink/70 flex items-center justify-center">
-                <IkonKonfigurasi />
-              </div>
-              <span className="font-medium text-ink">Konfigurasi</span>
-              <span className="ml-auto text-ink/40">
-                <IkonChevron terbuka={konfigurasiTerbuka} />
-              </span>
+              <IkonKonfigurasi />
+              Konfigurasi
+              <span className="ml-auto text-ink/40"><IkonChevron terbuka={konfigurasiTerbuka} /></span>
             </button>
             {konfigurasiTerbuka && (
-              <div className="px-4 pb-3.5 pt-1 space-y-1">
-                <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-paper text-sm text-ink/60">
-                  <span>Data Pegawai</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Segera Hadir</span>
-                </div>
+              <div className="mt-1 space-y-1">
+                <button
+                  type="button"
+                  onClick={() => pilihMenu('data-pegawai')}
+                  className={`w-full flex items-center gap-2.5 pl-10 pr-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+                    menuAktif === 'data-pegawai' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+                  }`}
+                >
+                  Data Pegawai
+                </button>
               </div>
             )}
           </div>
-        </div>
+        </nav>
+      </aside>
+
+      {/* Konten utama */}
+      <div className="flex-1 min-w-0">
+        <header className="md:hidden sticky top-0 z-20 bg-paper/90 backdrop-blur border-b border-ink/10 flex items-center gap-3 px-4 py-3">
+          <button
+            onClick={() => setMenuTerbuka(true)}
+            aria-label="Buka menu"
+            className="w-9 h-9 flex items-center justify-center rounded-lg border border-ink/15 shrink-0"
+          >
+            <IkonHamburger />
+          </button>
+          <p className="font-display font-semibold">Basedata</p>
+        </header>
+
+        <main className="px-6 py-10 max-w-lg mx-auto">
+          <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
+          {aktifSaatIni?.segeraHadir ? (
+            <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+              <span className="inline-block text-xs px-3 py-1 rounded-full bg-clay/10 text-clay font-medium mb-3">Segera Hadir</span>
+              <p className="text-ink/60 text-sm">Modul ini masih dalam pengembangan dan akan tersedia di sini.</p>
+            </div>
+          ) : null}
+        </main>
       </div>
     </div>
   )
