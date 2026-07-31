@@ -190,6 +190,19 @@ function TabelPotongan({ data }) {
   )
 }
 
+function TombolKembali({ onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-ink mb-4"
+    >
+      <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      Kembali ke Dashboard
+    </button>
+  )
+}
+
 function SegeraHadir({ label }) {
   return (
     <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
@@ -301,8 +314,7 @@ export default function BasedataPage() {
     }
   }
 
-  const modulNavigasi = MODUL.filter((m) => !m.induk) // yang tampil di navbar atas
-  const modulDashboard = MODUL.filter((m) => m.key !== 'dashboard') // yang tampil di grid dashboard
+  const modulDashboard = MODUL.filter((m) => m.key !== 'dashboard' && !m.induk) // Data Pegawai & Potongan TPP tidak tampil di sini
   const aktifSaatIni = MODUL.find((m) => m.key === menuAktif)
 
   function pilihMenu(key) {
@@ -321,36 +333,25 @@ export default function BasedataPage() {
 
   return (
     <div className="min-h-screen bg-paper">
-      {/* Navbar atas — tanpa sidebar/panel geser */}
+      {/* Header — hanya identitas portal, tanpa navbar maupun sidebar */}
       <header className="border-b border-ink/10 bg-white sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center">
+        <div className="max-w-6xl mx-auto px-5 py-4">
+          <button
+            type="button"
+            onClick={() => pilihMenu('dashboard')}
+            className="flex items-center gap-3"
+          >
+            <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center shrink-0">
               <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gold-500">
                 <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
                 <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>
             </div>
-            <div>
+            <div className="text-left">
               <p className="font-display font-semibold leading-tight">PADUAN</p>
               <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
             </div>
-          </div>
-          <nav className="flex items-center gap-1 overflow-x-auto -mx-1 px-1">
-            {modulNavigasi.map((m) => (
-              <button
-                key={m.key}
-                type="button"
-                onClick={() => pilihMenu(m.key)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  menuAktif === m.key ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-                }`}
-              >
-                <m.Ikon />
-                {m.label}
-              </button>
-            ))}
-          </nav>
+          </button>
         </div>
       </header>
 
@@ -404,6 +405,7 @@ export default function BasedataPage() {
           </div>
         ) : menuAktif === 'penilaian-asn' ? (
           <div>
+            <TombolKembali onClick={() => pilihMenu('dashboard')} />
             <h1 className="font-display font-bold text-2xl text-ink mb-4">Penilaian ASN</h1>
             <div className="inline-flex bg-ink/5 rounded-lg p-1 mb-5">
               <button
@@ -425,6 +427,7 @@ export default function BasedataPage() {
           </div>
         ) : menuAktif === 'sipp' ? (
           <div>
+            <TombolKembali onClick={() => pilihMenu('dashboard')} />
             <h1 className="font-display font-bold text-2xl text-ink mb-4">SIPP</h1>
             <div className="inline-flex bg-ink/5 rounded-lg p-1 mb-5">
               <button
@@ -589,6 +592,7 @@ export default function BasedataPage() {
           </div>
         ) : (
           <div>
+            <TombolKembali onClick={() => pilihMenu('dashboard')} />
             <h1 className="font-display font-bold text-2xl text-ink mb-1">{aktifSaatIni?.label}</h1>
             <SegeraHadir label={aktifSaatIni?.label} />
           </div>
