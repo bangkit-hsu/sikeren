@@ -308,7 +308,7 @@ export default function BasedataPage() {
             </svg>
           </div>
           <div>
-            <p className="font-display font-semibold leading-tight">Basedata</p>
+            <p className="font-display font-semibold leading-tight">SiKeren</p>
             <p className="text-xs text-ink/50 font-mono">Portal Modul Internal</p>
           </div>
         </div>
@@ -374,7 +374,7 @@ export default function BasedataPage() {
           >
             <IkonHamburger />
           </button>
-          <p className="font-display font-semibold">Basedata</p>
+          <p className="font-display font-semibold">SiKeren</p>
         </header>
 
         <main className={`px-6 py-10 mx-auto ${menuAktif === 'potongan-tpp' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-lg'}`}>
