@@ -312,17 +312,23 @@ export default function BasedataPage() {
       <main className={`px-5 sm:px-6 py-10 mx-auto ${menuAktif === 'dashboard' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-2xl'}`}>
         {menuAktif === 'dashboard' ? (
           <div>
-            <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-8 sm:px-10 sm:py-10 mb-8">
+            <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
               <div
                 className="absolute inset-0 opacity-30"
                 style={{
                   backgroundImage: 'radial-gradient(circle at 12% 15%, rgba(201,162,39,0.35), transparent 35%), radial-gradient(circle at 88% 85%, rgba(201,162,39,0.25), transparent 40%)',
                 }}
               />
-              <div className="relative">
+              <div className="relative max-w-lg mx-auto">
+                <div className="w-14 h-14 mx-auto rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center mb-4">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold-500">
+                    <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                    <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                  </svg>
+                </div>
                 <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
-                <h1 className="font-display font-bold text-3xl sm:text-4xl">PADUAN</h1>
-                <p className="text-paper/80 text-sm sm:text-base mt-2 max-w-lg">
+                <h1 className="font-display font-bold text-3xl sm:text-4xl">SiKeren</h1>
+                <p className="text-paper/80 text-sm sm:text-base mt-2">
                   Penilaian ASN Digital Terpadu dan Akuntabel — satu portal untuk seluruh modul penilaian, presensi, dan data kepegawaian Sekretariat Daerah.
                 </p>
               </div>

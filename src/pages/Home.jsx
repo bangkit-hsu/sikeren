@@ -35,7 +35,7 @@ export default function Home() {
               <circle cx="12" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.6" />
             </svg>
           </div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">SiKeren</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">e-Apel</h1>
           <p className="text-paper/70 text-sm mt-1">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gold-500/40 to-transparent" />
