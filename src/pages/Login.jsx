@@ -27,7 +27,10 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const loggedIn = await login(nip, password)
+      const batasWaktu = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Koneksi terlalu lama. Periksa sinyal/jaringan lalu coba lagi.')), 20000)
+      })
+      const loggedIn = await Promise.race([login(nip, password), batasWaktu])
       navigate(tujuanSetelahLogin(loggedIn.role))
     } catch (err) {
       setError(err.message || 'Login gagal.')
