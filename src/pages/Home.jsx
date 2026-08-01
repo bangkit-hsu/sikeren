@@ -72,6 +72,16 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Portal Admin — login admin lalu masuk ke portal SiKeren */}
+      <div className="text-center px-6 -mt-2 pb-2">
+        <Link
+          to="/login?tujuan=basedata"
+          className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-ink/60 hover:text-ink border border-ink/15 hover:border-ink/30 rounded-full px-4 py-2 transition-colors"
+        >
+          Portal Admin <span aria-hidden>→</span>
+        </Link>
+      </div>
+
       {/* Judul */}
       <div className="text-center px-6 pt-10 pb-4">
         <p className="font-display font-bold text-xl sm:text-2xl leading-snug max-w-2xl mx-auto text-ink">

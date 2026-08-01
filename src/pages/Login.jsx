@@ -1,18 +1,25 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import HeroKecil from '../components/HeroKecil.jsx'
 
 export default function Login() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const tujuanBasedata = searchParams.get('tujuan') === 'basedata'
   const [nip, setNip] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  function tujuanSetelahLogin(role) {
+    if (role === 'admin' && tujuanBasedata) return '/basedata'
+    return role === 'admin' ? '/admin/rekap' : '/pegawai/absensi'
+  }
+
   if (user) {
-    return <Navigate to={user.role === 'admin' ? '/admin/rekap' : '/pegawai/absensi'} replace />
+    return <Navigate to={tujuanSetelahLogin(user.role)} replace />
   }
 
   async function handleSubmit(e) {
@@ -21,7 +28,7 @@ export default function Login() {
     setLoading(true)
     try {
       const loggedIn = await login(nip, password)
-      navigate(loggedIn.role === 'admin' ? '/admin/rekap' : '/pegawai/absensi')
+      navigate(tujuanSetelahLogin(loggedIn.role))
     } catch (err) {
       setError(err.message || 'Login gagal.')
     } finally {
@@ -31,7 +38,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-paper">
-      <HeroKecil eyebrow="e-Apel" title="Login Manual" subtitle="Masuk dengan NIP & password untuk mencatat kehadiran apel" />
+      <HeroKecil
+        eyebrow={tujuanBasedata ? 'Portal Admin' : 'e-Apel'}
+        title="Login Manual"
+        subtitle={tujuanBasedata ? 'Masuk dengan NIP & password admin untuk membuka Portal SiKeren' : 'Masuk dengan NIP & password untuk mencatat kehadiran apel'}
+      />
 
       <div className="flex justify-center px-5 py-10">
         <div className="w-full max-w-sm">
