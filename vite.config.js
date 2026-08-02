@@ -10,9 +10,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'e-Apel - Absensi Apel Pegawai',
-        short_name: 'e-Apel',
-        description: 'Absensi apel pegawai berbasis pengenalan wajah dan radius lokasi',
+        name: 'SiKeren - Sistem Kinerja dan Reward ASN',
+        short_name: 'SiKeren',
+        description: 'Portal terpadu penilaian, presensi (e-Apel), dan data kepegawaian Sekretariat Daerah',
         start_url: '.',
         scope: '.',
         display: 'standalone',
