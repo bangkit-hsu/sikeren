@@ -239,8 +239,12 @@ export default function BasedataPage() {
   })
 
   function handleKeluar() {
-    logout()
-    navigate('/')
+    if (menuAktif === 'dashboard') {
+      logout()
+      navigate('/')
+    } else {
+      pilihMenu('dashboard')
+    }
   }
 
   const now = new Date()
