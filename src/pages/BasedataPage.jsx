@@ -8,6 +8,7 @@ import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
 import { DATA_PEGAWAI } from '../data/dataPegawai'
+import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonDashboard() {
@@ -311,6 +312,13 @@ export default function BasedataPage() {
   const [nipTerpilihEdit, setNipTerpilihEdit] = useState(new Set())
   const [menyimpanEditPenetapan, setMenyimpanEditPenetapan] = useState(false)
   const [cariPegawaiEdit, setCariPegawaiEdit] = useState('')
+
+  const [pegawaiDinilai, setPegawaiDinilai] = useState(null) // objek pegawai yang sedang diberi nilai, atau null
+  const [jawabanForm, setJawabanForm] = useState({}) // { [indeksKriteria]: { huruf, teks, skor } }
+  const [menyimpanNilai, setMenyimpanNilai] = useState(false)
+  const [pesanNilai, setPesanNilai] = useState('')
+  const [nilaiTersimpanMap, setNilaiTersimpanMap] = useState({}) // nip -> { skorAkhir, jawaban }
+  const [memuatNilaiMap, setMemuatNilaiMap] = useState(false)
   const [menuTerbuka, setMenuTerbuka] = useState(false)
   const [grupTerbuka, setGrupTerbuka] = useState(() => {
     if (menuAktif === 'penilaian-asn') return 'penilaian-asn'
@@ -525,6 +533,14 @@ export default function BasedataPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subPenilaianIndividu])
 
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'nilai' || !atasanTerpilih || !dataPegawai) return
+    const pakai = penetapanTersimpan && penetapanTersimpan.atasan === atasanTerpilih
+    const daftar = pakai ? penetapanTersimpan.pegawai : dataPegawai.filter((p) => p.atasan === atasanTerpilih)
+    if (daftar.length > 0) muatPetaNilai(daftar, atasanBulan, atasanTahun)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subPenilaianIndividu, atasanTerpilih, atasanBulan, atasanTahun, dataPegawai, penetapanTersimpan])
+
   async function simpanPenetapanAtasan(daftarPegawaiBinaan) {
     setMenyimpanPenetapan(true)
     setPesanPenetapan('')
@@ -596,6 +612,73 @@ export default function BasedataPage() {
       alert('Gagal menyimpan perubahan: ' + err.message)
     } finally {
       setMenyimpanEditPenetapan(false)
+    }
+  }
+
+  function idPenilaian(bulanIdx, tahun, nip) {
+    return `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}_${nip}`
+  }
+
+  async function muatPetaNilai(daftarPegawai, bulanIdx, tahun) {
+    setMemuatNilaiMap(true)
+    try {
+      const hasil = {}
+      await Promise.all(daftarPegawai.map(async (p) => {
+        const snap = await getDoc(doc(db, 'penilaianIndividu', idPenilaian(bulanIdx, tahun, p.nip)))
+        if (snap.exists()) hasil[p.nip] = snap.data()
+      }))
+      setNilaiTersimpanMap(hasil)
+    } catch {
+      // tidak fatal — daftar tetap tampil tanpa status nilai
+    } finally {
+      setMemuatNilaiMap(false)
+    }
+  }
+
+  function mulaiNilaiPegawai(pegawai) {
+    setPesanNilai('')
+    const tersimpan = nilaiTersimpanMap[pegawai.nip]
+    if (tersimpan?.jawaban) {
+      const isi = {}
+      tersimpan.jawaban.forEach((j, i) => { isi[i] = { huruf: j.huruf, teks: j.jawaban, skor: j.skor } })
+      setJawabanForm(isi)
+    } else {
+      setJawabanForm({})
+    }
+    setPegawaiDinilai(pegawai)
+  }
+
+  async function simpanNilaiPegawai() {
+    if (Object.keys(jawabanForm).length < KRITERIA_PENILAIAN.length) {
+      setPesanNilai('Semua kriteria wajib dijawab sebelum disimpan.')
+      return
+    }
+    setMenyimpanNilai(true)
+    setPesanNilai('')
+    try {
+      const skorTotal = KRITERIA_PENILAIAN.reduce((sum, _, i) => sum + (jawabanForm[i]?.skor || 0), 0)
+      const skorAkhir = Math.round((skorTotal / KRITERIA_PENILAIAN.length) * 100) / 100
+      const data = {
+        nip: pegawaiDinilai.nip,
+        nama: pegawaiDinilai.nama,
+        jabatan: pegawaiDinilai.jabatan,
+        unitKerja: pegawaiDinilai.unitKerja,
+        pejabatPenilai: atasanTerpilih,
+        bulan: atasanBulan,
+        tahun: atasanTahun,
+        jawaban: KRITERIA_PENILAIAN.map((k, i) => ({
+          pertanyaan: k.pertanyaan, huruf: jawabanForm[i].huruf, jawaban: jawabanForm[i].teks, skor: jawabanForm[i].skor,
+        })),
+        skorAkhir,
+        dinilaiPada: serverTimestamp(),
+      }
+      await setDoc(doc(db, 'penilaianIndividu', idPenilaian(atasanBulan, atasanTahun, pegawaiDinilai.nip)), data)
+      setNilaiTersimpanMap((prev) => ({ ...prev, [pegawaiDinilai.nip]: data }))
+      setPegawaiDinilai(null)
+    } catch (err) {
+      setPesanNilai('Gagal menyimpan: ' + err.message)
+    } finally {
+      setMenyimpanNilai(false)
     }
   }
 
@@ -1070,6 +1153,62 @@ export default function BasedataPage() {
               <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Nilai Pegawai' : 'Kelola Atasan Penilai'}</h1>
 
               {subPenilaianIndividu === 'nilai' ? (
+                pegawaiDinilai ? (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setPegawaiDinilai(null)}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/60 hover:text-ink mb-4"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      Kembali ke Daftar
+                    </button>
+
+                    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 mb-5">
+                      <p className="font-display font-semibold text-lg">{pegawaiDinilai.nama}</p>
+                      <p className="text-ink/50 text-xs font-mono">{pegawaiDinilai.nip} · {pegawaiDinilai.jabatan} · {pegawaiDinilai.unitKerja}</p>
+                      <p className="text-ink/50 text-xs font-mono mt-1">Pejabat Penilai: {atasanTerpilih} · Periode: {namaBulan(atasanBulan)} {atasanTahun}</p>
+                    </div>
+
+                    {pesanNilai && (
+                      <p className="text-sm text-clay bg-clay/10 rounded-lg px-3 py-2 mb-4">{pesanNilai}</p>
+                    )}
+
+                    <div className="space-y-5">
+                      {KRITERIA_PENILAIAN.map((k, i) => (
+                        <div key={i} className="bg-white/60 border border-ink/10 rounded-xl2 p-4">
+                          <p className="font-medium text-ink text-sm mb-3">{i + 1}. {k.pertanyaan}</p>
+                          <div className="space-y-2">
+                            {k.opsi.map((o) => (
+                              <label key={o.huruf} className="flex items-start gap-2.5 text-sm cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name={`kriteria-${i}`}
+                                  checked={jawabanForm[i]?.huruf === o.huruf}
+                                  onChange={() => setJawabanForm((prev) => ({ ...prev, [i]: { huruf: o.huruf, teks: o.teks, skor: o.skor } }))}
+                                  className="mt-0.5"
+                                />
+                                <span className="text-ink/80">{o.huruf}. {o.teks}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-4 mt-6">
+                      <button
+                        type="button"
+                        disabled={menyimpanNilai}
+                        onClick={simpanNilaiPegawai}
+                        className="bg-moss-700 text-paper text-sm font-medium rounded-lg px-5 py-2.5 hover:bg-moss-800 transition-colors disabled:opacity-50"
+                      >
+                        {menyimpanNilai ? 'Menyimpan…' : 'Simpan Penilaian'}
+                      </button>
+                      <p className="text-xs text-ink/40 font-mono">{Object.keys(jawabanForm).length} dari {KRITERIA_PENILAIAN.length} kriteria terisi</p>
+                    </div>
+                  </div>
+                ) : (
                 (() => {
                   const daftarAtasanNilai = dataPegawai
                     ? [...new Set(dataPegawai.map((p) => p.atasan).filter(Boolean))].sort()
@@ -1129,32 +1268,50 @@ export default function BasedataPage() {
                           <p className="text-ink/50 text-xs font-mono mb-3">
                             {daftarUntukDinilai.length} pegawai di bawah {atasanTerpilih} untuk {namaBulan(atasanBulan)} {atasanTahun}
                             {pakaiPenetapanTersimpan ? ' (dari penetapan tersimpan)' : ' (dari Data Pegawai — belum ada penetapan tersimpan)'}
+                            {memuatNilaiMap ? ' · memuat status nilai…' : ''}
                           </p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[820px]">
+                            <table className="w-full text-sm min-w-[860px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3">NIP</th>
                                   <th className="px-3 py-3">Nama</th>
                                   <th className="px-3 py-3">Jabatan</th>
                                   <th className="px-3 py-3">Unit Kerja</th>
-                                  <th className="px-3 py-3 w-32">Nilai</th>
+                                  <th className="px-3 py-3 w-24">Skor</th>
+                                  <th className="px-3 py-3 w-28">Aksi</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
-                                {daftarUntukDinilai.map((p, i) => (
-                                  <tr key={`${p.nip}-${i}`}>
-                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
-                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
-                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan}</td>
-                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
-                                    <td className="px-3 py-2.5">
-                                      <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Segera Hadir</span>
-                                    </td>
-                                  </tr>
-                                ))}
+                                {daftarUntukDinilai.map((p, i) => {
+                                  const sudah = nilaiTersimpanMap[p.nip]
+                                  return (
+                                    <tr key={`${p.nip}-${i}`}>
+                                      <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                      <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                      <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan}</td>
+                                      <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
+                                      <td className="px-3 py-2.5">
+                                        {sudah ? (
+                                          <span className="font-semibold text-moss-800">{sudah.skorAkhir}</span>
+                                        ) : (
+                                          <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Belum</span>
+                                        )}
+                                      </td>
+                                      <td className="px-3 py-2.5 whitespace-nowrap">
+                                        <button
+                                          type="button"
+                                          onClick={() => mulaiNilaiPegawai(p)}
+                                          className="text-moss-700 font-medium hover:underline"
+                                        >
+                                          {sudah ? 'Ubah Nilai' : 'Beri Nilai'}
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  )
+                                })}
                                 {daftarUntukDinilai.length === 0 && (
-                                  <tr><td colSpan={5} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai untuk Atasan ini.</td></tr>
+                                  <tr><td colSpan={6} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai untuk Atasan ini.</td></tr>
                                 )}
                               </tbody>
                             </table>
@@ -1164,6 +1321,7 @@ export default function BasedataPage() {
                     </div>
                   )
                 })()
+                )
               ) : (
                 (() => {
                   const daftarAtasan = dataPegawai
