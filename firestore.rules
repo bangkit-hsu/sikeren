@@ -49,5 +49,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Dipakai oleh halaman Basedata (menu Penilaian Individu → Kelola Atasan Penilai)
+    // untuk menyimpan penetapan atasan penilai & pegawai binaannya per periode (bulan-tahun).
+    match /atasanPenilai/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

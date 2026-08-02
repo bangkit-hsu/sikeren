@@ -282,6 +282,14 @@ const NAV_GROUPS = [
       { key: 'sipp:potongan-tpp', label: 'Potongan TPP' },
     ],
   },
+  {
+    key: 'penilaian-individu',
+    label: 'Penilaian Individu',
+    items: [
+      { key: 'penilaian-individu:nilai', label: 'Nilai Pegawai' },
+      { key: 'penilaian-individu:atasan', label: 'Kelola Atasan Penilai' },
+    ],
+  },
 ]
 
 export default function BasedataPage() {
@@ -298,6 +306,13 @@ export default function BasedataPage() {
   })
   const [subPenilaianAsn, setSubPenilaianAsn] = useState(menuAwal === 'data-pegawai' ? 'data-pegawai' : 'utama')
   const [subSipp, setSubSipp] = useState(menuAwal === 'potongan-tpp' ? 'potongan-tpp' : 'utama')
+  const [subPenilaianIndividu, setSubPenilaianIndividu] = useState('nilai') // 'nilai' | 'atasan'
+  const [atasanBulan, setAtasanBulan] = useState(new Date().getMonth())
+  const [atasanTahun, setAtasanTahun] = useState(new Date().getFullYear())
+  const [atasanTerpilih, setAtasanTerpilih] = useState('')
+  const [menyimpanPenetapan, setMenyimpanPenetapan] = useState(false)
+  const [pesanPenetapan, setPesanPenetapan] = useState('')
+  const [penetapanTersimpan, setPenetapanTersimpan] = useState(null)
   const [menuTerbuka, setMenuTerbuka] = useState(false)
   const [grupTerbuka, setGrupTerbuka] = useState(() => {
     if (menuAktif === 'penilaian-asn') return 'penilaian-asn'
@@ -333,7 +348,9 @@ export default function BasedataPage() {
   const [pesanPegawai, setPesanPegawai] = useState('')
 
   useEffect(() => {
-    if (menuAktif !== 'penilaian-asn' || subPenilaianAsn !== 'data-pegawai' || dataPegawai) return
+    const perluDataPegawai = (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
+      || (menuAktif === 'penilaian-individu' && subPenilaianIndividu === 'atasan')
+    if (!perluDataPegawai || dataPegawai) return
     async function muatDataPegawai() {
       setMemuatDataPegawai(true)
       try {
@@ -354,7 +371,7 @@ export default function BasedataPage() {
     }
     muatDataPegawai()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuAktif, subPenilaianAsn])
+  }, [menuAktif, subPenilaianAsn, subPenilaianIndividu])
 
   useEffect(() => {
     if (menuAktif !== 'sipp' || subSipp !== 'utama') return
@@ -485,6 +502,46 @@ export default function BasedataPage() {
     }
   }
 
+  function idPenetapan(bulanIdx, tahun, atasan) {
+    return `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}_${atasan.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}`
+  }
+
+  useEffect(() => {
+    setPesanPenetapan('')
+    setPenetapanTersimpan(null)
+    if (!atasanTerpilih) return
+    async function cekPenetapan() {
+      try {
+        const snap = await getDoc(doc(db, 'atasanPenilai', idPenetapan(atasanBulan, atasanTahun, atasanTerpilih)))
+        if (snap.exists()) setPenetapanTersimpan(snap.data())
+      } catch {
+        // biarkan saja, tidak fatal kalau gagal cek status penetapan
+      }
+    }
+    cekPenetapan()
+  }, [atasanBulan, atasanTahun, atasanTerpilih])
+
+  async function simpanPenetapanAtasan(daftarPegawaiBinaan) {
+    setMenyimpanPenetapan(true)
+    setPesanPenetapan('')
+    try {
+      const id = idPenetapan(atasanBulan, atasanTahun, atasanTerpilih)
+      await setDoc(doc(db, 'atasanPenilai', id), {
+        bulan: atasanBulan,
+        tahun: atasanTahun,
+        atasan: atasanTerpilih,
+        pegawai: daftarPegawaiBinaan.map((p) => ({ nip: p.nip, nama: p.nama, jabatan: p.jabatan, unitKerja: p.unitKerja })),
+        ditetapkanPada: serverTimestamp(),
+      })
+      setPenetapanTersimpan({ atasan: atasanTerpilih, pegawai: daftarPegawaiBinaan })
+      setPesanPenetapan(`Berhasil menetapkan ${daftarPegawaiBinaan.length} pegawai binaan untuk ${atasanTerpilih}.`)
+    } catch (err) {
+      setPesanPenetapan('Gagal menyimpan: ' + err.message)
+    } finally {
+      setMenyimpanPenetapan(false)
+    }
+  }
+
   function pilihMenu(key) {
     if (key === 'penilaian-asn:utama') {
       setMenuAktif('penilaian-asn'); setSubPenilaianAsn('utama')
@@ -494,6 +551,12 @@ export default function BasedataPage() {
       setMenuAktif('sipp'); setSubSipp('utama')
     } else if (key === 'sipp:potongan-tpp') {
       setMenuAktif('sipp'); setSubSipp('potongan-tpp')
+    } else if (key === 'penilaian-individu:nilai') {
+      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
+    } else if (key === 'penilaian-individu:atasan') {
+      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('atasan')
+    } else if (key === 'penilaian-individu') {
+      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
     } else {
       setMenuAktif(key)
     }
@@ -550,7 +613,7 @@ export default function BasedataPage() {
 
           {(menuAktif === 'dashboard' ? NAV_GROUPS : NAV_GROUPS.filter((g) => g.key === menuAktif)).map((group) => {
             const terbuka = menuAktif === group.key ? true : grupTerbuka === group.key
-            const Ikon = group.key === 'penilaian-asn' ? IkonBintang : IkonDokumen
+            const Ikon = group.key === 'penilaian-asn' ? IkonBintang : group.key === 'sipp' ? IkonDokumen : IkonOrang
             return (
               <div key={group.key} className="pt-2">
                 <button
@@ -566,9 +629,12 @@ export default function BasedataPage() {
                   <div className="space-y-1 mt-1">
                     {group.items.map((item) => {
                       const aktif = menuAktif === group.key
-                        && ((item.key.endsWith('utama') && (group.key === 'penilaian-asn' ? subPenilaianAsn === 'utama' : subSipp === 'utama'))
-                          || (item.key.endsWith('data-pegawai') && subPenilaianAsn === 'data-pegawai')
-                          || (item.key.endsWith('potongan-tpp') && subSipp === 'potongan-tpp'))
+                        && ((item.key.endsWith('utama') && group.key === 'penilaian-asn' && subPenilaianAsn === 'utama')
+                          || (item.key.endsWith('data-pegawai') && group.key === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
+                          || (item.key.endsWith('utama') && group.key === 'sipp' && subSipp === 'utama')
+                          || (item.key.endsWith('potongan-tpp') && group.key === 'sipp' && subSipp === 'potongan-tpp')
+                          || (item.key.endsWith('nilai') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'nilai')
+                          || (item.key.endsWith('atasan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'atasan'))
                       return (
                         <button
                           key={item.key}
@@ -587,19 +653,6 @@ export default function BasedataPage() {
               </div>
             )
           })}
-
-          {(menuAktif === 'dashboard' || menuAktif === 'penilaian-individu') && (
-            <button
-              type="button"
-              onClick={() => pilihMenu('penilaian-individu')}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left mt-2 ${
-                menuAktif === 'penilaian-individu' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-              }`}
-            >
-              <IkonOrang />
-              Penilaian Individu
-            </button>
-          )}
 
           {menuAktif === 'dashboard' && (
           <Link
@@ -636,7 +689,7 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">SiKeren</p>
         </header>
 
-        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai') ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai') || (menuAktif === 'penilaian-individu' && subPenilaianIndividu === 'atasan') ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
@@ -955,6 +1008,121 @@ export default function BasedataPage() {
                     <span className="font-semibold text-ink">h.</span> Persentase pengurangan ditiadakan apabila ketentuan sebagaimana dimaksud pada huruf a, huruf b, huruf c, huruf d, huruf e, huruf f, dan huruf g, alasannya diterima dan dapat dipertanggungjawabkan.
                   </p>
                 </div>
+              )}
+            </div>
+          ) : menuAktif === 'penilaian-individu' ? (
+            <div>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Nilai Pegawai' : 'Kelola Atasan Penilai'}</h1>
+
+              {subPenilaianIndividu === 'nilai' ? (
+                <SegeraHadir label="Nilai Pegawai" />
+              ) : (
+                (() => {
+                  const daftarAtasan = dataPegawai
+                    ? [...new Set(dataPegawai.map((p) => p.atasan).filter(Boolean))].sort()
+                    : []
+                  const pegawaiBinaan = atasanTerpilih && dataPegawai
+                    ? dataPegawai.filter((p) => p.atasan === atasanTerpilih)
+                    : []
+                  return (
+                    <div>
+                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan — daftar pegawai binaannya diambil otomatis dari menu Data Pegawai (Penilaian ASN), berdasarkan kolom Atasan.</p>
+
+                      <div className="flex flex-wrap items-end gap-3 mb-5">
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                          <select
+                            value={atasanBulan}
+                            onChange={(e) => setAtasanBulan(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                          <select
+                            value={atasanTahun}
+                            onChange={(e) => setAtasanTahun(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Atasan</label>
+                          <select
+                            value={atasanTerpilih}
+                            onChange={(e) => setAtasanTerpilih(e.target.value)}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm min-w-[240px]"
+                          >
+                            <option value="">— Pilih Atasan —</option>
+                            {daftarAtasan.map((a) => <option key={a} value={a}>{a}</option>)}
+                          </select>
+                        </div>
+                      </div>
+
+                      {memuatDataPegawai ? (
+                        <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                      ) : !atasanTerpilih ? (
+                        <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                          <p className="text-ink/60 text-sm">Pilih Atasan untuk menampilkan daftar pegawai binaannya.</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-ink/50 text-xs font-mono mb-3">{pegawaiBinaan.length} pegawai di bawah {atasanTerpilih} untuk {namaBulan(atasanBulan)} {atasanTahun}</p>
+
+                          {pesanPenetapan && (
+                            <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanPenetapan.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
+                              {pesanPenetapan}
+                            </p>
+                          )}
+
+                          {penetapanTersimpan && (
+                            <p className="text-xs text-moss-700 bg-moss-50 border border-moss-200 rounded-lg px-3 py-2 mb-4">
+                              Sudah ditetapkan sebelumnya untuk periode ini.
+                            </p>
+                          )}
+
+                          <div className="border border-ink/10 rounded-xl2 overflow-hidden mb-4">
+                            <table className="w-full text-sm">
+                              <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                                <tr>
+                                  <th className="px-3 py-3">NIP</th>
+                                  <th className="px-3 py-3">Nama</th>
+                                  <th className="px-3 py-3">Jabatan</th>
+                                  <th className="px-3 py-3">Unit Kerja</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-ink/10">
+                                {pegawaiBinaan.map((p, i) => (
+                                  <tr key={`${p.nip}-${i}`}>
+                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                    <td className="px-3 py-2.5">{p.jabatan}</td>
+                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
+                                  </tr>
+                                ))}
+                                {pegawaiBinaan.length === 0 && (
+                                  <tr><td colSpan={4} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai dengan Atasan ini di Data Pegawai.</td></tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={menyimpanPenetapan || pegawaiBinaan.length === 0}
+                            onClick={() => simpanPenetapanAtasan(pegawaiBinaan)}
+                            className="bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-moss-800 transition-colors disabled:opacity-50"
+                          >
+                            {menyimpanPenetapan ? 'Menyimpan…' : 'Tetapkan sebagai Atasan Penilai Periode Ini'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()
               )}
             </div>
           ) : (
