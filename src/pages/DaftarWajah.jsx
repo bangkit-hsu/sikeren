@@ -4,6 +4,7 @@ import { collection, getDocs, query, where, addDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { hashPassword } from '../utils/hash'
 import PilihBagian from '../components/PilihBagian.jsx'
+import { JABATAN_PER_BAGIAN } from '../utils/bagian'
 import {
   muatModelWajah, nyalakanKamera, matikanKamera,
   ambilDescriptorDariVideo, rataRataDescriptor, tangkapFotoDariVideo,
@@ -24,6 +25,7 @@ export default function DaftarWajah() {
   const [fotoRekam, setFotoRekam] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [form, setForm] = useState({ nip: '', nama: '', bagian: '', jabatan: '', password: '' })
+  const [jabatanManual, setJabatanManual] = useState(false)
 
   useEffect(() => {
     return () => matikanKamera(streamRef.current)
@@ -138,18 +140,64 @@ export default function DaftarWajah() {
             <div>
               <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bagian</label>
               <div className="mt-1">
-                <PilihBagian value={form.bagian} onChange={(v) => setForm({ ...form, bagian: v })} required />
+                <PilihBagian
+                  value={form.bagian}
+                  onChange={(v) => { setForm({ ...form, bagian: v, jabatan: '' }); setJabatanManual(false) }}
+                  required
+                />
               </div>
             </div>
             <div>
               <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Jabatan</label>
-              <input
-                value={form.jabatan}
-                onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
-                required
-                placeholder="mis. Staf, Kepala Sub Bagian, dsb."
-                className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white focus:border-moss-600 outline-none"
-              />
+              {(() => {
+                const opsiJabatan = JABATAN_PER_BAGIAN[form.bagian] || []
+                if (!form.bagian) {
+                  return (
+                    <input
+                      disabled
+                      placeholder="Pilih Bagian terlebih dahulu"
+                      className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-ink/5 text-ink/40 outline-none"
+                    />
+                  )
+                }
+                if (jabatanManual || opsiJabatan.length === 0) {
+                  return (
+                    <div>
+                      <input
+                        value={form.jabatan}
+                        onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
+                        required
+                        placeholder="mis. Staf, Kepala Sub Bagian, dsb."
+                        className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white focus:border-moss-600 outline-none"
+                      />
+                      {opsiJabatan.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => { setJabatanManual(false); setForm({ ...form, jabatan: '' }) }}
+                          className="text-xs text-moss-700 underline mt-1"
+                        >
+                          Pilih dari daftar Jabatan Bagian ini
+                        </button>
+                      )}
+                    </div>
+                  )
+                }
+                return (
+                  <select
+                    value={form.jabatan}
+                    onChange={(e) => {
+                      if (e.target.value === '__lainnya__') { setJabatanManual(true); setForm({ ...form, jabatan: '' }) }
+                      else setForm({ ...form, jabatan: e.target.value })
+                    }}
+                    required
+                    className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2.5 bg-white focus:border-moss-600 outline-none"
+                  >
+                    <option value="">— Pilih Jabatan —</option>
+                    {opsiJabatan.map((j) => <option key={j} value={j}>{j}</option>)}
+                    <option value="__lainnya__">Lainnya (ketik manual)</option>
+                  </select>
+                )
+              })()}
             </div>
             <div>
               <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Buat Password</label>
