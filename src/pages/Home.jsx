@@ -44,12 +44,13 @@ export default function Home() {
       {/* Dua kartu: Pegawai & Admin */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-8 grid grid-cols-2 gap-3 sm:gap-4">
         <div className="bg-moss-50 rounded-xl2 border border-moss-200 p-4 sm:p-6 shadow-sm flex flex-col">
-          <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-moss-700 text-paper flex items-center justify-center mb-3 sm:mb-4">
-            <IkonPegawai />
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 shrink-0 rounded-lg sm:rounded-xl bg-moss-700 text-paper flex items-center justify-center">
+              <IkonPegawai />
+            </div>
+            <h2 className="font-display font-semibold text-base sm:text-xl">e-Apel</h2>
           </div>
-          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">e-Apel</h2>
-          <p className="text-moss-700/70 text-[11px] sm:text-xs font-mono uppercase tracking-wide mb-1">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
-          <p className="text-ink/60 text-xs sm:text-sm flex-1">Rekam kehadiran apel dengan pemindaian wajah 3 detik.</p>
+          <p className="text-ink/60 text-xs sm:text-sm flex-1">Absensi apel dengan pemindaian wajah.</p>
           <Link
             to="/absen"
             className="mt-4 sm:mt-5 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-moss-700 text-paper text-xs sm:text-base font-medium rounded-lg py-2 sm:py-2.5 px-2 hover:bg-moss-800 transition-colors text-center"
@@ -59,10 +60,12 @@ export default function Home() {
         </div>
 
         <div className="bg-ink rounded-xl2 border border-ink/10 p-4 sm:p-6 shadow-sm flex flex-col text-paper">
-          <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gold-500 text-ink flex items-center justify-center mb-3 sm:mb-4">
-            <IkonAdmin />
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-11 sm:h-11 shrink-0 rounded-lg sm:rounded-xl bg-gold-500 text-ink flex items-center justify-center">
+              <IkonAdmin />
+            </div>
+            <h2 className="font-display font-semibold text-base sm:text-xl">Pimpinan</h2>
           </div>
-          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Pimpinan</h2>
           <p className="text-paper/60 text-xs sm:text-sm flex-1">Portal penilaian ASN, presensi, dan data kepegawaian.</p>
           <Link
             to="/pimpinan"
