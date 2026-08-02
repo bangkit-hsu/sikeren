@@ -889,9 +889,14 @@ export default function BasedataPage() {
         <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
-              <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
+              <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-14 mb-8 text-center">
                 <div
-                  className="absolute inset-0 opacity-30"
+                  className="absolute inset-0 bg-cover bg-center opacity-25"
+                  style={{ backgroundImage: `url(${import.meta.env.BASE_URL}images/kantor-bupati-hsu.jpg)` }}
+                />
+                <div className="absolute inset-0 bg-moss-900/70" />
+                <div
+                  className="absolute inset-0 opacity-40"
                   style={{
                     backgroundImage: 'radial-gradient(circle at 12% 15%, rgba(201,162,39,0.35), transparent 35%), radial-gradient(circle at 88% 85%, rgba(201,162,39,0.25), transparent 40%)',
                   }}
@@ -904,7 +909,7 @@ export default function BasedataPage() {
                     </svg>
                   </div>
                   <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
-                  <h1 className="font-display font-bold text-3xl sm:text-4xl">SiKeren</h1>
+                  <h1 className="font-display font-bold text-3xl sm:text-5xl">SiKeren</h1>
                   <p className="text-paper/80 text-sm sm:text-base mt-2">
                     Portal terpadu penilaian, presensi, dan data kepegawaian.
                   </p>
@@ -912,15 +917,15 @@ export default function BasedataPage() {
               </div>
 
               <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Modul Tersedia</p>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                <button type="button" onClick={() => pilihMenu('penilaian-asn')} className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-ink/10 text-ink/50"><IkonBintang /></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button type="button" onClick={() => pilihMenu('penilaian-asn')} className="text-left bg-gold-50 border border-gold-200 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-gold-500 text-ink"><IkonBintang /></div>
                   <p className="font-display font-semibold text-ink">Nilai ASN</p>
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Penilaian kinerja dan perilaku kerja ASN secara berkala.</p>
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-clay/10 text-clay">Segera Hadir</span>
                 </button>
 
-                <button type="button" onClick={() => pilihMenu('sipp')} className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <button type="button" onClick={() => pilihMenu('sipp')} className="text-left bg-moss-50 border border-moss-200 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-moss-700 text-paper"><IkonDokumen /></div>
                   <p className="font-display font-semibold text-ink">SIPP</p>
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Rekapitulasi presensi bulanan & perhitungan potongan TPP.</p>
@@ -934,8 +939,8 @@ export default function BasedataPage() {
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-400">Aktif</span>
                 </Link>
 
-                <button type="button" onClick={() => pilihMenu('penilaian-individu')} className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-ink/10 text-ink/50"><IkonOrang /></div>
+                <button type="button" onClick={() => pilihMenu('penilaian-individu')} className="text-left bg-clay/5 border border-clay/20 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-clay text-paper"><IkonOrang /></div>
                   <p className="font-display font-semibold text-ink">Penilaian Individu</p>
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Catatan penilaian dan capaian kerja per individu pegawai.</p>
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-clay/10 text-clay">Segera Hadir</span>
