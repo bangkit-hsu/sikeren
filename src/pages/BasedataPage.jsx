@@ -347,7 +347,7 @@ export default function BasedataPage() {
 
   useEffect(() => {
     const perluDataPegawai = (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
-      || (menuAktif === 'penilaian-individu' && subPenilaianIndividu === 'atasan')
+      || (menuAktif === 'penilaian-individu')
     if (!perluDataPegawai || dataPegawai) return
     async function muatDataPegawai() {
       setMemuatDataPegawai(true)
@@ -746,7 +746,7 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">SiKeren</p>
         </header>
 
-        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai') || (menuAktif === 'penilaian-individu' && subPenilaianIndividu === 'atasan') ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai') || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
@@ -1070,7 +1070,100 @@ export default function BasedataPage() {
               <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Nilai Pegawai' : 'Kelola Atasan Penilai'}</h1>
 
               {subPenilaianIndividu === 'nilai' ? (
-                <SegeraHadir label="Nilai Pegawai" />
+                (() => {
+                  const daftarAtasanNilai = dataPegawai
+                    ? [...new Set(dataPegawai.map((p) => p.atasan).filter(Boolean))].sort()
+                    : []
+                  const binaanLive = atasanTerpilih && dataPegawai
+                    ? dataPegawai.filter((p) => p.atasan === atasanTerpilih)
+                    : []
+                  const pakaiPenetapanTersimpan = penetapanTersimpan && penetapanTersimpan.atasan === atasanTerpilih
+                  const daftarUntukDinilai = pakaiPenetapanTersimpan ? penetapanTersimpan.pegawai : binaanLive
+
+                  return (
+                    <div>
+                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan Penilai — daftar pegawai yang dinilai muncul otomatis (memakai penetapan tersimpan dari menu Kelola Atasan Penilai kalau ada, atau data Atasan terkini dari Data Pegawai).</p>
+
+                      <div className="flex flex-wrap items-end gap-3 mb-5">
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                          <select
+                            value={atasanBulan}
+                            onChange={(e) => setAtasanBulan(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                          <select
+                            value={atasanTahun}
+                            onChange={(e) => setAtasanTahun(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Atasan Penilai</label>
+                          <select
+                            value={atasanTerpilih}
+                            onChange={(e) => setAtasanTerpilih(e.target.value)}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm min-w-[240px]"
+                          >
+                            <option value="">— Pilih Atasan —</option>
+                            {daftarAtasanNilai.map((a) => <option key={a} value={a}>{a}</option>)}
+                          </select>
+                        </div>
+                      </div>
+
+                      {memuatDataPegawai ? (
+                        <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                      ) : !atasanTerpilih ? (
+                        <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                          <p className="text-ink/60 text-sm">Pilih Atasan Penilai untuk menampilkan daftar pegawai yang dinilai.</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-ink/50 text-xs font-mono mb-3">
+                            {daftarUntukDinilai.length} pegawai di bawah {atasanTerpilih} untuk {namaBulan(atasanBulan)} {atasanTahun}
+                            {pakaiPenetapanTersimpan ? ' (dari penetapan tersimpan)' : ' (dari Data Pegawai — belum ada penetapan tersimpan)'}
+                          </p>
+                          <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                            <table className="w-full text-sm min-w-[820px]">
+                              <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                                <tr>
+                                  <th className="px-3 py-3">NIP</th>
+                                  <th className="px-3 py-3">Nama</th>
+                                  <th className="px-3 py-3">Jabatan</th>
+                                  <th className="px-3 py-3">Unit Kerja</th>
+                                  <th className="px-3 py-3 w-32">Nilai</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-ink/10">
+                                {daftarUntukDinilai.map((p, i) => (
+                                  <tr key={`${p.nip}-${i}`}>
+                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan}</td>
+                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
+                                    <td className="px-3 py-2.5">
+                                      <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Segera Hadir</span>
+                                    </td>
+                                  </tr>
+                                ))}
+                                {daftarUntukDinilai.length === 0 && (
+                                  <tr><td colSpan={5} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai untuk Atasan ini.</td></tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()
               ) : (
                 (() => {
                   const daftarAtasan = dataPegawai
