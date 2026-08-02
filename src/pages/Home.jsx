@@ -35,8 +35,8 @@ export default function Home() {
               <circle cx="12" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.6" />
             </svg>
           </div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">e-Apel</h1>
-          <p className="text-paper/70 text-sm mt-1">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">SiKeren</h1>
+          <p className="text-paper/70 text-sm mt-1">Sistem Kepegawaian Terintegrasi Sekretariat Daerah</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gold-500/40 to-transparent" />
       </div>
@@ -47,7 +47,8 @@ export default function Home() {
           <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-moss-700 text-paper flex items-center justify-center mb-3 sm:mb-4">
             <IkonPegawai />
           </div>
-          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Pegawai</h2>
+          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">e-Apel</h2>
+          <p className="text-moss-700/70 text-[11px] sm:text-xs font-mono uppercase tracking-wide mb-1">Absensi Apel · Pengenalan Wajah &amp; Radius Lokasi</p>
           <p className="text-ink/60 text-xs sm:text-sm flex-1">Rekam kehadiran apel dengan pemindaian wajah 3 detik.</p>
           <Link
             to="/absen"
