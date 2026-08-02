@@ -7,6 +7,7 @@ import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
+import { DATA_PEGAWAI } from '../data/dataPegawai'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonDashboard() {
@@ -257,6 +258,34 @@ export default function BasedataPage() {
   const [tahapUpload, setTahapUpload] = useState(null)
   const [tahapGagalDi, setTahapGagalDi] = useState(null)
 
+  const [dataPegawai, setDataPegawai] = useState(null)
+  const [memuatDataPegawai, setMemuatDataPegawai] = useState(false)
+  const [cariPegawai, setCariPegawai] = useState('')
+
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-asn' || subPenilaianAsn !== 'data-pegawai' || dataPegawai) return
+    async function muatDataPegawai() {
+      setMemuatDataPegawai(true)
+      try {
+        const ref = doc(db, 'dataPegawai', 'utama')
+        const snap = await getDoc(ref)
+        if (snap.exists()) {
+          setDataPegawai(snap.data().data || [])
+        } else {
+          await setDoc(ref, { data: DATA_PEGAWAI, diunggahPada: serverTimestamp() })
+          setDataPegawai(DATA_PEGAWAI)
+        }
+      } catch {
+        // Kalau gagal memuat dari Firestore (mis. offline), tetap tampilkan data bawaan supaya halaman tidak kosong.
+        setDataPegawai(DATA_PEGAWAI)
+      } finally {
+        setMemuatDataPegawai(false)
+      }
+    }
+    muatDataPegawai()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subPenilaianAsn])
+
   useEffect(() => {
     if (menuAktif !== 'sipp' || subSipp !== 'utama') return
     muatDataSipp(sippBulan, sippTahun)
@@ -471,7 +500,7 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">SiKeren</p>
         </header>
 
-        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai') ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
@@ -530,7 +559,65 @@ export default function BasedataPage() {
           ) : menuAktif === 'penilaian-asn' ? (
             <div>
               <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Penilaian ASN' : 'Data Pegawai'}</h1>
-              {subPenilaianAsn === 'utama' ? <SegeraHadir label="Penilaian ASN" /> : <SegeraHadir label="Data Pegawai" />}
+              {subPenilaianAsn === 'utama' ? (
+                <SegeraHadir label="Penilaian ASN" />
+              ) : (
+                <div>
+                  <input
+                    value={cariPegawai}
+                    onChange={(e) => setCariPegawai(e.target.value)}
+                    placeholder="Cari NIP, nama, jabatan, atau unit kerja…"
+                    className="mb-4 w-full max-w-md rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                  />
+                  {memuatDataPegawai ? (
+                    <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                  ) : dataPegawai && dataPegawai.length > 0 ? (
+                    (() => {
+                      const q = cariPegawai.toLowerCase()
+                      const tersaring = dataPegawai.filter((p) =>
+                        !q
+                        || p.nip.includes(q)
+                        || p.nama.toLowerCase().includes(q)
+                        || (p.jabatan || '').toLowerCase().includes(q)
+                        || (p.unitKerja || '').toLowerCase().includes(q),
+                      )
+                      return (
+                        <>
+                          <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {dataPegawai.length} pegawai</p>
+                          <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                            <table className="w-full text-sm min-w-[900px]">
+                              <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                                <tr>
+                                  <th className="px-3 py-3">NIP</th>
+                                  <th className="px-3 py-3">Nama</th>
+                                  <th className="px-3 py-3">Jabatan</th>
+                                  <th className="px-3 py-3">Unit Kerja</th>
+                                  <th className="px-3 py-3">Atasan</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-ink/10">
+                                {tersaring.map((p, i) => (
+                                  <tr key={`${p.nip}-${i}`}>
+                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                    <td className="px-3 py-2.5">{p.jabatan}</td>
+                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
+                                    <td className="px-3 py-2.5">{p.atasan}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
+                      )
+                    })()
+                  ) : (
+                    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                      <p className="text-ink/60 text-sm">Belum ada data pegawai.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ) : menuAktif === 'sipp' ? (
             <div>

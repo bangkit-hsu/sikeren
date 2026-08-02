@@ -42,5 +42,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Dipakai oleh halaman Basedata (menu Penilaian ASN → Data Pegawai) untuk menyimpan
+    // data induk kepegawaian (NIP, Nama, Jabatan, Unit Kerja, Atasan).
+    match /dataPegawai/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }
