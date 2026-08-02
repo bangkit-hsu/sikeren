@@ -2,7 +2,7 @@
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { doc, getDoc, getDocs, collection, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, getDocs, collection, query, where, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
@@ -261,9 +261,9 @@ function SegeraHadir({ label }) {
 const NAV_GROUPS = [
   {
     key: 'penilaian-asn',
-    label: 'Penilaian ASN',
+    label: 'Nilai ASN',
     items: [
-      { key: 'penilaian-asn:utama', label: 'Penilaian ASN' },
+      { key: 'penilaian-asn:utama', label: 'Nilai ASN' },
       { key: 'penilaian-asn:data-pegawai', label: 'Data Pegawai' },
     ],
   },
@@ -319,6 +319,12 @@ export default function BasedataPage() {
   const [pesanNilai, setPesanNilai] = useState('')
   const [nilaiTersimpanMap, setNilaiTersimpanMap] = useState({}) // nip -> { skorAkhir, jawaban }
   const [memuatNilaiMap, setMemuatNilaiMap] = useState(false)
+
+  const [nilaiAsnBulan, setNilaiAsnBulan] = useState(new Date().getMonth())
+  const [nilaiAsnTahun, setNilaiAsnTahun] = useState(new Date().getFullYear())
+  const [nilaiAsnData, setNilaiAsnData] = useState(null)
+  const [memuatNilaiAsn, setMemuatNilaiAsn] = useState(false)
+  const [cariNilaiAsn, setCariNilaiAsn] = useState('')
   const [menuTerbuka, setMenuTerbuka] = useState(false)
   const [grupTerbuka, setGrupTerbuka] = useState(() => {
     if (menuAktif === 'penilaian-asn') return 'penilaian-asn'
@@ -354,8 +360,7 @@ export default function BasedataPage() {
   const [pesanPegawai, setPesanPegawai] = useState('')
 
   useEffect(() => {
-    const perluDataPegawai = (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
-      || (menuAktif === 'penilaian-individu')
+    const perluDataPegawai = menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu'
     if (!perluDataPegawai || dataPegawai) return
     async function muatDataPegawai() {
       setMemuatDataPegawai(true)
@@ -619,6 +624,58 @@ export default function BasedataPage() {
     return `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}_${nip}`
   }
 
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-asn' || subPenilaianAsn !== 'utama' || !dataPegawai) return
+    muatNilaiAsn(nilaiAsnBulan, nilaiAsnTahun)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subPenilaianAsn, nilaiAsnBulan, nilaiAsnTahun, dataPegawai])
+
+  async function muatNilaiAsn(bulanIdx, tahun) {
+    setMemuatNilaiAsn(true)
+    try {
+      // Pot. Presensi dari menu SIPP untuk bulan-tahun ini
+      const sippId = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+      const sippSnap = await getDoc(doc(db, 'sipp', sippId))
+      const petaPresensi = {}
+      if (sippSnap.exists()) {
+        (sippSnap.data().data || []).forEach((p) => { petaPresensi[p.nip] = p.penguranganPresensi })
+      }
+
+      // Pot. Apel dari data absensi e-Apel untuk bulan-tahun ini (jumlah Tidak Apel x 0,5%)
+      const bulanStr = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+      const absensiSnap = await getDocs(
+        query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
+      )
+      const jumlahTidakApel = {}
+      absensiSnap.docs.forEach((d) => {
+        const a = d.data()
+        if (a.status === 'tidak_apel' && a.nip) jumlahTidakApel[a.nip] = (jumlahTidakApel[a.nip] || 0) + 1
+      })
+
+      // e-Kinerja (skor akhir) dari menu Penilaian Individu untuk bulan-tahun ini
+      const penilaianSnap = await getDocs(
+        query(collection(db, 'penilaianIndividu'), where('bulan', '==', bulanIdx), where('tahun', '==', tahun)),
+      )
+      const petaKinerja = {}
+      penilaianSnap.docs.forEach((d) => { const p = d.data(); petaKinerja[p.nip] = p.skorAkhir })
+
+      const gabungan = dataPegawai.map((p) => ({
+        nip: p.nip,
+        nama: p.nama,
+        unitKerja: p.unitKerja,
+        jabatan: p.jabatan,
+        presensiKehadiran: petaPresensi[p.nip] ?? null,
+        kehadiranApel: jumlahTidakApel[p.nip] != null ? Math.round(jumlahTidakApel[p.nip] * 0.5 * 100) / 100 : 0,
+        eKinerja: petaKinerja[p.nip] ?? null,
+      }))
+      setNilaiAsnData(gabungan)
+    } catch (err) {
+      setNilaiAsnData([])
+    } finally {
+      setMemuatNilaiAsn(false)
+    }
+  }
+
   async function muatPetaNilai(daftarPegawai, bulanIdx, tahun) {
     setMemuatNilaiMap(true)
     try {
@@ -709,7 +766,7 @@ export default function BasedataPage() {
 
   const judulHalaman = {
     dashboard: 'Dashboard',
-    'penilaian-asn': 'Penilaian ASN',
+    'penilaian-asn': 'Nilai ASN',
     sipp: 'SIPP',
     'penilaian-individu': 'Penilaian Individu',
   }[menuAktif] || 'Dashboard'
@@ -829,7 +886,7 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">SiKeren</p>
         </header>
 
-        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || (menuAktif === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai') || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
@@ -858,7 +915,7 @@ export default function BasedataPage() {
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <button type="button" onClick={() => pilihMenu('penilaian-asn')} className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-ink/10 text-ink/50"><IkonBintang /></div>
-                  <p className="font-display font-semibold text-ink">Penilaian ASN</p>
+                  <p className="font-display font-semibold text-ink">Nilai ASN</p>
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Penilaian kinerja dan perilaku kerja ASN secara berkala.</p>
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-clay/10 text-clay">Segera Hadir</span>
                 </button>
@@ -887,9 +944,91 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-asn' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Penilaian ASN' : 'Data Pegawai'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : 'Data Pegawai'}</h1>
               {subPenilaianAsn === 'utama' ? (
-                <SegeraHadir label="Penilaian ASN" />
+                (() => {
+                  const q = cariNilaiAsn.toLowerCase()
+                  const tersaring = (nilaiAsnData || []).filter((p) =>
+                    !q
+                    || p.nip.includes(q)
+                    || p.nama.toLowerCase().includes(q)
+                    || (p.unitKerja || '').toLowerCase().includes(q)
+                    || (p.jabatan || '').toLowerCase().includes(q),
+                  )
+                  return (
+                    <div>
+                      <p className="text-ink/60 text-sm mb-4">Rekap gabungan per pegawai untuk periode yang dipilih: Presensi Kehadiran (dari SIPP), Kehadiran Apel (dari e-Apel), dan e-Kinerja (dari Penilaian Individu).</p>
+
+                      <div className="flex flex-wrap items-end gap-3 mb-4">
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                          <select
+                            value={nilaiAsnBulan}
+                            onChange={(e) => setNilaiAsnBulan(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                          <select
+                            value={nilaiAsnTahun}
+                            onChange={(e) => setNilaiAsnTahun(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                          </select>
+                        </div>
+                        <input
+                          value={cariNilaiAsn}
+                          onChange={(e) => setCariNilaiAsn(e.target.value)}
+                          placeholder="Cari NIP, nama, bagian, atau jabatan…"
+                          className="rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm w-full max-w-xs"
+                        />
+                      </div>
+
+                      {memuatNilaiAsn ? (
+                        <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                      ) : (
+                        <>
+                          <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
+                          <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                            <table className="w-full text-sm min-w-[960px]">
+                              <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                                <tr>
+                                  <th className="px-3 py-3">NIP</th>
+                                  <th className="px-3 py-3">Nama</th>
+                                  <th className="px-3 py-3">Bagian / Unit Kerja</th>
+                                  <th className="px-3 py-3">Jabatan</th>
+                                  <th className="px-3 py-3">Presensi Kehadiran</th>
+                                  <th className="px-3 py-3">Kehadiran Apel</th>
+                                  <th className="px-3 py-3">e-Kinerja</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-ink/10">
+                                {tersaring.map((p, i) => (
+                                  <tr key={`${p.nip}-${i}`}>
+                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
+                                    <td className="px-3 py-2.5">{p.jabatan}</td>
+                                    <td className="px-3 py-2.5">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
+                                    <td className="px-3 py-2.5">{p.kehadiranApel}%</td>
+                                    <td className="px-3 py-2.5 font-semibold text-moss-800">{p.eKinerja != null ? p.eKinerja : <span className="text-ink/30 font-normal">—</span>}</td>
+                                  </tr>
+                                ))}
+                                {tersaring.length === 0 && (
+                                  <tr><td colSpan={7} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )
+                })()
               ) : (
                 <div>
                   <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -1328,7 +1467,7 @@ export default function BasedataPage() {
                     : []
                   return (
                     <div>
-                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan — daftar pegawai binaannya diambil otomatis dari menu Data Pegawai (Penilaian ASN), berdasarkan kolom Atasan.</p>
+                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan — daftar pegawai binaannya diambil otomatis dari menu Data Pegawai (Nilai ASN), berdasarkan kolom Atasan.</p>
 
                       <div className="flex flex-wrap items-end gap-3 mb-5">
                         <div>
