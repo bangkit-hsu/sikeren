@@ -8,13 +8,14 @@ export default function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const tujuanBasedata = searchParams.get('tujuan') === 'basedata'
+  const menuTujuan = searchParams.get('menu')
   const [nip, setNip] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   function tujuanSetelahLogin(role) {
-    if (role === 'admin' && tujuanBasedata) return '/basedata'
+    if (role === 'admin' && tujuanBasedata) return menuTujuan ? `/basedata?menu=${menuTujuan}` : '/basedata'
     return role === 'admin' ? '/admin/rekap' : '/pegawai/absensi'
   }
 

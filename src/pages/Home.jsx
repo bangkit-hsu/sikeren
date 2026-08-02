@@ -61,25 +61,15 @@ export default function Home() {
           <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gold-500 text-ink flex items-center justify-center mb-3 sm:mb-4">
             <IkonAdmin />
           </div>
-          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Administrator</h2>
-          <p className="text-paper/60 text-xs sm:text-sm flex-1">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi.</p>
+          <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Pimpinan</h2>
+          <p className="text-paper/60 text-xs sm:text-sm flex-1">Portal penilaian ASN, presensi, dan data kepegawaian.</p>
           <Link
-            to="/login"
+            to="/login?tujuan=basedata&menu=penilaian-asn"
             className="mt-4 sm:mt-5 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-gold-500 text-ink text-xs sm:text-base font-medium rounded-lg py-2 sm:py-2.5 px-2 hover:bg-gold-400 transition-colors text-center"
           >
-            <span>Masuk Admin</span> <span aria-hidden>→</span>
+            <span>Masuk Portal</span> <span aria-hidden>→</span>
           </Link>
         </div>
-      </div>
-
-      {/* Portal Admin — login admin lalu masuk ke portal SiKeren */}
-      <div className="text-center px-6 -mt-2 pb-2">
-        <Link
-          to="/login?tujuan=basedata"
-          className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-ink/60 hover:text-ink border border-ink/15 hover:border-ink/30 rounded-full px-4 py-2 transition-colors"
-        >
-          Portal Admin <span aria-hidden>→</span>
-        </Link>
       </div>
 
       {/* Judul */}

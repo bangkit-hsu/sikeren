@@ -1,6 +1,7 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
@@ -213,9 +214,17 @@ function SegeraHadir({ label }) {
 }
 
 export default function BasedataPage() {
-  const [menuAktif, setMenuAktif] = useState('dashboard')
-  const [subPenilaianAsn, setSubPenilaianAsn] = useState('utama') // 'utama' | 'data-pegawai'
-  const [subSipp, setSubSipp] = useState('utama') // 'utama' | 'potongan-tpp'
+  const [searchParams] = useSearchParams()
+  const menuAwal = searchParams.get('menu')
+
+  const [menuAktif, setMenuAktif] = useState(() => {
+    if (menuAwal === 'data-pegawai') return 'penilaian-asn'
+    if (menuAwal === 'potongan-tpp') return 'sipp'
+    if (['penilaian-asn', 'sipp', 'penilaian-individu'].includes(menuAwal)) return menuAwal
+    return 'dashboard'
+  })
+  const [subPenilaianAsn, setSubPenilaianAsn] = useState(menuAwal === 'data-pegawai' ? 'data-pegawai' : 'utama')
+  const [subSipp, setSubSipp] = useState(menuAwal === 'potongan-tpp' ? 'potongan-tpp' : 'utama')
 
   const now = new Date()
   const [sippBulan, setSippBulan] = useState(now.getMonth())
@@ -355,6 +364,21 @@ export default function BasedataPage() {
                   </span>
                 </button>
               ))}
+
+              <Link
+                to="/login"
+                className="text-left bg-ink text-paper border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+              >
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-gold-500 text-ink">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+                    <path d="M12 3l7 3v5c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6l7-3z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <p className="font-display font-semibold">Administrator e-Apel</p>
+                <p className="text-paper/60 text-xs mt-1.5 leading-relaxed">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi apel.</p>
+                <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-400">Aktif</span>
+              </Link>
             </div>
           </div>
         ) : menuAktif === 'penilaian-asn' ? (
