@@ -264,7 +264,7 @@ const NAV_GROUPS = [
     label: 'Nilai ASN',
     items: [
       { key: 'penilaian-asn:utama', label: 'Nilai ASN' },
-      { key: 'penilaian-asn:data-pegawai', label: 'Data Pegawai' },
+      { key: 'penilaian-asn:data-pegawai', label: 'Data ASN' },
     ],
   },
   {
@@ -944,7 +944,7 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-asn' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : 'Data Pegawai'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : 'Data ASN'}</h1>
               {subPenilaianAsn === 'utama' ? (
                 (() => {
                   const q = cariNilaiAsn.toLowerCase()
@@ -1360,7 +1360,7 @@ export default function BasedataPage() {
 
                   return (
                     <div>
-                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan Penilai — daftar pegawai yang dinilai muncul otomatis (memakai penetapan tersimpan dari menu Kelola Atasan Penilai kalau ada, atau data Atasan terkini dari Data Pegawai).</p>
+                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan Penilai — daftar pegawai yang dinilai muncul otomatis (memakai penetapan tersimpan dari menu Kelola Atasan Penilai kalau ada, atau data Atasan terkini dari Data ASN).</p>
 
                       <div className="flex flex-wrap items-end gap-3 mb-5">
                         <div>
@@ -1406,7 +1406,7 @@ export default function BasedataPage() {
                         <div>
                           <p className="text-ink/50 text-xs font-mono mb-3">
                             {daftarUntukDinilai.length} pegawai di bawah {atasanTerpilih} untuk {namaBulan(atasanBulan)} {atasanTahun}
-                            {pakaiPenetapanTersimpan ? ' (dari penetapan tersimpan)' : ' (dari Data Pegawai — belum ada penetapan tersimpan)'}
+                            {pakaiPenetapanTersimpan ? ' (dari penetapan tersimpan)' : ' (dari Data ASN — belum ada penetapan tersimpan)'}
                             {memuatNilaiMap ? ' · memuat status nilai…' : ''}
                           </p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
@@ -1467,7 +1467,7 @@ export default function BasedataPage() {
                     : []
                   return (
                     <div>
-                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan — daftar pegawai binaannya diambil otomatis dari menu Data Pegawai (Nilai ASN), berdasarkan kolom Atasan.</p>
+                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan — daftar pegawai binaannya diambil otomatis dari menu Data ASN (Nilai ASN), berdasarkan kolom Atasan.</p>
 
                       <div className="flex flex-wrap items-end gap-3 mb-5">
                         <div>
@@ -1545,7 +1545,7 @@ export default function BasedataPage() {
                                   </tr>
                                 ))}
                                 {pegawaiBinaan.length === 0 && (
-                                  <tr><td colSpan={4} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai dengan Atasan ini di Data Pegawai.</td></tr>
+                                  <tr><td colSpan={4} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai dengan Atasan ini di Data ASN.</td></tr>
                                 )}
                               </tbody>
                             </table>
