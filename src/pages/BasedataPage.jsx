@@ -279,7 +279,7 @@ const NAV_GROUPS = [
     key: 'penilaian-individu',
     label: 'Penilaian Individu',
     items: [
-      { key: 'penilaian-individu:nilai', label: 'Nilai Pegawai' },
+      { key: 'penilaian-individu:nilai', label: 'Penilaian ASN' },
       { key: 'penilaian-individu:atasan', label: 'Kelola Atasan Penilai' },
     ],
   },
@@ -1289,7 +1289,7 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-individu' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Nilai Pegawai' : 'Kelola Atasan Penilai'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Penilaian ASN' : 'Kelola Atasan Penilai'}</h1>
 
               {subPenilaianIndividu === 'nilai' ? (
                 pegawaiDinilai ? (
