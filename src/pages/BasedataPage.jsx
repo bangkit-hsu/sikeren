@@ -383,8 +383,8 @@ export default function BasedataPage() {
             Dashboard
           </button>
 
-          {NAV_GROUPS.map((group) => {
-            const terbuka = grupTerbuka === group.key
+          {(menuAktif === 'dashboard' ? NAV_GROUPS : NAV_GROUPS.filter((g) => g.key === menuAktif)).map((group) => {
+            const terbuka = menuAktif === group.key ? true : grupTerbuka === group.key
             const Ikon = group.key === 'penilaian-asn' ? IkonBintang : IkonDokumen
             return (
               <div key={group.key} className="pt-2">
@@ -423,17 +423,20 @@ export default function BasedataPage() {
             )
           })}
 
-          <button
-            type="button"
-            onClick={() => pilihMenu('penilaian-individu')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left mt-2 ${
-              menuAktif === 'penilaian-individu' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
-            }`}
-          >
-            <IkonOrang />
-            Penilaian Individu
-          </button>
+          {(menuAktif === 'dashboard' || menuAktif === 'penilaian-individu') && (
+            <button
+              type="button"
+              onClick={() => pilihMenu('penilaian-individu')}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left mt-2 ${
+                menuAktif === 'penilaian-individu' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'
+              }`}
+            >
+              <IkonOrang />
+              Penilaian Individu
+            </button>
+          )}
 
+          {menuAktif === 'dashboard' && (
           <Link
             to="/login"
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-ink/70 hover:bg-moss-100 transition-colors mt-2"
@@ -441,6 +444,7 @@ export default function BasedataPage() {
             <IkonAdmin />
             e-Apel
           </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-ink/10">
