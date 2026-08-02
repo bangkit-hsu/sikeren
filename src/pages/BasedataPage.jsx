@@ -1,12 +1,13 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
+import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonDashboard() {
   return (
@@ -214,6 +215,8 @@ function SegeraHadir({ label }) {
 }
 
 export default function BasedataPage() {
+  const navigate = useNavigate()
+  const { logout } = useAuth()
   const [searchParams] = useSearchParams()
   const menuAwal = searchParams.get('menu')
 
@@ -225,6 +228,11 @@ export default function BasedataPage() {
   })
   const [subPenilaianAsn, setSubPenilaianAsn] = useState(menuAwal === 'data-pegawai' ? 'data-pegawai' : 'utama')
   const [subSipp, setSubSipp] = useState(menuAwal === 'potongan-tpp' ? 'potongan-tpp' : 'utama')
+
+  function handleKeluar() {
+    logout()
+    navigate('/')
+  }
 
   const now = new Date()
   const [sippBulan, setSippBulan] = useState(now.getMonth())
@@ -322,6 +330,13 @@ export default function BasedataPage() {
         {menuAktif === 'dashboard' ? (
           <div>
             <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-12 mb-8 text-center">
+              <button
+                type="button"
+                onClick={handleKeluar}
+                className="absolute top-4 right-4 z-10 text-xs sm:text-sm font-medium text-paper/70 hover:text-paper border border-paper/20 hover:border-paper/40 rounded-full px-3 py-1.5 transition-colors"
+              >
+                Keluar
+              </button>
               <div
                 className="absolute inset-0 opacity-30"
                 style={{
@@ -338,14 +353,14 @@ export default function BasedataPage() {
                 <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
                 <h1 className="font-display font-bold text-3xl sm:text-4xl">SiKeren</h1>
                 <p className="text-paper/80 text-sm sm:text-base mt-2">
-                  Penilaian ASN Digital Terpadu dan Akuntabel — satu portal untuk seluruh modul penilaian, presensi, dan data kepegawaian Sekretariat Daerah.
+                  Portal terpadu penilaian, presensi, dan data kepegawaian.
                 </p>
               </div>
             </div>
 
             <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Modul Tersedia</p>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-              {modulDashboard.map((m) => (
+              {modulDashboard.slice(0, 2).map((m) => (
                 <button
                   key={m.key}
                   type="button"
@@ -375,10 +390,30 @@ export default function BasedataPage() {
                     <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-                <p className="font-display font-semibold">Administrator e-Apel</p>
+                <p className="font-display font-semibold">e-Apel</p>
                 <p className="text-paper/60 text-xs mt-1.5 leading-relaxed">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi apel.</p>
                 <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-400">Aktif</span>
               </Link>
+
+              {modulDashboard.slice(2).map((m) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  onClick={() => pilihMenu(m.key)}
+                  className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                >
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${m.segeraHadir ? 'bg-ink/10 text-ink/50' : 'bg-moss-700 text-paper'}`}>
+                    <m.Ikon />
+                  </div>
+                  <p className="font-display font-semibold text-ink">{m.label}</p>
+                  <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">{m.deskripsi}</p>
+                  <span className={`inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium ${
+                    m.segeraHadir ? 'bg-clay/10 text-clay' : 'bg-moss-100 text-moss-800'
+                  }`}>
+                    {m.segeraHadir ? 'Segera Hadir' : 'Aktif'}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         ) : menuAktif === 'penilaian-asn' ? (
