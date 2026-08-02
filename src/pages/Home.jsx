@@ -64,12 +64,22 @@ export default function Home() {
           <h2 className="font-display font-semibold text-base sm:text-xl mb-1">Pimpinan</h2>
           <p className="text-paper/60 text-xs sm:text-sm flex-1">Portal penilaian ASN, presensi, dan data kepegawaian.</p>
           <Link
-            to="/login?tujuan=basedata&menu=penilaian-asn"
+            to="/pimpinan"
             className="mt-4 sm:mt-5 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-gold-500 text-ink text-xs sm:text-base font-medium rounded-lg py-2 sm:py-2.5 px-2 hover:bg-gold-400 transition-colors text-center"
           >
             <span>Masuk Portal</span> <span aria-hidden>→</span>
           </Link>
         </div>
+      </div>
+
+      {/* Portal Admin SiKeren — login admin lalu masuk ke portal SiKeren */}
+      <div className="text-center px-6 -mt-2 pb-2">
+        <Link
+          to="/login?tujuan=basedata"
+          className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-ink/60 hover:text-ink border border-ink/15 hover:border-ink/30 rounded-full px-4 py-2 transition-colors"
+        >
+          Portal Admin SiKeren <span aria-hidden>→</span>
+        </Link>
       </div>
 
       {/* Judul */}
