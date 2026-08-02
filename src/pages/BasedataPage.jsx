@@ -656,6 +656,7 @@ export default function BasedataPage() {
       const penilaianSnap = await getDocs(
         query(collection(db, 'penilaianIndividu'), where('bulan', '==', bulanIdx), where('tahun', '==', tahun)),
       )
+      // e-Kinerja diambil dari Pot. Penilaian (skorAkhir) di menu Penilaian Individu untuk bulan-tahun ini
       const petaKinerja = {}
       penilaianSnap.docs.forEach((d) => { const p = d.data(); petaKinerja[p.nip] = p.skorAkhir })
 
@@ -1021,7 +1022,7 @@ export default function BasedataPage() {
                                     <td className="px-3 py-2.5">{p.jabatan}</td>
                                     <td className="px-3 py-2.5">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
                                     <td className="px-3 py-2.5">{p.kehadiranApel}%</td>
-                                    <td className="px-3 py-2.5 font-semibold text-moss-800">{p.eKinerja != null ? p.eKinerja : <span className="text-ink/30 font-normal">—</span>}</td>
+                                    <td className="px-3 py-2.5 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                   </tr>
                                 ))}
                                 {tersaring.length === 0 && (
