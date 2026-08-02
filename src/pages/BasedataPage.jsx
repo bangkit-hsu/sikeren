@@ -891,12 +891,12 @@ export default function BasedataPage() {
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-14 mb-8 text-center">
                 <div
-                  className="absolute inset-0 bg-cover bg-center opacity-25"
+                  className="absolute inset-0 bg-cover bg-center"
                   style={{ backgroundImage: `url(${import.meta.env.BASE_URL}images/kantor-bupati-hsu.jpg)` }}
                 />
-                <div className="absolute inset-0 bg-moss-900/70" />
+                <div className="absolute inset-0 bg-moss-900/60" />
                 <div
-                  className="absolute inset-0 opacity-40"
+                  className="absolute inset-0 opacity-25"
                   style={{
                     backgroundImage: 'radial-gradient(circle at 12% 15%, rgba(201,162,39,0.35), transparent 35%), radial-gradient(circle at 88% 85%, rgba(201,162,39,0.25), transparent 40%)',
                   }}
@@ -917,7 +917,7 @@ export default function BasedataPage() {
               </div>
 
               <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Modul Tersedia</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <button type="button" onClick={() => pilihMenu('penilaian-asn')} className="text-left bg-gold-50 border border-gold-200 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-gold-500 text-ink"><IkonBintang /></div>
                   <p className="font-display font-semibold text-ink">Nilai ASN</p>
