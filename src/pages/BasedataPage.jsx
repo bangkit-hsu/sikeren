@@ -2,7 +2,7 @@
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, getDocs, collection, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { parseFileSipp } from '../utils/sipp'
@@ -224,14 +224,6 @@ function FormPegawai({ awal, onBatal, onSimpan, menyimpan }) {
           className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
         />
       </div>
-      <div className="sm:col-span-2">
-        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Atasan</label>
-        <input
-          value={form.atasan}
-          onChange={(e) => setForm({ ...form, atasan: e.target.value })}
-          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
-        />
-      </div>
       <div className="sm:col-span-2 flex gap-2">
         <button
           type="button"
@@ -313,6 +305,12 @@ export default function BasedataPage() {
   const [menyimpanPenetapan, setMenyimpanPenetapan] = useState(false)
   const [pesanPenetapan, setPesanPenetapan] = useState('')
   const [penetapanTersimpan, setPenetapanTersimpan] = useState(null)
+  const [daftarPenetapan, setDaftarPenetapan] = useState(null)
+  const [memuatDaftarPenetapan, setMemuatDaftarPenetapan] = useState(false)
+  const [editPenetapanId, setEditPenetapanId] = useState(null)
+  const [nipTerpilihEdit, setNipTerpilihEdit] = useState(new Set())
+  const [menyimpanEditPenetapan, setMenyimpanEditPenetapan] = useState(false)
+  const [cariPegawaiEdit, setCariPegawaiEdit] = useState('')
   const [menuTerbuka, setMenuTerbuka] = useState(false)
   const [grupTerbuka, setGrupTerbuka] = useState(() => {
     if (menuAktif === 'penilaian-asn') return 'penilaian-asn'
@@ -521,6 +519,12 @@ export default function BasedataPage() {
     cekPenetapan()
   }, [atasanBulan, atasanTahun, atasanTerpilih])
 
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'atasan' || daftarPenetapan) return
+    muatDaftarPenetapan()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subPenilaianIndividu])
+
   async function simpanPenetapanAtasan(daftarPegawaiBinaan) {
     setMenyimpanPenetapan(true)
     setPesanPenetapan('')
@@ -535,10 +539,63 @@ export default function BasedataPage() {
       })
       setPenetapanTersimpan({ atasan: atasanTerpilih, pegawai: daftarPegawaiBinaan })
       setPesanPenetapan(`Berhasil menetapkan ${daftarPegawaiBinaan.length} pegawai binaan untuk ${atasanTerpilih}.`)
+      muatDaftarPenetapan()
     } catch (err) {
       setPesanPenetapan('Gagal menyimpan: ' + err.message)
     } finally {
       setMenyimpanPenetapan(false)
+    }
+  }
+
+  async function muatDaftarPenetapan() {
+    setMemuatDaftarPenetapan(true)
+    try {
+      const snap = await getDocs(collection(db, 'atasanPenilai'))
+      const daftar = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      daftar.sort((a, b) => (b.tahun - a.tahun) || (b.bulan - a.bulan) || a.atasan.localeCompare(b.atasan))
+      setDaftarPenetapan(daftar)
+    } catch {
+      setDaftarPenetapan([])
+    } finally {
+      setMemuatDaftarPenetapan(false)
+    }
+  }
+
+  async function hapusPenetapan(id) {
+    if (!confirm('Hapus penetapan ini?')) return
+    try {
+      await deleteDoc(doc(db, 'atasanPenilai', id))
+      setDaftarPenetapan((prev) => prev.filter((p) => p.id !== id))
+    } catch (err) {
+      alert('Gagal menghapus: ' + err.message)
+    }
+  }
+
+  function mulaiEditPenetapan(item) {
+    setEditPenetapanId(item.id)
+    setNipTerpilihEdit(new Set(item.pegawai.map((p) => p.nip)))
+    setCariPegawaiEdit('')
+  }
+
+  async function simpanEditPenetapan(item) {
+    setMenyimpanEditPenetapan(true)
+    try {
+      const pegawaiBaru = (dataPegawai || [])
+        .filter((p) => nipTerpilihEdit.has(p.nip))
+        .map((p) => ({ nip: p.nip, nama: p.nama, jabatan: p.jabatan, unitKerja: p.unitKerja }))
+      await setDoc(doc(db, 'atasanPenilai', item.id), {
+        bulan: item.bulan,
+        tahun: item.tahun,
+        atasan: item.atasan,
+        pegawai: pegawaiBaru,
+        ditetapkanPada: serverTimestamp(),
+      })
+      setEditPenetapanId(null)
+      muatDaftarPenetapan()
+    } catch (err) {
+      alert('Gagal menyimpan perubahan: ' + err.message)
+    } finally {
+      setMenyimpanEditPenetapan(false)
     }
   }
 
@@ -805,7 +862,6 @@ export default function BasedataPage() {
                                   <th className="px-3 py-3">Nama</th>
                                   <th className="px-3 py-3">Jabatan</th>
                                   <th className="px-3 py-3">Unit Kerja</th>
-                                  <th className="px-3 py-3">Atasan</th>
                                   <th className="px-3 py-3 w-28">Aksi</th>
                                 </tr>
                               </thead>
@@ -813,7 +869,7 @@ export default function BasedataPage() {
                                 {tersaring.map(({ p, idx }) => (
                                   editPegawaiIndex === idx ? (
                                     <tr key={`${p.nip}-${idx}`}>
-                                      <td colSpan={6} className="px-3 py-3 bg-moss-50/60">
+                                      <td colSpan={5} className="px-3 py-3 bg-moss-50/60">
                                         <FormPegawai
                                           awal={p}
                                           onBatal={() => setEditPegawaiIndex(null)}
@@ -828,7 +884,6 @@ export default function BasedataPage() {
                                       <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
                                       <td className="px-3 py-2.5">{p.jabatan}</td>
                                       <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
-                                      <td className="px-3 py-2.5">{p.atasan}</td>
                                       <td className="px-3 py-2.5 whitespace-nowrap">
                                         <button
                                           type="button"
@@ -1084,8 +1139,8 @@ export default function BasedataPage() {
                             </p>
                           )}
 
-                          <div className="border border-ink/10 rounded-xl2 overflow-hidden mb-4">
-                            <table className="w-full text-sm">
+                          <div className="border border-ink/10 rounded-xl2 overflow-x-auto mb-4">
+                            <table className="w-full text-sm min-w-[720px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3">NIP</th>
@@ -1099,7 +1154,7 @@ export default function BasedataPage() {
                                   <tr key={`${p.nip}-${i}`}>
                                     <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
                                     <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
-                                    <td className="px-3 py-2.5">{p.jabatan}</td>
+                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan}</td>
                                     <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
                                   </tr>
                                 ))}
@@ -1119,6 +1174,88 @@ export default function BasedataPage() {
                             {menyimpanPenetapan ? 'Menyimpan…' : 'Tetapkan sebagai Atasan Penilai Periode Ini'}
                           </button>
                         </div>
+                      )}
+
+                      <hr className="border-ink/10 my-8" />
+
+                      <h2 className="font-display font-semibold text-lg text-ink mb-1">Daftar Penetapan Tersimpan</h2>
+                      <p className="text-ink/60 text-sm mb-4">Semua penetapan Atasan Penilai yang sudah disimpan, dari periode mana pun. Edit untuk mengubah daftar pegawai binaannya secara manual, atau Hapus untuk membatalkan penetapan.</p>
+
+                      {memuatDaftarPenetapan ? (
+                        <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                      ) : daftarPenetapan && daftarPenetapan.length > 0 ? (
+                        <div className="space-y-3">
+                          {daftarPenetapan.map((item) => (
+                            <div key={item.id} className="border border-ink/10 rounded-xl2 bg-white/60 p-4">
+                              {editPenetapanId === item.id ? (
+                                <div>
+                                  <p className="font-medium text-ink mb-1">{item.atasan} — {namaBulan(item.bulan)} {item.tahun}</p>
+                                  <input
+                                    value={cariPegawaiEdit}
+                                    onChange={(e) => setCariPegawaiEdit(e.target.value)}
+                                    placeholder="Cari pegawai untuk ditambahkan/dihapus dari daftar…"
+                                    className="my-2 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                                  />
+                                  <div className="max-h-72 overflow-y-auto border border-ink/10 rounded-lg divide-y divide-ink/10">
+                                    {(dataPegawai || [])
+                                      .filter((p) => {
+                                        const q = cariPegawaiEdit.toLowerCase()
+                                        return !q || p.nama.toLowerCase().includes(q) || p.nip.includes(q) || (p.jabatan || '').toLowerCase().includes(q)
+                                      })
+                                      .map((p) => (
+                                        <label key={p.nip} className="flex items-center gap-2.5 px-3 py-2 text-sm cursor-pointer hover:bg-moss-50">
+                                          <input
+                                            type="checkbox"
+                                            checked={nipTerpilihEdit.has(p.nip)}
+                                            onChange={(e) => {
+                                              setNipTerpilihEdit((prev) => {
+                                                const baru = new Set(prev)
+                                                if (e.target.checked) baru.add(p.nip); else baru.delete(p.nip)
+                                                return baru
+                                              })
+                                            }}
+                                          />
+                                          <span>{p.nama} <span className="text-ink/40 font-mono text-xs">({p.nip})</span></span>
+                                        </label>
+                                      ))}
+                                  </div>
+                                  <p className="text-xs text-ink/40 font-mono mt-2 mb-3">{nipTerpilihEdit.size} pegawai terpilih</p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      type="button"
+                                      disabled={menyimpanEditPenetapan}
+                                      onClick={() => simpanEditPenetapan(item)}
+                                      className="text-sm font-medium bg-moss-700 text-paper rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
+                                    >
+                                      {menyimpanEditPenetapan ? 'Menyimpan…' : 'Simpan'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={menyimpanEditPenetapan}
+                                      onClick={() => setEditPenetapanId(null)}
+                                      className="text-sm font-medium border border-ink/15 rounded-lg px-4 py-2 hover:bg-ink/5 transition-colors"
+                                    >
+                                      Batal
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-between gap-3 flex-wrap">
+                                  <div>
+                                    <p className="font-medium text-ink">{item.atasan}</p>
+                                    <p className="text-xs text-ink/50 font-mono">{namaBulan(item.bulan)} {item.tahun} · {item.pegawai?.length || 0} pegawai binaan</p>
+                                  </div>
+                                  <div className="flex items-center gap-3 shrink-0">
+                                    <button type="button" onClick={() => mulaiEditPenetapan(item)} className="text-sm text-moss-700 font-medium hover:underline">Edit</button>
+                                    <button type="button" onClick={() => hapusPenetapan(item.id)} className="text-sm text-clay font-medium hover:underline">Hapus</button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-ink/50 text-sm">Belum ada penetapan tersimpan.</p>
                       )}
                     </div>
                   )
