@@ -188,6 +188,72 @@ function TabelPotongan({ data }) {
   )
 }
 
+function FormPegawai({ awal, onBatal, onSimpan, menyimpan }) {
+  const [form, setForm] = useState(awal || { nip: '', nama: '', jabatan: '', unitKerja: '', atasan: '' })
+  return (
+    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 grid sm:grid-cols-2 gap-3 mb-4">
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>
+        <input
+          value={form.nip}
+          onChange={(e) => setForm({ ...form, nip: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Nama</label>
+        <input
+          value={form.nama}
+          onChange={(e) => setForm({ ...form, nama: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Jabatan</label>
+        <input
+          value={form.jabatan}
+          onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Unit Kerja</label>
+        <input
+          value={form.unitKerja}
+          onChange={(e) => setForm({ ...form, unitKerja: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+        />
+      </div>
+      <div className="sm:col-span-2">
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Atasan</label>
+        <input
+          value={form.atasan}
+          onChange={(e) => setForm({ ...form, atasan: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+        />
+      </div>
+      <div className="sm:col-span-2 flex gap-2">
+        <button
+          type="button"
+          disabled={menyimpan}
+          onClick={() => onSimpan(form)}
+          className="text-sm font-medium bg-moss-700 text-paper rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
+        >
+          {menyimpan ? 'Menyimpan…' : 'Simpan'}
+        </button>
+        <button
+          type="button"
+          disabled={menyimpan}
+          onClick={onBatal}
+          className="text-sm font-medium border border-ink/15 rounded-lg px-4 py-2 hover:bg-ink/5 transition-colors"
+        >
+          Batal
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function SegeraHadir({ label }) {
   return (
     <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
@@ -261,6 +327,10 @@ export default function BasedataPage() {
   const [dataPegawai, setDataPegawai] = useState(null)
   const [memuatDataPegawai, setMemuatDataPegawai] = useState(false)
   const [cariPegawai, setCariPegawai] = useState('')
+  const [tambahPegawaiAktif, setTambahPegawaiAktif] = useState(false)
+  const [editPegawaiIndex, setEditPegawaiIndex] = useState(null)
+  const [menyimpanPegawai, setMenyimpanPegawai] = useState(false)
+  const [pesanPegawai, setPesanPegawai] = useState('')
 
   useEffect(() => {
     if (menuAktif !== 'penilaian-asn' || subPenilaianAsn !== 'data-pegawai' || dataPegawai) return
@@ -346,6 +416,72 @@ export default function BasedataPage() {
     } finally {
       setMengunggahSipp(false)
       e.target.value = ''
+    }
+  }
+
+  async function simpanDataPegawaiKeFirestore(dataBaru) {
+    await setDoc(doc(db, 'dataPegawai', 'utama'), { data: dataBaru, diunggahPada: serverTimestamp() })
+    setDataPegawai(dataBaru)
+  }
+
+  async function tambahPegawai(form) {
+    setPesanPegawai('')
+    const nip = form.nip.trim()
+    if (!nip || !form.nama.trim()) {
+      setPesanPegawai('NIP dan Nama wajib diisi.')
+      return
+    }
+    if (dataPegawai.some((p) => p.nip === nip)) {
+      setPesanPegawai('NIP sudah dipakai pegawai lain.')
+      return
+    }
+    setMenyimpanPegawai(true)
+    try {
+      const baru = [...dataPegawai, {
+        nip, nama: form.nama.trim(), jabatan: form.jabatan.trim(), unitKerja: form.unitKerja.trim(), atasan: form.atasan.trim(),
+      }]
+      await simpanDataPegawaiKeFirestore(baru)
+      setTambahPegawaiAktif(false)
+    } catch (err) {
+      setPesanPegawai('Gagal menambah: ' + err.message)
+    } finally {
+      setMenyimpanPegawai(false)
+    }
+  }
+
+  async function simpanEditPegawai(index, form) {
+    setPesanPegawai('')
+    const nip = form.nip.trim()
+    if (!nip || !form.nama.trim()) {
+      setPesanPegawai('NIP dan Nama wajib diisi.')
+      return
+    }
+    if (dataPegawai.some((p, i) => p.nip === nip && i !== index)) {
+      setPesanPegawai('NIP sudah dipakai pegawai lain.')
+      return
+    }
+    setMenyimpanPegawai(true)
+    try {
+      const baru = dataPegawai.map((p, i) => (i === index ? {
+        nip, nama: form.nama.trim(), jabatan: form.jabatan.trim(), unitKerja: form.unitKerja.trim(), atasan: form.atasan.trim(),
+      } : p))
+      await simpanDataPegawaiKeFirestore(baru)
+      setEditPegawaiIndex(null)
+    } catch (err) {
+      setPesanPegawai('Gagal menyimpan: ' + err.message)
+    } finally {
+      setMenyimpanPegawai(false)
+    }
+  }
+
+  async function hapusPegawai(index) {
+    if (!confirm(`Hapus data ${dataPegawai[index]?.nama}?`)) return
+    setPesanPegawai('')
+    try {
+      const baru = dataPegawai.filter((_, i) => i !== index)
+      await simpanDataPegawaiKeFirestore(baru)
+    } catch (err) {
+      setPesanPegawai('Gagal menghapus: ' + err.message)
     }
   }
 
@@ -563,29 +699,53 @@ export default function BasedataPage() {
                 <SegeraHadir label="Penilaian ASN" />
               ) : (
                 <div>
-                  <input
-                    value={cariPegawai}
-                    onChange={(e) => setCariPegawai(e.target.value)}
-                    placeholder="Cari NIP, nama, jabatan, atau unit kerja…"
-                    className="mb-4 w-full max-w-md rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
-                  />
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <input
+                      value={cariPegawai}
+                      onChange={(e) => setCariPegawai(e.target.value)}
+                      placeholder="Cari NIP, nama, jabatan, atau unit kerja…"
+                      className="w-full max-w-md rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { setTambahPegawaiAktif((v) => !v); setEditPegawaiIndex(null); setPesanPegawai('') }}
+                      className="bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors"
+                    >
+                      {tambahPegawaiAktif ? 'Tutup Form' : '+ Tambah Pegawai'}
+                    </button>
+                  </div>
+
+                  {pesanPegawai && (
+                    <p className="text-sm text-clay bg-clay/10 rounded-lg px-3 py-2 mb-4">{pesanPegawai}</p>
+                  )}
+
+                  {tambahPegawaiAktif && (
+                    <FormPegawai
+                      onBatal={() => setTambahPegawaiAktif(false)}
+                      onSimpan={tambahPegawai}
+                      menyimpan={menyimpanPegawai}
+                    />
+                  )}
+
                   {memuatDataPegawai ? (
                     <p className="text-ink/50 font-mono text-sm">Memuat…</p>
                   ) : dataPegawai && dataPegawai.length > 0 ? (
                     (() => {
                       const q = cariPegawai.toLowerCase()
-                      const tersaring = dataPegawai.filter((p) =>
-                        !q
-                        || p.nip.includes(q)
-                        || p.nama.toLowerCase().includes(q)
-                        || (p.jabatan || '').toLowerCase().includes(q)
-                        || (p.unitKerja || '').toLowerCase().includes(q),
-                      )
+                      const tersaring = dataPegawai
+                        .map((p, idx) => ({ p, idx }))
+                        .filter(({ p }) =>
+                          !q
+                          || p.nip.includes(q)
+                          || p.nama.toLowerCase().includes(q)
+                          || (p.jabatan || '').toLowerCase().includes(q)
+                          || (p.unitKerja || '').toLowerCase().includes(q),
+                        )
                       return (
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {dataPegawai.length} pegawai</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[900px]">
+                            <table className="w-full text-sm min-w-[1000px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3">NIP</th>
@@ -593,17 +753,47 @@ export default function BasedataPage() {
                                   <th className="px-3 py-3">Jabatan</th>
                                   <th className="px-3 py-3">Unit Kerja</th>
                                   <th className="px-3 py-3">Atasan</th>
+                                  <th className="px-3 py-3 w-28">Aksi</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
-                                {tersaring.map((p, i) => (
-                                  <tr key={`${p.nip}-${i}`}>
-                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
-                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
-                                    <td className="px-3 py-2.5">{p.jabatan}</td>
-                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
-                                    <td className="px-3 py-2.5">{p.atasan}</td>
-                                  </tr>
+                                {tersaring.map(({ p, idx }) => (
+                                  editPegawaiIndex === idx ? (
+                                    <tr key={`${p.nip}-${idx}`}>
+                                      <td colSpan={6} className="px-3 py-3 bg-moss-50/60">
+                                        <FormPegawai
+                                          awal={p}
+                                          onBatal={() => setEditPegawaiIndex(null)}
+                                          onSimpan={(form) => simpanEditPegawai(idx, form)}
+                                          menyimpan={menyimpanPegawai}
+                                        />
+                                      </td>
+                                    </tr>
+                                  ) : (
+                                    <tr key={`${p.nip}-${idx}`}>
+                                      <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                      <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                      <td className="px-3 py-2.5">{p.jabatan}</td>
+                                      <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
+                                      <td className="px-3 py-2.5">{p.atasan}</td>
+                                      <td className="px-3 py-2.5 whitespace-nowrap">
+                                        <button
+                                          type="button"
+                                          onClick={() => { setEditPegawaiIndex(idx); setTambahPegawaiAktif(false); setPesanPegawai('') }}
+                                          className="text-moss-700 font-medium hover:underline mr-3"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => hapusPegawai(idx)}
+                                          className="text-clay font-medium hover:underline"
+                                        >
+                                          Hapus
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  )
                                 ))}
                               </tbody>
                             </table>
