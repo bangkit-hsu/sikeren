@@ -36,7 +36,7 @@ export default function Home() {
             </svg>
           </div>
           <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">SiKeren</h1>
-          <p className="text-paper/70 text-sm mt-1">Sistem Kepegawaian Terintegrasi Sekretariat Daerah</p>
+          <p className="text-paper/70 text-sm mt-1">Sistem Kinerja dan Reward ASN Sekretariat Daerah</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gold-500/40 to-transparent" />
       </div>
@@ -89,8 +89,8 @@ export default function Home() {
       {/* Judul */}
       <div className="text-center px-6 pt-10 pb-4">
         <p className="font-display font-bold text-xl sm:text-2xl leading-snug max-w-2xl mx-auto text-ink">
-          APEL ADALAH <span className="text-gold-600">KEWAJIBAN</span>,<br />
-          BUKTI <span className="text-gold-600">DISIPLIN</span> &amp; <span className="text-gold-600">TANGGUNG JAWAB</span> SEBAGAI ASN.
+          <span className="text-gold-600">OBJEKTIF</span> MENILAI, <span className="text-gold-600">TRANSPARAN</span> MENGHARGAI<br />
+          SERTA MENDORONG ASN <span className="text-gold-600">BERAKHLAK</span> DAN <span className="text-gold-600">BERKINERJA</span>.
         </p>
       </div>
 
