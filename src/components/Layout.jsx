@@ -186,17 +186,9 @@ export default function Layout({ children }) {
         </nav>
 
         <div className="p-4 border-t border-ink/10">
-          {isAdmin && (
-            <Link
-              to="/basedata"
-              className="w-full inline-flex items-center justify-center gap-1 text-xs font-mono px-2 py-1.5 rounded-full border border-ink/15 text-ink/50 hover:bg-ink/5 transition-colors mb-3"
-            >
-              🏗️ Building
-            </Link>
-          )}
           <p className="text-sm text-ink/70 truncate mb-2">{user?.nama}</p>
           <button
-            onClick={handleLogout}
+            onClick={() => navigate('/basedata')}
             className="w-full text-sm font-medium px-3 py-2 rounded-lg border border-ink/15 hover:bg-ink hover:text-paper transition-colors"
           >
             Keluar
