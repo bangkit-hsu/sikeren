@@ -247,6 +247,31 @@ function FormPegawai({ awal, onBatal, onSimpan, menyimpan }) {
   )
 }
 
+function DashboardModul({ judul, deskripsi, tautan }) {
+  return (
+    <div>
+      <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 mb-6">
+        <p className="font-display font-semibold text-lg text-ink mb-1">{judul}</p>
+        <p className="text-ink/60 text-sm">{deskripsi}</p>
+      </div>
+      <p className="text-xs font-mono uppercase tracking-wide text-ink/40 mb-3">Menu di {judul}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {tautan.map((t) => (
+          <button
+            key={t.label}
+            type="button"
+            onClick={t.onClick}
+            className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+          >
+            <p className="font-display font-semibold text-ink">{t.label}</p>
+            <p className="text-ink/50 text-xs mt-1.5">{t.deskripsi}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function SegeraHadir({ label }) {
   return (
     <div className="mt-4 bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
@@ -263,6 +288,7 @@ const NAV_GROUPS = [
     key: 'penilaian-asn',
     label: 'Nilai ASN',
     items: [
+      { key: 'penilaian-asn:dashboard', label: 'Dashboard' },
       { key: 'penilaian-asn:utama', label: 'Nilai ASN' },
       { key: 'penilaian-asn:data-pegawai', label: 'Data ASN' },
     ],
@@ -271,6 +297,7 @@ const NAV_GROUPS = [
     key: 'sipp',
     label: 'SIPP',
     items: [
+      { key: 'sipp:dashboard', label: 'Dashboard' },
       { key: 'sipp:utama', label: 'Rekap SIPP' },
       { key: 'sipp:potongan-tpp', label: 'Potongan TPP' },
     ],
@@ -279,6 +306,7 @@ const NAV_GROUPS = [
     key: 'penilaian-individu',
     label: 'Penilaian Individu',
     items: [
+      { key: 'penilaian-individu:dashboard', label: 'Dashboard' },
       { key: 'penilaian-individu:nilai', label: 'Penilaian ASN' },
       { key: 'penilaian-individu:atasan', label: 'Kelola Atasan Penilai' },
     ],
@@ -297,9 +325,9 @@ export default function BasedataPage() {
     if (['penilaian-asn', 'sipp', 'penilaian-individu'].includes(menuAwal)) return menuAwal
     return 'dashboard'
   })
-  const [subPenilaianAsn, setSubPenilaianAsn] = useState(menuAwal === 'data-pegawai' ? 'data-pegawai' : 'utama')
-  const [subSipp, setSubSipp] = useState(menuAwal === 'potongan-tpp' ? 'potongan-tpp' : 'utama')
-  const [subPenilaianIndividu, setSubPenilaianIndividu] = useState('nilai') // 'nilai' | 'atasan'
+  const [subPenilaianAsn, setSubPenilaianAsn] = useState(menuAwal === 'data-pegawai' ? 'data-pegawai' : menuAwal === 'penilaian-asn' ? 'utama' : 'dashboard')
+  const [subSipp, setSubSipp] = useState(menuAwal === 'potongan-tpp' ? 'potongan-tpp' : menuAwal === 'sipp' ? 'utama' : 'dashboard')
+  const [subPenilaianIndividu, setSubPenilaianIndividu] = useState('dashboard') // 'dashboard' | 'nilai' | 'atasan'
   const [atasanBulan, setAtasanBulan] = useState(new Date().getMonth())
   const [atasanTahun, setAtasanTahun] = useState(new Date().getFullYear())
   const [atasanTerpilih, setAtasanTerpilih] = useState('')
@@ -740,20 +768,30 @@ export default function BasedataPage() {
   }
 
   function pilihMenu(key) {
-    if (key === 'penilaian-asn:utama') {
+    if (key === 'penilaian-asn:dashboard') {
+      setMenuAktif('penilaian-asn'); setSubPenilaianAsn('dashboard')
+    } else if (key === 'penilaian-asn:utama') {
       setMenuAktif('penilaian-asn'); setSubPenilaianAsn('utama')
     } else if (key === 'penilaian-asn:data-pegawai') {
       setMenuAktif('penilaian-asn'); setSubPenilaianAsn('data-pegawai')
+    } else if (key === 'sipp:dashboard') {
+      setMenuAktif('sipp'); setSubSipp('dashboard')
     } else if (key === 'sipp:utama') {
       setMenuAktif('sipp'); setSubSipp('utama')
     } else if (key === 'sipp:potongan-tpp') {
       setMenuAktif('sipp'); setSubSipp('potongan-tpp')
+    } else if (key === 'penilaian-individu:dashboard') {
+      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('dashboard')
     } else if (key === 'penilaian-individu:nilai') {
       setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
     } else if (key === 'penilaian-individu:atasan') {
       setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('atasan')
+    } else if (key === 'penilaian-asn') {
+      setMenuAktif('penilaian-asn'); setSubPenilaianAsn('dashboard')
+    } else if (key === 'sipp') {
+      setMenuAktif('sipp'); setSubSipp('dashboard')
     } else if (key === 'penilaian-individu') {
-      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
+      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('dashboard')
     } else {
       setMenuAktif(key)
     }
@@ -826,10 +864,13 @@ export default function BasedataPage() {
                   <div className="space-y-1 mt-1">
                     {group.items.map((item) => {
                       const aktif = menuAktif === group.key
-                        && ((item.key.endsWith('utama') && group.key === 'penilaian-asn' && subPenilaianAsn === 'utama')
+                        && ((item.key.endsWith('dashboard') && group.key === 'penilaian-asn' && subPenilaianAsn === 'dashboard')
+                          || (item.key.endsWith('utama') && group.key === 'penilaian-asn' && subPenilaianAsn === 'utama')
                           || (item.key.endsWith('data-pegawai') && group.key === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
+                          || (item.key.endsWith('dashboard') && group.key === 'sipp' && subSipp === 'dashboard')
                           || (item.key.endsWith('utama') && group.key === 'sipp' && subSipp === 'utama')
                           || (item.key.endsWith('potongan-tpp') && group.key === 'sipp' && subSipp === 'potongan-tpp')
+                          || (item.key.endsWith('dashboard') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'dashboard')
                           || (item.key.endsWith('nilai') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'nilai')
                           || (item.key.endsWith('atasan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'atasan'))
                       return (
@@ -944,8 +985,19 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-asn' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : 'Data ASN'}</h1>
-              {subPenilaianAsn === 'utama' ? (
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">
+                {subPenilaianAsn === 'dashboard' ? 'Dashboard Nilai ASN' : subPenilaianAsn === 'utama' ? 'Nilai ASN' : 'Data ASN'}
+              </h1>
+              {subPenilaianAsn === 'dashboard' ? (
+                <DashboardModul
+                  judul="Nilai ASN"
+                  deskripsi="Rekap gabungan Presensi Kehadiran, Kehadiran Apel, dan e-Kinerja per pegawai, serta data induk kepegawaian."
+                  tautan={[
+                    { label: 'Nilai ASN', deskripsi: 'Rekap gabungan per pegawai untuk periode tertentu.', onClick: () => pilihMenu('penilaian-asn:utama') },
+                    { label: 'Data ASN', deskripsi: 'Kelola data induk kepegawaian (NIP, Nama, Jabatan, dst).', onClick: () => pilihMenu('penilaian-asn:data-pegawai') },
+                  ]}
+                />
+              ) : subPenilaianAsn === 'utama' ? (
                 (() => {
                   const q = cariNilaiAsn.toLowerCase()
                   const tersaring = (nilaiAsnData || []).filter((p) =>
@@ -1141,9 +1193,20 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'sipp' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subSipp === 'utama' ? 'SIPP' : 'Potongan TPP'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">
+                {subSipp === 'dashboard' ? 'Dashboard SIPP' : subSipp === 'utama' ? 'SIPP' : 'Potongan TPP'}
+              </h1>
 
-              {subSipp === 'utama' ? (
+              {subSipp === 'dashboard' ? (
+                <DashboardModul
+                  judul="SIPP"
+                  deskripsi="Rekapitulasi presensi bulanan yang diunggah dari file Excel, dan ketentuan potongan TPP yang berlaku."
+                  tautan={[
+                    { label: 'Rekap SIPP', deskripsi: 'Unggah & lihat rekap presensi bulanan.', onClick: () => pilihMenu('sipp:utama') },
+                    { label: 'Potongan TPP', deskripsi: 'Tabel ketentuan persentase potongan TPP.', onClick: () => pilihMenu('sipp:potongan-tpp') },
+                  ]}
+                />
+              ) : subSipp === 'utama' ? (
                 <div>
                   <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file rekapitulasi presensi (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
 
@@ -1289,9 +1352,20 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-individu' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Penilaian ASN' : 'Kelola Atasan Penilai'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">
+                {subPenilaianIndividu === 'dashboard' ? 'Dashboard Penilaian Individu' : subPenilaianIndividu === 'nilai' ? 'Penilaian ASN' : 'Kelola Atasan Penilai'}
+              </h1>
 
-              {subPenilaianIndividu === 'nilai' ? (
+              {subPenilaianIndividu === 'dashboard' ? (
+                <DashboardModul
+                  judul="Penilaian Individu"
+                  deskripsi="Penilaian kinerja 20 kriteria per pegawai, dan pengelolaan penetapan atasan penilai per periode."
+                  tautan={[
+                    { label: 'Penilaian ASN', deskripsi: 'Isi form penilaian 20 kriteria per pegawai.', onClick: () => pilihMenu('penilaian-individu:nilai') },
+                    { label: 'Kelola Atasan Penilai', deskripsi: 'Tetapkan pegawai binaan tiap Atasan per periode.', onClick: () => pilihMenu('penilaian-individu:atasan') },
+                  ]}
+                />
+              ) : subPenilaianIndividu === 'nilai' ? (
                 pegawaiDinilai ? (
                   <div>
                     <button
