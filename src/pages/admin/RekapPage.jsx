@@ -55,6 +55,7 @@ export default function RekapPage() {
           hariBesar: milik.filter((a) => a.keterangan === 'hari_besar').length,
           wfh: milik.filter((a) => a.keterangan === 'wfh').length,
           total: hadir.length,
+          potApel: Math.round(milik.filter((a) => a.status === 'tidak_apel').length * 0.5 * 100) / 100,
         }
       })
       .filter((p) =>
@@ -80,6 +81,7 @@ export default function RekapPage() {
       'Total Hadir': p.total,
       'Hari Absen': hariKerja,
       '% Kehadiran': hariKerja > 0 ? Math.round((p.total / hariKerja) * 100) : 0,
+      'Pot. Apel': `${p.potApel}%`,
     }))
     unduhExcel(`Rekap-Absen-${namaBulan(bulan)}-${tahun}.xlsx`, baris, 'Rekap Absen')
   }
@@ -119,7 +121,7 @@ export default function RekapPage() {
         <p className="text-ink/50 font-mono text-sm">Memuat…</p>
       ) : (
         <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-          <table className="w-full text-sm min-w-[1060px]">
+          <table className="w-full text-sm min-w-[1160px]">
             <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
               <tr>
                 <th className="px-4 py-3">NIP</th>
@@ -134,6 +136,7 @@ export default function RekapPage() {
                 <th className="px-4 py-3">WFH</th>
                 <th className="px-4 py-3">Total Hadir</th>
                 <th className="px-4 py-3">% dari Hari Absen</th>
+                <th className="px-4 py-3">Pot. Apel</th>
                 <th className="px-4 py-3">Aksi</th>
               </tr>
             </thead>
@@ -156,6 +159,9 @@ export default function RekapPage() {
                   <td className="px-4 py-3 font-mono">
                     {hariKerja > 0 ? Math.round((p.total / hariKerja) * 100) : 0}%
                   </td>
+                  <td className="px-4 py-3 font-mono">
+                    {p.potApel > 0 ? <span className="text-clay font-medium">{p.potApel}%</span> : `${p.potApel}%`}
+                  </td>
                   <td className="px-4 py-3">
                     <Link to={`/admin/koreksi?uid=${p.id}`} className="text-moss-700 font-medium hover:underline whitespace-nowrap">
                       Koreksi
@@ -164,7 +170,7 @@ export default function RekapPage() {
                 </tr>
               ))}
               {rekap.length === 0 && (
-                <tr><td colSpan={13} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
+                <tr><td colSpan={14} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
               )}
             </tbody>
           </table>
