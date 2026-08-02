@@ -726,6 +726,7 @@ export default function BasedataPage() {
         jawaban: KRITERIA_PENILAIAN.map((k, i) => ({
           pertanyaan: k.pertanyaan, huruf: jawabanForm[i].huruf, jawaban: jawabanForm[i].teks, skor: jawabanForm[i].skor,
         })),
+        skorTotal,
         skorAkhir,
         dinilaiPada: serverTimestamp(),
       }
@@ -1415,12 +1416,13 @@ export default function BasedataPage() {
                             {memuatNilaiMap ? ' · memuat status nilai…' : ''}
                           </p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[520px]">
+                            <table className="w-full text-sm min-w-[620px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3">NIP</th>
                                   <th className="px-3 py-3">Nama</th>
                                   <th className="px-3 py-3 w-24">Skor</th>
+                                  <th className="px-3 py-3 w-32">Pot. Penilaian</th>
                                   <th className="px-3 py-3 w-28">Aksi</th>
                                 </tr>
                               </thead>
@@ -1433,10 +1435,13 @@ export default function BasedataPage() {
                                       <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
                                       <td className="px-3 py-2.5">
                                         {sudah ? (
-                                          <span className="font-semibold text-moss-800">{sudah.skorAkhir}</span>
+                                          <span className="font-semibold text-moss-800">{sudah.skorTotal}</span>
                                         ) : (
                                           <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Belum</span>
                                         )}
+                                      </td>
+                                      <td className="px-3 py-2.5">
+                                        {sudah ? `${sudah.skorAkhir}%` : '0%'}
                                       </td>
                                       <td className="px-3 py-2.5 whitespace-nowrap">
                                         <button
@@ -1451,7 +1456,7 @@ export default function BasedataPage() {
                                   )
                                 })}
                                 {daftarUntukDinilai.length === 0 && (
-                                  <tr><td colSpan={4} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai untuk Atasan ini.</td></tr>
+                                  <tr><td colSpan={5} className="px-3 py-4 text-center text-ink/40">Tidak ada pegawai untuk Atasan ini.</td></tr>
                                 )}
                               </tbody>
                             </table>
