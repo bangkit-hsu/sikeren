@@ -33,6 +33,7 @@ export default function SetupAwal() {
         nip: form.nip.trim(),
         nama: form.nama,
         bagian: form.bagian,
+        jabatan: 'Administrator',
         passwordHash,
         role: 'admin',
       })
