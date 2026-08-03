@@ -27,7 +27,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/basedata" element={<BasedataPage />} />
+      <Route path="/basedata/*" element={<BasedataPage />} />
       <Route path="/pimpinan" element={<PimpinanPage />} />
       <Route path="/absen" element={<FaceLogin />} />
       <Route path="/daftar-wajah" element={<DaftarWajah />} />

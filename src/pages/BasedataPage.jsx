@@ -1,7 +1,7 @@
 // Halaman ini sengaja dibuat terpisah dari alur aplikasi utama (tidak memakai Layout/AuthContext),
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { doc, getDoc, getDocs, collection, query, where, addDoc, updateDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
@@ -354,15 +354,35 @@ export default function BasedataPage() {
   const [searchParams] = useSearchParams()
   const menuAwal = searchParams.get('menu')
 
-  const [menuAktif, setMenuAktif] = useState(() => {
-    if (menuAwal === 'data-pegawai') return 'penilaian-asn'
-    if (menuAwal === 'potongan-tpp') return 'sipp'
-    if (['penilaian-asn', 'sipp', 'penilaian-individu'].includes(menuAwal)) return menuAwal
-    return 'dashboard'
-  })
-  const [subPenilaianAsn, setSubPenilaianAsn] = useState(menuAwal === 'data-pegawai' ? 'data-pegawai' : 'utama')
-  const [subSipp, setSubSipp] = useState(menuAwal === 'potongan-tpp' ? 'potongan-tpp' : 'utama')
-  const [subPenilaianIndividu, setSubPenilaianIndividu] = useState('nilai') // 'nilai' | 'atasan'
+  const location = useLocation()
+  const path = location.pathname.replace(/^.*\/basedata\/?/, '').replace(/\/$/, '')
+
+  let menuAktif = 'dashboard'
+  let subPenilaianAsn = 'utama'
+  let subSipp = 'utama'
+  let subPenilaianIndividu = 'nilai'
+
+  if (path === 'nilai-asn') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'utama' }
+  else if (path === 'nilai-asn/data-asn') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'data-pegawai' }
+  else if (path === 'sipp') { menuAktif = 'sipp'; subSipp = 'utama' }
+  else if (path === 'sipp/potongan-tpp') { menuAktif = 'sipp'; subSipp = 'potongan-tpp' }
+  else if (path === 'penilaian-individu') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'nilai' }
+  else if (path === 'penilaian-individu/kelompok-asn') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'atasan' }
+  else if (path === 'penilaian-individu/daftar-pimpinan') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'pimpinan' }
+
+  useEffect(() => {
+    if (!menuAwal || path) return // hanya redirect kalau masih di /basedata polos dengan ?menu=
+    const peta = {
+      'penilaian-asn': '/basedata/nilai-asn',
+      'data-pegawai': '/basedata/nilai-asn/data-asn',
+      sipp: '/basedata/sipp',
+      'potongan-tpp': '/basedata/sipp/potongan-tpp',
+      'penilaian-individu': '/basedata/penilaian-individu',
+    }
+    if (peta[menuAwal]) navigate(peta[menuAwal], { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const [atasanBulan, setAtasanBulan] = useState(new Date().getMonth())
   const [atasanTahun, setAtasanTahun] = useState(new Date().getFullYear())
   const [atasanTerpilih, setAtasanTerpilih] = useState('')
@@ -892,25 +912,20 @@ export default function BasedataPage() {
   }
 
   function pilihMenu(key) {
-    if (key === 'penilaian-asn:utama') {
-      setMenuAktif('penilaian-asn'); setSubPenilaianAsn('utama')
-    } else if (key === 'penilaian-asn:data-pegawai') {
-      setMenuAktif('penilaian-asn'); setSubPenilaianAsn('data-pegawai')
-    } else if (key === 'sipp:utama') {
-      setMenuAktif('sipp'); setSubSipp('utama')
-    } else if (key === 'sipp:potongan-tpp') {
-      setMenuAktif('sipp'); setSubSipp('potongan-tpp')
-    } else if (key === 'penilaian-individu:nilai') {
-      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
-    } else if (key === 'penilaian-individu:atasan') {
-      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('atasan')
-    } else if (key === 'penilaian-individu:pimpinan') {
-      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('pimpinan')
-    } else if (key === 'penilaian-individu') {
-      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
-    } else {
-      setMenuAktif(key)
+    const peta = {
+      dashboard: '/basedata',
+      'penilaian-asn': '/basedata/nilai-asn',
+      'penilaian-asn:utama': '/basedata/nilai-asn',
+      'penilaian-asn:data-pegawai': '/basedata/nilai-asn/data-asn',
+      sipp: '/basedata/sipp',
+      'sipp:utama': '/basedata/sipp',
+      'sipp:potongan-tpp': '/basedata/sipp/potongan-tpp',
+      'penilaian-individu': '/basedata/penilaian-individu',
+      'penilaian-individu:nilai': '/basedata/penilaian-individu',
+      'penilaian-individu:atasan': '/basedata/penilaian-individu/kelompok-asn',
+      'penilaian-individu:pimpinan': '/basedata/penilaian-individu/daftar-pimpinan',
     }
+    navigate(peta[key] || '/basedata')
     setMenuTerbuka(false)
   }
 
