@@ -239,7 +239,11 @@ export default function FaceLogin() {
         {tahap === 'belum_mulai' && (
           <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-6 text-center">
             <p className="font-display font-semibold text-lg text-moss-800 mb-1">Jam Absen Apel Belum Dimulai</p>
-            <p className="text-sm text-ink/60">Absen apel bisa dilakukan mulai pukul <span className="font-medium text-ink">07:50 WITA</span>. Halaman ini akan otomatis memeriksa ulang secara berkala.</p>
+            <p className="text-sm text-ink/60 mb-4">Absen apel bisa dilakukan mulai pukul <span className="font-medium text-ink">07:50 WITA</span>. Halaman ini akan otomatis memeriksa ulang secara berkala.</p>
+            <div className="flex flex-col gap-2">
+              <button onClick={() => navigate('/daftar-wajah')} className="text-sm underline text-moss-700 font-medium">Registrasi Data Mandiri</button>
+              <button onClick={() => navigate('/login')} className="text-sm underline text-moss-700 font-medium">Masuk Menu Pegawai (lihat Riwayat Saya)</button>
+            </div>
           </div>
         )}
 
