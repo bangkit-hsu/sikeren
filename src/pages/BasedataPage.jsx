@@ -987,12 +987,11 @@ export default function BasedataPage() {
         }`}
       >
         <div className="px-5 py-5 border-b border-ink/10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-gold-500">
-              <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}images/logo-sikeren.png`}
+            alt="SiKeren"
+            className="w-9 h-9 rounded-xl shrink-0 object-cover"
+          />
           <div>
             <p className="font-display font-semibold leading-tight">{menuAktif === 'dashboard' ? 'SiKeren' : judulHalaman}</p>
             <p className="text-xs text-ink/50 font-mono">Portal Admin</p>
@@ -1108,12 +1107,11 @@ export default function BasedataPage() {
                   }}
                 />
                 <div className="relative max-w-lg mx-auto">
-                  <div className="w-14 h-14 mx-auto rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center mb-4">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold-500">
-                      <path d="M4 21V6.5L12 3l8 3.5V21" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-                      <path d="M9 21v-6h6v6M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                    </svg>
-                  </div>
+                  <img
+                    src={`${import.meta.env.BASE_URL}images/logo-sikeren.png`}
+                    alt="SiKeren"
+                    className="w-16 h-16 mx-auto rounded-2xl mb-4 object-cover"
+                  />
                   <p className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">Portal Modul Internal</p>
                   <h1 className="font-display font-bold text-3xl sm:text-5xl">SiKeren</h1>
                   <p className="text-paper/80 text-sm sm:text-base mt-2">
