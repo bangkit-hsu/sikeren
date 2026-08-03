@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { hashPassword } from '../../utils/hash'
 import PilihBagian from '../../components/PilihBagian.jsx'
+import {
+  muatModelWajah, nyalakanKamera, matikanKamera,
+  ambilDescriptorDariVideo, rataRataDescriptorRobust, tangkapFotoDariVideo,
+} from '../../utils/face'
+import CincinPemindai from '../../components/CincinPemindai.jsx'
+
+const JUMLAH_JEPRETAN_ADMIN = 7
+const JEDA_ANTAR_JEPRETAN_ADMIN_MS = 700 // ≈5 detik total perekaman
 
 function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
+
   const [form, setForm] = useState({
     nip: pegawai.nip || '',
     nama: pegawai.nama || '',
@@ -15,6 +26,57 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
   })
   const [menyimpan, setMenyimpan] = useState(false)
   const [error, setError] = useState('')
+
+  const [tahapWajah, setTahapWajah] = useState('idle') // idle | menyiapkan_kamera | merekam | selesai_rekam
+  const [jumlahTertangkap, setJumlahTertangkap] = useState(0)
+  const [descriptorBaru, setDescriptorBaru] = useState(null)
+  const [fotoBaru, setFotoBaru] = useState(null)
+  const [errorWajah, setErrorWajah] = useState('')
+
+  useEffect(() => {
+    return () => matikanKamera(streamRef.current)
+  }, [])
+
+  async function mulaiRekamUlang() {
+    setTahapWajah('menyiapkan_kamera')
+    setErrorWajah('')
+    try {
+      await muatModelWajah()
+      streamRef.current = await nyalakanKamera(videoRef.current)
+      setTahapWajah('merekam')
+      rekamBertahap([])
+    } catch (err) {
+      setTahapWajah('idle')
+      setErrorWajah(err.message || 'Tidak bisa mengakses kamera. Pastikan izin kamera diaktifkan.')
+    }
+  }
+
+  async function rekamBertahap(kumpulan) {
+    await new Promise((r) => setTimeout(r, JEDA_ANTAR_JEPRETAN_ADMIN_MS))
+    const descriptor = await ambilDescriptorDariVideo(videoRef.current)
+    if (!descriptor) {
+      rekamBertahap(kumpulan)
+      return
+    }
+    const baru = [...kumpulan, descriptor]
+    setJumlahTertangkap(baru.length)
+    if (baru.length >= JUMLAH_JEPRETAN_ADMIN) {
+      setDescriptorBaru(rataRataDescriptorRobust(baru))
+      setFotoBaru(tangkapFotoDariVideo(videoRef.current))
+      matikanKamera(streamRef.current)
+      setTahapWajah('selesai_rekam')
+    } else {
+      rekamBertahap(baru)
+    }
+  }
+
+  function batalRekamWajah() {
+    matikanKamera(streamRef.current)
+    setTahapWajah('idle')
+    setJumlahTertangkap(0)
+    setDescriptorBaru(null)
+    setFotoBaru(null)
+  }
 
   async function simpan() {
     setError('')
@@ -43,6 +105,10 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
       }
       if (form.passwordBaru) {
         perubahan.passwordHash = await hashPassword(form.passwordBaru)
+      }
+      if (descriptorBaru) {
+        perubahan.faceDescriptor = descriptorBaru
+        perubahan.foto = fotoBaru
       }
       await updateDoc(doc(db, 'users', pegawai.id), perubahan)
       onSimpan()
@@ -106,6 +172,76 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
           />
         </div>
       </div>
+
+      <div className="border-t border-ink/10 mt-4 pt-4">
+        <p className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono mb-2">Update Rekam Wajah</p>
+        <p className="text-xs text-ink/50 mb-3">Dipakai kalau ASN tidak bisa login sendiri (mis. wajah tidak terdeteksi). Merekam ulang otomatis memperbarui foto profilnya juga.</p>
+
+        {tahapWajah === 'idle' && (
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-ink border border-ink/10 shrink-0">
+              {(fotoBaru || pegawai.foto) ? (
+                <img src={fotoBaru || pegawai.foto} alt={pegawai.nama} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-paper/50 text-[9px] font-mono text-center leading-tight">Belum ada</div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={mulaiRekamUlang}
+              className="text-sm font-medium border border-moss-600 text-moss-700 rounded-lg px-4 py-2 hover:bg-moss-50 transition-colors"
+            >
+              {descriptorBaru ? 'Rekam Ulang Lagi' : 'Rekam Ulang Wajah'}
+            </button>
+          </div>
+        )}
+
+        {descriptorBaru && tahapWajah === 'idle' && (
+          <p className="text-xs text-moss-700 bg-moss-50 rounded-lg px-3 py-2 mt-3">Data wajah baru siap disimpan — klik "Simpan" di bawah untuk menerapkannya.</p>
+        )}
+
+        {(tahapWajah === 'menyiapkan_kamera' || tahapWajah === 'merekam') && (
+          <div>
+            <div className="relative aspect-square w-40 mx-auto rounded-full overflow-hidden bg-ink border border-ink/10">
+              <video ref={videoRef} muted playsInline className="w-full h-full object-cover scale-x-[-1] rounded-full" />
+              {tahapWajah === 'menyiapkan_kamera' && (
+                <div className="absolute inset-0 flex items-center justify-center bg-ink/60 text-paper text-xs font-mono rounded-full text-center px-2">
+                  Menyiapkan kamera…
+                </div>
+              )}
+              {tahapWajah === 'merekam' && (
+                <CincinPemindai className="absolute inset-0 w-full h-full pointer-events-none" />
+              )}
+            </div>
+            {tahapWajah === 'merekam' && (
+              <p className="text-center text-xs text-ink/60 mt-2 font-mono">
+                Tetap lihat ke kamera… {jumlahTertangkap}/{JUMLAH_JEPRETAN_ADMIN}
+              </p>
+            )}
+            <button type="button" onClick={batalRekamWajah} className="block mx-auto text-xs text-ink/50 underline mt-2">Batal</button>
+          </div>
+        )}
+
+        {tahapWajah === 'selesai_rekam' && (
+          <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-4 text-center">
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-ink border border-ink/10 mx-auto mb-2">
+              {fotoBaru && <img src={fotoBaru} alt="Pratinjau" className="w-full h-full object-cover" />}
+            </div>
+            <p className="text-sm font-medium text-moss-800 mb-3">Wajah berhasil direkam ulang</p>
+            <div className="flex gap-2 justify-center">
+              <button type="button" onClick={mulaiRekamUlang} className="text-xs font-medium border border-ink/15 rounded-lg px-3 py-1.5 hover:bg-ink/5 transition-colors">
+                Rekam Ulang
+              </button>
+              <button type="button" onClick={() => setTahapWajah('idle')} className="text-xs font-medium bg-moss-700 text-paper rounded-lg px-3 py-1.5 hover:bg-moss-800 transition-colors">
+                Gunakan Ini
+              </button>
+            </div>
+          </div>
+        )}
+
+        {errorWajah && <p className="text-xs text-clay bg-clay/10 rounded-lg px-3 py-2 mt-2">{errorWajah}</p>}
+      </div>
+
       {error && <p className="text-sm text-clay bg-clay/10 rounded-lg px-3 py-2 mt-3">{error}</p>}
       <div className="flex gap-2 mt-4">
         <button

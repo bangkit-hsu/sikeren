@@ -31,6 +31,9 @@ export function AuthProvider({ children }) {
     const data = docSnap.data()
     const hashed = await hashPassword(password)
     if (hashed !== data.passwordHash) throw new Error('Password salah.')
+    if (data.role === 'pegawai' && Array.isArray(data.faceDescriptor) && data.faceDescriptor.length === 128) {
+      throw new Error('Akun ini sudah merekam data wajah. Silakan masuk lewat pemindaian wajah di halaman Rekam Absen. Hubungi admin jika perlu bantuan.')
+    }
     const sessionUser = {
       id: docSnap.id,
       nip: data.nip,
