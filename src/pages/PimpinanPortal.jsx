@@ -19,6 +19,7 @@ export default function PimpinanPortal() {
   const navigate = useNavigate()
 
   const [menu, setMenu] = useState('nilai') // 'nilai' | 'password'
+  const [menuTerbuka, setMenuTerbuka] = useState(false)
 
   const now = new Date()
   const [bulan, setBulan] = useState(now.getMonth())
@@ -54,11 +55,11 @@ export default function PimpinanPortal() {
       const semua = snapPegawai.exists() ? (snapPegawai.data().data || []) : []
       setDataPegawai(semua)
 
-      const snapPenetapan = await getDoc(doc(db, 'atasanPenilai', idPenetapan(bulan, tahun, user.nama)))
+      const snapPenetapan = await getDoc(doc(db, 'atasanPenilai', idPenetapan(bulan, tahun, user.jabatan)))
       const penetapan = snapPenetapan.exists() ? snapPenetapan.data() : null
       setPenetapanTersimpan(penetapan)
 
-      const daftar = penetapan ? penetapan.pegawai : semua.filter((p) => p.atasan === user.nama)
+      const daftar = penetapan ? penetapan.pegawai : semua.filter((p) => p.atasan === user.jabatan)
       const peta = {}
       await Promise.all(daftar.map(async (p) => {
         const snap = await getDoc(doc(db, 'penilaianIndividu', idPenilaian(bulan, tahun, p.nip)))
@@ -156,26 +157,39 @@ export default function PimpinanPortal() {
 
   const daftarUntukDinilai = penetapanTersimpan
     ? penetapanTersimpan.pegawai
-    : (dataPegawai || []).filter((p) => p.atasan === user.nama)
+    : (dataPegawai || []).filter((p) => p.atasan === user.jabatan)
 
   return (
     <div className="min-h-screen md:flex">
-      <aside className="w-full md:w-64 shrink-0 bg-white border-r border-ink/10 md:h-screen md:sticky md:top-0 flex flex-col">
-        <div className="px-5 py-5 border-b border-ink/10">
-          <p className="font-display font-semibold leading-tight">{user.nama}</p>
-          <p className="text-xs text-ink/50 font-mono">Portal Pimpinan</p>
+      {menuTerbuka && (
+        <div className="fixed inset-0 bg-ink/40 z-30 md:hidden" onClick={() => setMenuTerbuka(false)} />
+      )}
+
+      <aside
+        className={`fixed md:sticky md:top-0 inset-y-0 left-0 z-40 w-64 h-screen shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
+          menuTerbuka ? 'flex translate-x-0' : 'flex -translate-x-full md:translate-x-0'
+        }`}
+      >
+        <div className="px-5 py-5 border-b border-ink/10 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-moss-800 border-2 border-gold-500 flex items-center justify-center shrink-0 font-display font-semibold text-sm text-gold-500">
+            {user.nama.slice(0, 1)}
+          </div>
+          <div className="min-w-0">
+            <p className="font-display font-semibold leading-tight truncate">{user.nama}</p>
+            <p className="text-xs text-ink/50 font-mono">Portal Pimpinan</p>
+          </div>
         </div>
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           <button
             type="button"
-            onClick={() => setMenu('nilai')}
+            onClick={() => { setMenu('nilai'); setMenuTerbuka(false) }}
             className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${menu === 'nilai' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'}`}
           >
             Penilaian Individu
           </button>
           <button
             type="button"
-            onClick={() => setMenu('password')}
+            onClick={() => { setMenu('password'); setMenuTerbuka(false) }}
             className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${menu === 'password' ? 'bg-moss-700 text-paper' : 'text-ink/70 hover:bg-moss-100'}`}
           >
             Update Password
@@ -190,6 +204,20 @@ export default function PimpinanPortal() {
           </button>
         </div>
       </aside>
+
+      <div className="flex-1 min-w-0 flex flex-col">
+        <header className="md:hidden sticky top-0 z-20 bg-paper/90 backdrop-blur border-b border-ink/10 flex items-center gap-3 px-4 py-3">
+          <button
+            onClick={() => setMenuTerbuka(true)}
+            aria-label="Buka menu"
+            className="w-9 h-9 flex items-center justify-center rounded-lg border border-ink/15 shrink-0"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
+          <p className="font-display font-semibold">{user.nama}</p>
+        </header>
 
       <main className="flex-1 min-w-0 px-5 sm:px-6 py-8 max-w-3xl mx-auto w-full">
         {menu === 'nilai' ? (
@@ -331,6 +359,7 @@ export default function PimpinanPortal() {
           </div>
         )}
       </main>
+      </div>
     </div>
   )
 }
