@@ -342,7 +342,7 @@ const NAV_GROUPS = [
     key: 'penilaian-individu',
     label: 'Penilaian Individu',
     items: [
-      { key: 'penilaian-individu:nilai', label: 'Penilaian ASN' },
+      { key: 'penilaian-individu:nilai', label: 'Penilaian Individu' },
       { key: 'penilaian-individu:atasan', label: 'Kelompok ASN' },
       { key: 'penilaian-individu:pimpinan', label: 'Daftar Pimpinan' },
     ],
@@ -1473,7 +1473,7 @@ export default function BasedataPage() {
           ) : menuAktif === 'penilaian-individu' ? (
             <div>
               <h1 className="font-display font-bold text-2xl text-ink mb-4">
-                {subPenilaianIndividu === 'nilai' ? 'Penilaian ASN' : subPenilaianIndividu === 'atasan' ? 'Kelompok ASN' : 'Daftar Pimpinan'}
+                {subPenilaianIndividu === 'nilai' ? 'Penilaian Individu' : subPenilaianIndividu === 'atasan' ? 'Kelompok ASN' : 'Daftar Pimpinan'}
               </h1>
 
               {subPenilaianIndividu === 'nilai' ? (
@@ -1557,7 +1557,7 @@ export default function BasedataPage() {
                       }
                     })
                     const namaAtasan = semuaAtasan ? 'Semua-Atasan' : atasanTerpilih.replace(/[^a-zA-Z0-9]+/g, '-')
-                    unduhExcel(`Penilaian-ASN-${namaAtasan}-${namaBulan(atasanBulan)}-${atasanTahun}.xlsx`, baris, 'Penilaian ASN')
+                    unduhExcel(`Penilaian-Individu-${namaAtasan}-${namaBulan(atasanBulan)}-${atasanTahun}.xlsx`, baris, 'Penilaian Individu')
                   }
 
                   return (
