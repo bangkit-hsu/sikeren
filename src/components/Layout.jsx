@@ -65,7 +65,7 @@ const adminNavGroups = [
   {
     label: 'Konfigurasi',
     items: [
-      { to: '/admin/pegawai', label: 'Kelola Pegawai' },
+      { to: '/admin/pegawai', label: 'Kelola ASN' },
       { to: '/admin/lokasi', label: 'Atur Area Apel' },
       { to: '/admin/hari-absen', label: 'Hari Absensi Apel' },
     ],

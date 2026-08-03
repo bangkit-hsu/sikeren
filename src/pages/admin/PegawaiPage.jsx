@@ -199,7 +199,7 @@ export default function PegawaiPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="font-display font-semibold text-2xl mb-1">Kelola Pegawai</h1>
+      <h1 className="font-display font-semibold text-2xl mb-1">Kelola ASN</h1>
       <p className="text-ink/60 text-sm mb-4">Buat akun login untuk pegawai baru atau admin lain.</p>
 
       <button
@@ -294,18 +294,29 @@ export default function PegawaiPage() {
             sedangEdit === u.id ? (
               <FormEditPegawai key={u.id} pegawai={u} onBatal={() => setSedangEdit(null)} onSimpan={simpanEdit} />
             ) : (
-              <li key={u.id} className="flex items-center justify-between px-4 py-3 bg-white/60">
-                <div>
-                  <p className="font-medium">{u.nama}</p>
-                  <p className="text-xs font-mono text-ink/40">NIP {u.nip} · {u.bagian}{u.jabatan ? ` · ${u.jabatan}` : ''}</p>
-                  <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-ink text-paper' : 'bg-moss-100 text-moss-800'}`}>
-                    {u.role === 'admin' ? 'Admin' : 'Pegawai'}
-                  </span>
-                  {u.role === 'pegawai' && (
-                    <span className={`inline-block mt-1 ml-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${Array.isArray(u.faceDescriptor) ? 'bg-moss-50 text-moss-700 border border-moss-200' : 'bg-clay/10 text-clay border border-clay/30'}`}>
-                      {Array.isArray(u.faceDescriptor) ? 'Wajah terdaftar' : 'Belum rekam wajah'}
-                    </span>
-                  )}
+              <li key={u.id} className="flex items-center justify-between gap-3 px-4 py-3 bg-white/60">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-ink border border-ink/10 shrink-0">
+                    {u.foto ? (
+                      <img src={u.foto} alt={u.nama} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-paper/50 text-[10px] font-mono text-center leading-tight">Belum ada</div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{u.nama}</p>
+                    <p className="text-xs font-mono text-ink/40 truncate">NIP {u.nip} · {u.bagian}{u.jabatan ? ` · ${u.jabatan}` : ''}</p>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${u.role === 'admin' ? 'bg-ink text-paper' : 'bg-moss-100 text-moss-800'}`}>
+                        {u.role === 'admin' ? 'Admin' : 'Pegawai'}
+                      </span>
+                      {u.role === 'pegawai' && (
+                        <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${Array.isArray(u.faceDescriptor) ? 'bg-moss-50 text-moss-700 border border-moss-200' : 'bg-clay/10 text-clay border border-clay/30'}`}>
+                          {Array.isArray(u.faceDescriptor) ? 'Wajah terdaftar' : 'Belum rekam wajah'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <button onClick={() => setSedangEdit(u.id)} className="text-sm text-moss-700 font-medium hover:underline">
