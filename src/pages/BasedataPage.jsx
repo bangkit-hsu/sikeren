@@ -1140,7 +1140,7 @@ export default function BasedataPage() {
                   )
                   return (
                     <div>
-                      <p className="text-ink/60 text-sm mb-4">Rekap gabungan per pegawai untuk periode yang dipilih: Presensi Kehadiran (dari SIPP), Kehadiran Apel (dari e-Apel), dan e-Kinerja (dari Penilaian Individu).</p>
+                      <p className="text-ink/60 text-sm mb-4">Rekap gabungan per pegawai untuk periode yang dipilih: Presensi Kehadiran (dari SIPP), Kehadiran Apel (dari e-Apel), dan Penilaian Individu (Pot. Penilaian dari menu Penilaian Individu).</p>
 
                       <div className="flex flex-wrap items-end gap-3 mb-4">
                         <div>
@@ -1186,7 +1186,7 @@ export default function BasedataPage() {
                                   <th className="px-3 py-3">Jabatan</th>
                                   <th className="px-3 py-3">Presensi Kehadiran</th>
                                   <th className="px-3 py-3">Kehadiran Apel</th>
-                                  <th className="px-3 py-3">e-Kinerja</th>
+                                  <th className="px-3 py-3">Penilaian Individu</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
