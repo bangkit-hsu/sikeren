@@ -954,7 +954,7 @@ export default function BasedataPage() {
 
       {/* Sidebar — tetap terlihat di desktop, geser dari kiri di smartphone (sama seperti Panel Admin e-Apel) */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
+        className={`fixed md:sticky md:top-0 inset-y-0 left-0 z-40 w-64 h-screen shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
           menuTerbuka ? 'flex translate-x-0' : 'flex -translate-x-full md:translate-x-0'
         }`}
       >

@@ -116,7 +116,7 @@ export default function Layout({ children }) {
       {/* Menu di sebelah kiri: sidebar tetap di desktop. Di smartphone: panel geser untuk admin,
           bilah bawah selalu terlihat untuk pegawai (lihat <nav> di akhir file). */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
+        className={`fixed md:sticky md:top-0 inset-y-0 left-0 z-40 w-64 h-screen shrink-0 bg-white border-r border-ink/10 flex-col transform transition-transform duration-200 md:flex md:translate-x-0 ${
           isAdmin ? (menuTerbuka ? 'flex translate-x-0' : 'flex -translate-x-full') : 'hidden -translate-x-full'
         }`}
       >
