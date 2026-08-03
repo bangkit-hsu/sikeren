@@ -10,6 +10,7 @@ import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
 import { DATA_PEGAWAI } from '../data/dataPegawai'
 import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
+import { unduhExcel } from '../utils/excel'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonDashboard() {
@@ -610,7 +611,7 @@ export default function BasedataPage() {
   useEffect(() => {
     setPesanPenetapan('')
     setPenetapanTersimpan(null)
-    if (!atasanTerpilih) return
+    if (!atasanTerpilih || atasanTerpilih === '__semua__') return
     async function cekPenetapan() {
       try {
         const snap = await getDoc(doc(db, 'atasanPenilai', idPenetapan(atasanBulan, atasanTahun, atasanTerpilih)))
@@ -630,8 +631,13 @@ export default function BasedataPage() {
 
   useEffect(() => {
     if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'nilai' || !atasanTerpilih || !dataPegawai) return
-    const pakai = penetapanTersimpan && penetapanTersimpan.atasan === atasanTerpilih
-    const daftar = pakai ? penetapanTersimpan.pegawai : dataPegawai.filter((p) => p.atasan === atasanTerpilih)
+    let daftar
+    if (atasanTerpilih === '__semua__') {
+      daftar = dataPegawai
+    } else {
+      const pakai = penetapanTersimpan && penetapanTersimpan.atasan === atasanTerpilih
+      daftar = pakai ? penetapanTersimpan.pegawai : dataPegawai.filter((p) => p.atasan === atasanTerpilih)
+    }
     if (daftar.length > 0) muatPetaNilai(daftar, atasanBulan, atasanTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subPenilaianIndividu, atasanTerpilih, atasanBulan, atasanTahun, dataPegawai, penetapanTersimpan])
@@ -1531,11 +1537,28 @@ export default function BasedataPage() {
                   const daftarAtasanNilai = dataPegawai
                     ? [...new Set(dataPegawai.map((p) => p.atasan).filter(Boolean))].sort()
                     : []
-                  const binaanLive = atasanTerpilih && dataPegawai
+                  const semuaAtasan = atasanTerpilih === '__semua__'
+                  const binaanLive = atasanTerpilih && dataPegawai && !semuaAtasan
                     ? dataPegawai.filter((p) => p.atasan === atasanTerpilih)
                     : []
-                  const pakaiPenetapanTersimpan = penetapanTersimpan && penetapanTersimpan.atasan === atasanTerpilih
-                  const daftarUntukDinilai = pakaiPenetapanTersimpan ? penetapanTersimpan.pegawai : binaanLive
+                  const pakaiPenetapanTersimpan = !semuaAtasan && penetapanTersimpan && penetapanTersimpan.atasan === atasanTerpilih
+                  const daftarUntukDinilai = semuaAtasan
+                    ? (dataPegawai || [])
+                    : pakaiPenetapanTersimpan ? penetapanTersimpan.pegawai : binaanLive
+
+                  function downloadExcelNilai() {
+                    const baris = daftarUntukDinilai.map((p) => {
+                      const sudah = nilaiTersimpanMap[p.nip]
+                      return {
+                        NIP: p.nip,
+                        Nama: p.nama,
+                        Skor: sudah ? sudah.skorTotal : '',
+                        'Pot. Penilaian': sudah ? `${sudah.skorAkhir}%` : '0%',
+                      }
+                    })
+                    const namaAtasan = semuaAtasan ? 'Semua-Atasan' : atasanTerpilih.replace(/[^a-zA-Z0-9]+/g, '-')
+                    unduhExcel(`Penilaian-ASN-${namaAtasan}-${namaBulan(atasanBulan)}-${atasanTahun}.xlsx`, baris, 'Penilaian ASN')
+                  }
 
                   return (
                     <div>
@@ -1570,9 +1593,18 @@ export default function BasedataPage() {
                             className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm min-w-[240px]"
                           >
                             <option value="">— Pilih Atasan —</option>
+                            <option value="__semua__">Semua Atasan</option>
                             {daftarAtasanNilai.map((a) => <option key={a} value={a}>{a}</option>)}
                           </select>
                         </div>
+                        <button
+                          type="button"
+                          onClick={downloadExcelNilai}
+                          disabled={!atasanTerpilih || daftarUntukDinilai.length === 0}
+                          className="bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-moss-800 transition-colors disabled:opacity-50 ml-auto"
+                        >
+                          Download Excel
+                        </button>
                       </div>
 
                       {memuatDataPegawai ? (
@@ -1584,8 +1616,8 @@ export default function BasedataPage() {
                       ) : (
                         <div>
                           <p className="text-ink/50 text-xs font-mono mb-3">
-                            {daftarUntukDinilai.length} pegawai di bawah {atasanTerpilih} untuk {namaBulan(atasanBulan)} {atasanTahun}
-                            {pakaiPenetapanTersimpan ? ' (dari penetapan tersimpan)' : ' (dari Data ASN — belum ada penetapan tersimpan)'}
+                            {daftarUntukDinilai.length} pegawai {semuaAtasan ? '(semua Atasan)' : `di bawah ${atasanTerpilih}`} untuk {namaBulan(atasanBulan)} {atasanTahun}
+                            {semuaAtasan ? '' : pakaiPenetapanTersimpan ? ' (dari penetapan tersimpan)' : ' (dari Data ASN — belum ada penetapan tersimpan)'}
                             {memuatNilaiMap ? ' · memuat status nilai…' : ''}
                           </p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
