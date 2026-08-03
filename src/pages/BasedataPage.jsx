@@ -454,7 +454,7 @@ export default function BasedataPage() {
 
   useEffect(() => {
     const perluDataPegawai = menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu'
-    if (!perluDataPegawai || dataPegawai) return
+    if (!perluDataPegawai) return
     async function muatDataPegawai() {
       setMemuatDataPegawai(true)
       try {
@@ -626,7 +626,7 @@ export default function BasedataPage() {
   }, [atasanBulan, atasanTahun, atasanTerpilih])
 
   useEffect(() => {
-    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'atasan' || daftarPenetapan) return
+    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'atasan') return
     muatDaftarPenetapan()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subPenilaianIndividu])
@@ -691,7 +691,7 @@ export default function BasedataPage() {
   }
 
   useEffect(() => {
-    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'pimpinan' || daftarPimpinan) return
+    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'pimpinan') return
     muatDaftarPimpinan()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subPenilaianIndividu])

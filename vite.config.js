@@ -9,6 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: false,
       manifest: {
         name: 'SiKeren - Sistem Kinerja dan Reward ASN',
         short_name: 'SiKeren',
