@@ -63,5 +63,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Dipakai oleh halaman Basedata (menu Penilaian Individu → Daftar Pimpinan) untuk
+    // menyimpan akun Pimpinan (NIP, Nama, Jabatan, passwordHash) yang nanti dipakai untuk login.
+    match /pimpinan/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

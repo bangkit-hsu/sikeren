@@ -2,9 +2,10 @@
 // supaya pengembangan di sini tidak mengganggu aplikasi e-Apel yang sudah berjalan.
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { doc, getDoc, getDocs, collection, query, where, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, getDocs, collection, query, where, addDoc, updateDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
+import { hashPassword } from '../utils/hash'
 import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
 import { DATA_PEGAWAI } from '../data/dataPegawai'
@@ -189,6 +190,67 @@ function TabelPotongan({ data }) {
   )
 }
 
+function FormPimpinan({ awal, onBatal, onSimpan, menyimpan }) {
+  const [form, setForm] = useState({ nip: awal?.nip || '', nama: awal?.nama || '', jabatan: awal?.jabatan || '', password: '' })
+  return (
+    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 grid sm:grid-cols-2 gap-3 mb-4">
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">NIP</label>
+        <input
+          value={form.nip}
+          onChange={(e) => setForm({ ...form, nip: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Nama</label>
+        <input
+          value={form.nama}
+          onChange={(e) => setForm({ ...form, nama: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Jabatan</label>
+        <input
+          value={form.jabatan}
+          onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">
+          Password {awal ? '(kosongkan jika tidak diubah)' : ''}
+        </label>
+        <input
+          type="text"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm font-mono"
+        />
+      </div>
+      <div className="sm:col-span-2 flex gap-2">
+        <button
+          type="button"
+          disabled={menyimpan}
+          onClick={() => onSimpan(form)}
+          className="text-sm font-medium bg-moss-700 text-paper rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
+        >
+          {menyimpan ? 'Menyimpan…' : 'Simpan'}
+        </button>
+        <button
+          type="button"
+          disabled={menyimpan}
+          onClick={onBatal}
+          className="text-sm font-medium border border-ink/15 rounded-lg px-4 py-2 hover:bg-ink/5 transition-colors"
+        >
+          Batal
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function FormPegawai({ awal, onBatal, onSimpan, menyimpan }) {
   const [form, setForm] = useState(awal || { nip: '', nama: '', jabatan: '', unitKerja: '', atasan: '' })
   return (
@@ -280,7 +342,8 @@ const NAV_GROUPS = [
     label: 'Penilaian Individu',
     items: [
       { key: 'penilaian-individu:nilai', label: 'Penilaian ASN' },
-      { key: 'penilaian-individu:atasan', label: 'Kelola Atasan Penilai' },
+      { key: 'penilaian-individu:atasan', label: 'Kelompok ASN' },
+      { key: 'penilaian-individu:pimpinan', label: 'Daftar Pimpinan' },
     ],
   },
 ]
@@ -306,6 +369,13 @@ export default function BasedataPage() {
   const [menyimpanPenetapan, setMenyimpanPenetapan] = useState(false)
   const [pesanPenetapan, setPesanPenetapan] = useState('')
   const [penetapanTersimpan, setPenetapanTersimpan] = useState(null)
+
+  const [daftarPimpinan, setDaftarPimpinan] = useState(null)
+  const [memuatPimpinan, setMemuatPimpinan] = useState(false)
+  const [tambahPimpinanAktif, setTambahPimpinanAktif] = useState(false)
+  const [editPimpinanId, setEditPimpinanId] = useState(null)
+  const [menyimpanPimpinan, setMenyimpanPimpinan] = useState(false)
+  const [pesanPimpinan, setPesanPimpinan] = useState('')
   const [daftarPenetapan, setDaftarPenetapan] = useState(null)
   const [memuatDaftarPenetapan, setMemuatDaftarPenetapan] = useState(false)
   const [editPenetapanId, setEditPenetapanId] = useState(null)
@@ -592,6 +662,86 @@ export default function BasedataPage() {
     }
   }
 
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'pimpinan' || daftarPimpinan) return
+    muatDaftarPimpinan()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subPenilaianIndividu])
+
+  async function muatDaftarPimpinan() {
+    setMemuatPimpinan(true)
+    try {
+      const snap = await getDocs(collection(db, 'pimpinan'))
+      const daftar = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => a.nama.localeCompare(b.nama))
+      setDaftarPimpinan(daftar)
+    } catch {
+      setDaftarPimpinan([])
+    } finally {
+      setMemuatPimpinan(false)
+    }
+  }
+
+  async function tambahPimpinan(form) {
+    setPesanPimpinan('')
+    const nip = form.nip.trim()
+    if (!nip || !form.nama.trim() || !form.password) {
+      setPesanPimpinan('NIP, Nama, dan Password wajib diisi.')
+      return
+    }
+    if ((daftarPimpinan || []).some((p) => p.nip === nip)) {
+      setPesanPimpinan('NIP sudah dipakai Pimpinan lain.')
+      return
+    }
+    setMenyimpanPimpinan(true)
+    try {
+      const passwordHash = await hashPassword(form.password)
+      const docRef = await addDoc(collection(db, 'pimpinan'), {
+        nip, nama: form.nama.trim(), jabatan: form.jabatan.trim(), passwordHash,
+      })
+      setDaftarPimpinan((prev) => [...(prev || []), { id: docRef.id, nip, nama: form.nama.trim(), jabatan: form.jabatan.trim(), passwordHash }].sort((a, b) => a.nama.localeCompare(b.nama)))
+      setTambahPimpinanAktif(false)
+    } catch (err) {
+      setPesanPimpinan('Gagal menambah: ' + err.message)
+    } finally {
+      setMenyimpanPimpinan(false)
+    }
+  }
+
+  async function simpanEditPimpinan(id, form) {
+    setPesanPimpinan('')
+    const nip = form.nip.trim()
+    if (!nip || !form.nama.trim()) {
+      setPesanPimpinan('NIP dan Nama wajib diisi.')
+      return
+    }
+    if ((daftarPimpinan || []).some((p) => p.nip === nip && p.id !== id)) {
+      setPesanPimpinan('NIP sudah dipakai Pimpinan lain.')
+      return
+    }
+    setMenyimpanPimpinan(true)
+    try {
+      const perubahan = { nip, nama: form.nama.trim(), jabatan: form.jabatan.trim() }
+      if (form.password) perubahan.passwordHash = await hashPassword(form.password)
+      await updateDoc(doc(db, 'pimpinan', id), perubahan)
+      setDaftarPimpinan((prev) => prev.map((p) => (p.id === id ? { ...p, ...perubahan } : p)).sort((a, b) => a.nama.localeCompare(b.nama)))
+      setEditPimpinanId(null)
+    } catch (err) {
+      setPesanPimpinan('Gagal menyimpan: ' + err.message)
+    } finally {
+      setMenyimpanPimpinan(false)
+    }
+  }
+
+  async function hapusPimpinan(id, nama) {
+    if (!confirm(`Hapus akun Pimpinan ${nama}?`)) return
+    try {
+      await deleteDoc(doc(db, 'pimpinan', id))
+      setDaftarPimpinan((prev) => prev.filter((p) => p.id !== id))
+    } catch (err) {
+      alert('Gagal menghapus: ' + err.message)
+    }
+  }
+
   function mulaiEditPenetapan(item) {
     setEditPenetapanId(item.id)
     setNipTerpilihEdit(new Set(item.pegawai.map((p) => p.nip)))
@@ -754,6 +904,8 @@ export default function BasedataPage() {
       setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
     } else if (key === 'penilaian-individu:atasan') {
       setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('atasan')
+    } else if (key === 'penilaian-individu:pimpinan') {
+      setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('pimpinan')
     } else if (key === 'penilaian-individu') {
       setMenuAktif('penilaian-individu'); setSubPenilaianIndividu('nilai')
     } else {
@@ -833,7 +985,8 @@ export default function BasedataPage() {
                           || (item.key.endsWith('utama') && group.key === 'sipp' && subSipp === 'utama')
                           || (item.key.endsWith('potongan-tpp') && group.key === 'sipp' && subSipp === 'potongan-tpp')
                           || (item.key.endsWith('nilai') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'nilai')
-                          || (item.key.endsWith('atasan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'atasan'))
+                          || (item.key.endsWith('atasan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'atasan')
+                          || (item.key.endsWith('pimpinan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'pimpinan'))
                       return (
                         <button
                           key={item.key}
@@ -1296,7 +1449,9 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-individu' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianIndividu === 'nilai' ? 'Penilaian ASN' : 'Kelola Atasan Penilai'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">
+                {subPenilaianIndividu === 'nilai' ? 'Penilaian ASN' : subPenilaianIndividu === 'atasan' ? 'Kelompok ASN' : 'Daftar Pimpinan'}
+              </h1>
 
               {subPenilaianIndividu === 'nilai' ? (
                 pegawaiDinilai ? (
@@ -1367,7 +1522,7 @@ export default function BasedataPage() {
 
                   return (
                     <div>
-                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan Penilai — daftar pegawai yang dinilai muncul otomatis (memakai penetapan tersimpan dari menu Kelola Atasan Penilai kalau ada, atau data Atasan terkini dari Data ASN).</p>
+                      <p className="text-ink/60 text-sm mb-4">Pilih bulan, tahun, dan Atasan Penilai — daftar pegawai yang dinilai muncul otomatis (memakai penetapan tersimpan dari menu Kelompok ASN kalau ada, atau data Atasan terkini dari Data ASN).</p>
 
                       <div className="flex flex-wrap items-end gap-3 mb-5">
                         <div>
@@ -1468,7 +1623,7 @@ export default function BasedataPage() {
                   )
                 })()
                 )
-              ) : (
+              ) : subPenilaianIndividu === 'atasan' ? (
                 (() => {
                   const daftarAtasan = dataPegawai
                     ? [...new Set(dataPegawai.map((p) => p.atasan).filter(Boolean))].sort()
@@ -1657,6 +1812,68 @@ export default function BasedataPage() {
                     </div>
                   )
                 })()
+              ) : (
+                <div>
+                  <p className="text-ink/60 text-sm mb-4">Akun Pimpinan yang bisa login sendiri untuk memberi penilaian ke ASN terkait. NIP, Nama, Jabatan, dan Password diatur di sini.</p>
+
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <button
+                      type="button"
+                      onClick={() => { setTambahPimpinanAktif((v) => !v); setEditPimpinanId(null); setPesanPimpinan('') }}
+                      className="bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors"
+                    >
+                      {tambahPimpinanAktif ? 'Tutup Form' : '+ Tambah Pimpinan'}
+                    </button>
+                  </div>
+
+                  {pesanPimpinan && (
+                    <p className="text-sm text-clay bg-clay/10 rounded-lg px-3 py-2 mb-4">{pesanPimpinan}</p>
+                  )}
+
+                  {tambahPimpinanAktif && (
+                    <FormPimpinan
+                      onBatal={() => setTambahPimpinanAktif(false)}
+                      onSimpan={tambahPimpinan}
+                      menyimpan={menyimpanPimpinan}
+                    />
+                  )}
+
+                  {memuatPimpinan ? (
+                    <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                  ) : daftarPimpinan && daftarPimpinan.length > 0 ? (
+                    <ul className="divide-y divide-ink/10 border border-ink/10 rounded-xl2 overflow-hidden">
+                      {daftarPimpinan.map((p) => (
+                        editPimpinanId === p.id ? (
+                          <li key={p.id} className="px-4 py-4 bg-moss-50/60">
+                            <FormPimpinan
+                              awal={p}
+                              onBatal={() => setEditPimpinanId(null)}
+                              onSimpan={(form) => simpanEditPimpinan(p.id, form)}
+                              menyimpan={menyimpanPimpinan}
+                            />
+                          </li>
+                        ) : (
+                          <li key={p.id} className="flex items-center justify-between px-4 py-3 bg-white/60">
+                            <div>
+                              <p className="font-medium">{p.nama}</p>
+                              <p className="text-xs font-mono text-ink/40">NIP {p.nip}{p.jabatan ? ` · ${p.jabatan}` : ''}</p>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <button onClick={() => { setEditPimpinanId(p.id); setTambahPimpinanAktif(false); setPesanPimpinan('') }} className="text-sm text-moss-700 font-medium hover:underline">
+                                Edit
+                              </button>
+                              <button onClick={() => hapusPimpinan(p.id, p.nama)} className="text-sm text-clay font-medium hover:underline">
+                                Hapus
+                              </button>
+                            </div>
+                          </li>
+                        )
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-ink/50 text-sm">Belum ada akun Pimpinan.</p>
+                  )}
+                </div>
               )}
             </div>
           ) : (
