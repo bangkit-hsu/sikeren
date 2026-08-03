@@ -7,12 +7,12 @@ import PilihBagian from '../components/PilihBagian.jsx'
 import { JABATAN_PER_BAGIAN } from '../utils/bagian'
 import {
   muatModelWajah, nyalakanKamera, matikanKamera,
-  ambilDescriptorDariVideo, rataRataDescriptor, tangkapFotoDariVideo,
+  ambilDescriptorDariVideo, rataRataDescriptorRobust, tangkapFotoDariVideo,
 } from '../utils/face'
 import CincinPemindai from '../components/CincinPemindai.jsx'
 
-const JUMLAH_JEPRETAN = 3
-const JEDA_ANTAR_JEPRETAN_MS = 700
+const JUMLAH_JEPRETAN = 7
+const JEDA_ANTAR_JEPRETAN_MS = 700 // 7 jepretan x 700ms ≈ 5 detik total perekaman
 
 export default function DaftarWajah() {
   const navigate = useNavigate()
@@ -62,7 +62,7 @@ export default function DaftarWajah() {
     const baru = [...kumpulan, descriptor]
     setJumlahTertangkap(baru.length)
     if (baru.length >= JUMLAH_JEPRETAN) {
-      const rataRata = rataRataDescriptor(baru)
+      const rataRata = rataRataDescriptorRobust(baru)
       setDescriptorRekam(rataRata)
       setFotoRekam(tangkapFotoDariVideo(videoRef.current))
       matikanKamera(streamRef.current)

@@ -5,7 +5,7 @@ let modelsLoaded = false
 
 // Jarak Euclidean maksimum antar descriptor wajah agar dianggap "cocok".
 // Makin kecil = makin ketat (mengurangi false-match, tapi bisa lebih sering gagal kenali).
-export const AMBANG_KECOCOKAN = 0.5
+export const AMBANG_KECOCOKAN = 0.45
 
 export async function muatModelWajah() {
   if (modelsLoaded) return
@@ -54,6 +54,19 @@ export function rataRataDescriptor(daftarDescriptor) {
     for (let i = 0; i < panjang; i++) hasil[i] += d[i]
   }
   return hasil.map((v) => v / daftarDescriptor.length)
+}
+
+// Sama seperti rataRataDescriptor, tapi membuang jepretan yang menyimpang jauh dari yang lain
+// (mis. karena buram, wajah bergerak, atau pencahayaan berubah sesaat) sebelum dirata-ratakan,
+// supaya descriptor akhir yang tersimpan lebih akurat dan tidak gampang salah kenali pegawai lain.
+export function rataRataDescriptorRobust(daftarDescriptor) {
+  if (daftarDescriptor.length <= 3) return rataRataDescriptor(daftarDescriptor)
+  const rataAwal = rataRataDescriptor(daftarDescriptor)
+  const berjarak = daftarDescriptor
+    .map((d) => ({ d, jarak: faceapi.euclideanDistance(d, rataAwal) }))
+    .sort((a, b) => a.jarak - b.jarak)
+  const jumlahDipakai = Math.max(3, Math.ceil(daftarDescriptor.length * 0.7))
+  return rataRataDescriptor(berjarak.slice(0, jumlahDipakai).map((x) => x.d))
 }
 
 export async function nyalakanKamera(videoEl) {
