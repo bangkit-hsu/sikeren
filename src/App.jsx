@@ -6,7 +6,6 @@ import Login from './pages/Login.jsx'
 import Home from './pages/Home.jsx'
 import SetupAwal from './pages/SetupAwal.jsx'
 import FaceLogin from './pages/FaceLogin.jsx'
-import DaftarWajah from './pages/DaftarWajah.jsx'
 import AbsensiPage from './pages/pegawai/AbsensiPage.jsx'
 import RiwayatPage from './pages/pegawai/RiwayatPage.jsx'
 import ProfilPage from './pages/pegawai/ProfilPage.jsx'
@@ -30,7 +29,6 @@ export default function App() {
       <Route path="/basedata/*" element={<BasedataPage />} />
       <Route path="/pimpinan" element={<PimpinanPage />} />
       <Route path="/absen" element={<FaceLogin />} />
-      <Route path="/daftar-wajah" element={<DaftarWajah />} />
       <Route path="/login" element={<Login />} />
       <Route path="/setup" element={<SetupAwal />} />
 

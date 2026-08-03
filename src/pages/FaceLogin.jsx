@@ -113,8 +113,6 @@ export default function FaceLogin() {
           setFotoTertangkap(foto)
           setPegawaiDikenali(cocok.pegawai)
           setTahap('dikenali')
-          loginDenganWajah(cocok.pegawai)
-          setTimeout(() => lanjutkanSetelahDikenali(cocok.pegawai), 700)
           return
         }
       }
@@ -122,6 +120,11 @@ export default function FaceLogin() {
       // frame gagal diproses, lanjut coba frame berikutnya
     }
     setTimeout(() => pindai(waktuMulai), JEDA_DETEKSI_MS)
+  }
+
+  function konfirmasiPegawai() {
+    loginDenganWajah(pegawaiDikenali)
+    lanjutkanSetelahDikenali(pegawaiDikenali)
   }
 
   async function lanjutkanSetelahDikenali(pegawai) {
@@ -241,7 +244,6 @@ export default function FaceLogin() {
             <p className="font-display font-semibold text-lg text-moss-800 mb-1">Jam Absen Apel Belum Dimulai</p>
             <p className="text-sm text-ink/60 mb-4">Absen apel bisa dilakukan mulai pukul <span className="font-medium text-ink">07:50 WITA</span>. Halaman ini akan otomatis memeriksa ulang secara berkala.</p>
             <div className="flex flex-col gap-2">
-              <button onClick={() => navigate('/daftar-wajah')} className="text-sm underline text-moss-700 font-medium">Registrasi Data Mandiri</button>
               <button onClick={() => navigate('/login')} className="text-sm underline text-moss-700 font-medium">Masuk Menu Pegawai (lihat Riwayat Saya)</button>
             </div>
           </div>
@@ -279,7 +281,7 @@ export default function FaceLogin() {
           )}
         </div>
 
-        {(tahap === 'dikenali' || tahap === 'mengecek_lokasi' || tahap === 'siap_absen' || tahap === 'mengirim' || tahap === 'sukses' || tahap === 'sudah_absen') && pegawaiDikenali && (
+        {(tahap === 'mengecek_lokasi' || tahap === 'siap_absen' || tahap === 'mengirim' || tahap === 'sukses' || tahap === 'sudah_absen') && pegawaiDikenali && (
           <p className="text-center font-display font-semibold mt-4">
             Wajah dikenali : {pegawaiDikenali.nama}
           </p>
@@ -290,12 +292,25 @@ export default function FaceLogin() {
           {tahap === 'tidak_dikenali' && (
             <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-5 text-center">
               <p className="text-clay font-medium mb-4">Wajah tidak dikenali dalam 3 detik.</p>
+              <button onClick={cobaLagi} className="w-full bg-ink text-paper font-medium rounded-lg py-2.5 hover:bg-ink/80 transition-colors">
+                Coba Lagi
+              </button>
+            </div>
+          )}
+
+          {tahap === 'dikenali' && pegawaiDikenali && (
+            <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-5 text-center">
+              <p className="text-xs font-mono uppercase tracking-wide text-ink/50 mb-2">Konfirmasi Identitas</p>
+              <p className="font-display font-semibold text-lg">{pegawaiDikenali.nama}</p>
+              <p className="text-sm text-ink/60 font-mono">{pegawaiDikenali.nip}</p>
+              <p className="text-sm text-ink/60 mb-4">{pegawaiDikenali.bagian}</p>
+              <p className="text-sm text-ink/70 mb-4">Pastikan informasi di atas sudah sesuai dengan pegawai yang absen.</p>
               <div className="flex gap-3">
-                <button onClick={cobaLagi} className="flex-1 bg-ink text-paper font-medium rounded-lg py-2.5 hover:bg-ink/80 transition-colors">
-                  Coba Lagi
+                <button onClick={cobaLagi} className="flex-1 border border-ink/15 font-medium rounded-lg py-2.5 hover:bg-ink/5 transition-colors">
+                  Deteksi Ulang
                 </button>
-                <button onClick={() => navigate('/daftar-wajah')} className="flex-1 bg-moss-700 text-paper font-medium rounded-lg py-2.5 hover:bg-moss-800 transition-colors">
-                  Daftar Data
+                <button onClick={konfirmasiPegawai} className="flex-1 bg-moss-700 text-paper font-medium rounded-lg py-2.5 hover:bg-moss-800 transition-colors">
+                  Lanjut
                 </button>
               </div>
             </div>
