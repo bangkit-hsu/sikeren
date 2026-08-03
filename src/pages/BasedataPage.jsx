@@ -1177,32 +1177,30 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[960px]">
+                            <table className="w-full text-sm min-w-[820px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
-                                  <th className="px-3 py-3">NIP</th>
-                                  <th className="px-3 py-3">Nama</th>
-                                  <th className="px-3 py-3">Bagian / Unit Kerja</th>
-                                  <th className="px-3 py-3">Jabatan</th>
-                                  <th className="px-3 py-3">Presensi Kehadiran</th>
-                                  <th className="px-3 py-3">Kehadiran Apel</th>
-                                  <th className="px-3 py-3">Penilaian Individu</th>
+                                  <th className="px-4 py-3">NIP</th>
+                                  <th className="px-4 py-3">Nama</th>
+                                  <th className="px-4 py-3">Jabatan</th>
+                                  <th className="px-4 py-3 w-36">Presensi Kehadiran</th>
+                                  <th className="px-4 py-3 w-32">Kehadiran Apel</th>
+                                  <th className="px-4 py-3 w-36">Penilaian Individu</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
                                 {tersaring.map((p, i) => (
                                   <tr key={`${p.nip}-${i}`}>
-                                    <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
-                                    <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
-                                    <td className="px-3 py-2.5 whitespace-nowrap">{p.unitKerja}</td>
-                                    <td className="px-3 py-2.5">{p.jabatan}</td>
-                                    <td className="px-3 py-2.5">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
-                                    <td className="px-3 py-2.5">{p.kehadiranApel}%</td>
-                                    <td className="px-3 py-2.5 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                    <td className="px-4 py-3 font-mono whitespace-nowrap">{p.nip}</td>
+                                    <td className="px-4 py-3 font-medium whitespace-nowrap">{p.nama}</td>
+                                    <td className="px-4 py-3">{p.jabatan}</td>
+                                    <td className="px-4 py-3">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
+                                    <td className="px-4 py-3">{p.kehadiranApel}%</td>
+                                    <td className="px-4 py-3 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                   </tr>
                                 ))}
                                 {tersaring.length === 0 && (
-                                  <tr><td colSpan={7} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                  <tr><td colSpan={6} className="px-4 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
                               </tbody>
                             </table>
