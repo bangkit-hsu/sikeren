@@ -297,7 +297,7 @@ export default function PegawaiPage() {
               <li key={u.id} className="flex items-center justify-between gap-3 px-4 py-3 bg-white/60">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-ink border border-ink/10 shrink-0">
-                    {u.foto ? (
+                    {u.foto && Array.isArray(u.faceDescriptor) ? (
                       <img src={u.foto} alt={u.nama} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-paper/50 text-[10px] font-mono text-center leading-tight">Belum ada</div>
