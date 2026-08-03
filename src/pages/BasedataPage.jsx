@@ -1232,7 +1232,7 @@ export default function BasedataPage() {
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-700">Aktif</span>
                 </Link>
 
-                <button type="button" onClick={() => pilihMenu('e-kinerja')} className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <button type="button" onClick={() => pilihMenu('e-kinerja')} className="text-left bg-moss-50 border border-moss-200 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-moss-700 text-paper"><IkonGrafik /></div>
                   <p className="font-display font-semibold text-ink">e-Kinerja</p>
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Unggah data dan lihat perhitungan e-Kinerja pegawai per periode.</p>
