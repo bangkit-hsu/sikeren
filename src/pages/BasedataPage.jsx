@@ -1638,26 +1638,48 @@ export default function BasedataPage() {
                   {memuatEKinerja ? (
                     <p className="text-ink/50 font-mono text-sm">Memuat…</p>
                   ) : dataEKinerja && dataEKinerja.length > 0 ? (
-                    <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                      <table className="w-full text-sm min-w-[520px]">
-                        <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
-                          <tr>
-                            <th className="px-3 py-3">NIP</th>
-                            <th className="px-3 py-3">Nama</th>
-                            <th className="px-3 py-3 w-32">Nilai e-Kinerja</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-ink/10">
-                          {dataEKinerja.map((p, i) => (
-                            <tr key={`${p.nip}-${i}`}>
-                              <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
-                              <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama || '—'}</td>
-                              <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilai}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    (() => {
+                      function badgeKategori(nilai) {
+                        const v = (nilai || '').toString().toUpperCase()
+                        if (!v || v.includes('BELUM')) return <span className="text-ink/30 text-xs">—</span>
+                        const warna = v.includes('DIATAS') || v.includes('SANGAT BAIK')
+                          ? 'bg-moss-100 text-moss-800'
+                          : v.includes('SESUAI') || (v === 'BAIK')
+                            ? 'bg-moss-50 text-moss-700'
+                            : v.includes('DIBAWAH') || v.includes('KURANG')
+                              ? 'bg-clay/10 text-clay'
+                              : 'bg-ink/10 text-ink/60'
+                        return <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${warna}`}>{nilai}</span>
+                      }
+                      return (
+                        <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                          <table className="w-full text-sm min-w-[820px]">
+                            <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                              <tr>
+                                <th className="px-3 py-3">NIP</th>
+                                <th className="px-3 py-3">Nama</th>
+                                <th className="px-3 py-3">Jabatan</th>
+                                <th className="px-3 py-3 w-28">Hasil Kerja</th>
+                                <th className="px-3 py-3 w-28">Perilaku Kerja</th>
+                                <th className="px-3 py-3 w-28">Hasil Akhir</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-ink/10">
+                              {dataEKinerja.map((p, i) => (
+                                <tr key={`${p.nip}-${i}`}>
+                                  <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                                  <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama || '—'}</td>
+                                  <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan || '—'}</td>
+                                  <td className="px-3 py-2.5">{badgeKategori(p.hasilKerja)}</td>
+                                  <td className="px-3 py-2.5">{badgeKategori(p.perilakuKerja)}</td>
+                                  <td className="px-3 py-2.5">{badgeKategori(p.hasilAkhir)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )
+                    })()
                   ) : (
                     <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
                       <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(eKinerjaBulan)} {eKinerjaTahun}. Unggah file e-Kinerja untuk periode ini.</p>
