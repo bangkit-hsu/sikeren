@@ -48,6 +48,28 @@ export function AuthProvider({ children }) {
     return sessionUser
   }
 
+  // Login untuk akun Pimpinan (disimpan di koleksi 'pimpinan', terpisah dari 'users').
+  async function loginPimpinan(nip, password) {
+    const ref = collection(db, 'pimpinan')
+    const q = query(ref, where('nip', '==', nip.trim()))
+    const snap = await getDocs(q)
+    if (snap.empty) throw new Error('NIP tidak ditemukan.')
+    const docSnap = snap.docs[0]
+    const data = docSnap.data()
+    const hashed = await hashPassword(password)
+    if (hashed !== data.passwordHash) throw new Error('Password salah.')
+    const sessionUser = {
+      id: docSnap.id,
+      nip: data.nip,
+      nama: data.nama,
+      jabatan: data.jabatan || '',
+      role: 'pimpinan',
+    }
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser))
+    setUser(sessionUser)
+    return sessionUser
+  }
+
   // Membuat sesi login langsung dari dokumen pegawai yang cocok lewat pengenalan wajah
   // (tidak perlu password lagi, karena identitas sudah diverifikasi lewat wajah).
   function loginDenganWajah(pegawaiDoc) {
@@ -81,7 +103,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, loginDenganWajah, logout, perbaruiSesiUser }}>
+    <AuthContext.Provider value={{ user, loading, login, loginPimpinan, loginDenganWajah, logout, perbaruiSesiUser }}>
       {children}
     </AuthContext.Provider>
   )
