@@ -1091,7 +1091,7 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">{menuAktif === 'dashboard' ? 'SiKeren' : judulHalaman}</p>
         </header>
 
-        <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        <main className={`flex-1 w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-14 mb-8 text-center">

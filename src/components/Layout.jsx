@@ -213,7 +213,7 @@ export default function Layout({ children }) {
           <p className="font-display font-semibold">e-Apel</p>
         </header>
 
-        <main className={`flex-1 w-full max-w-5xl mx-auto px-5 py-8 ${!isAdmin ? 'pb-24 md:pb-8' : ''}`}>{children}</main>
+        <main className={`flex-1 w-full max-w-5xl mx-auto px-4 sm:px-5 py-6 sm:py-8 ${!isAdmin ? 'pb-24 md:pb-8' : ''}`}>{children}</main>
         <footer className="hidden md:block text-center text-xs text-ink/40 py-6 font-mono">
           absen-apel-pegawai · dibangun dengan Vite + React + Firebase
         </footer>

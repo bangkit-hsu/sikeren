@@ -37,7 +37,7 @@ export default function AbsenHarianPage() {
       const hasilGenerate = await generateTidakApelUntukTanggal(tanggal, override)
       setHasil(hasilGenerate)
       if (!hasilGenerate.dilewati) {
-        // Generate Absen menandakan sesi absen apel tanggal ini resmi ditutup —
+        // Closing Apel menandakan sesi absen apel tanggal ini resmi ditutup —
         // setelah ini pegawai yang belum absen akan melihat "Jam Absen Apel Sudah Selesai".
         await setDoc(doc(db, 'settings', 'penutupanApel'), {
           tanggal,
@@ -89,12 +89,12 @@ export default function AbsenHarianPage() {
     <div className="max-w-xl">
       <h1 className="font-display font-semibold text-2xl mb-1">Absen Harian</h1>
       <p className="text-ink/60 text-sm mb-6">
-        Pilih tanggal, lalu klik <span className="font-medium text-ink">Generate Absen</span> untuk menandai pegawai
+        Pilih tanggal, lalu klik <span className="font-medium text-ink">Closing Apel</span> untuk menandai pegawai
         yang belum melakukan absen apel pada tanggal itu sebagai <span className="font-medium text-ink">Tidak Apel</span>.
         Tanggal yang bisa di-generate mengikuti pengaturan di menu Hari Absensi Apel.
       </p>
       <p className="text-xs text-ink/40 mb-6 font-mono">
-        Pegawai baru bisa absen mulai pukul 07:50 WITA. Klik Generate Absen menutup sesi absen apel untuk tanggal yang dipilih — pegawai yang belum absen setelah itu akan melihat "Jam Absen Apel Sudah Selesai".
+        Pegawai baru bisa absen mulai pukul 07:50 WITA. Klik Closing Apel menutup sesi absen apel untuk tanggal yang dipilih — pegawai yang belum absen setelah itu akan melihat "Jam Absen Apel Sudah Selesai".
       </p>
 
       <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 flex flex-wrap items-end gap-3 mb-6">
@@ -112,7 +112,7 @@ export default function AbsenHarianPage() {
           disabled={memproses || !tanggal || !tanggalAdalahHariAbsen}
           className="bg-moss-700 text-paper font-medium rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
         >
-          {memproses ? 'Memproses…' : 'Generate Absen'}
+          {memproses ? 'Memproses…' : 'Closing Apel'}
         </button>
         <button
           onClick={downloadExcel}
@@ -125,7 +125,7 @@ export default function AbsenHarianPage() {
 
       {!tanggalAdalahHariAbsen && (
         <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-4 text-clay text-sm mb-4">
-          Tanggal {tanggal} bukan Hari Absen (cek/atur di menu <span className="font-medium">Hari Absensi Apel</span>), jadi tombol Generate Absen dinonaktifkan untuk tanggal ini.
+          Tanggal {tanggal} bukan Hari Absen (cek/atur di menu <span className="font-medium">Hari Absensi Apel</span>), jadi tombol Closing Apel dinonaktifkan untuk tanggal ini.
         </div>
       )}
 
