@@ -191,8 +191,9 @@ function TabelPotongan({ data }) {
   )
 }
 
-function FormPimpinan({ awal, onBatal, onSimpan, menyimpan }) {
+function FormPimpinan({ awal, onBatal, onSimpan, menyimpan, daftarJabatan }) {
   const [form, setForm] = useState({ nip: awal?.nip || '', nama: awal?.nama || '', jabatan: awal?.jabatan || '', password: '' })
+  const [jabatanManual, setJabatanManual] = useState(!!awal?.jabatan && !(daftarJabatan || []).includes(awal.jabatan))
   return (
     <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 grid sm:grid-cols-2 gap-3 mb-4">
       <div>
@@ -213,11 +214,38 @@ function FormPimpinan({ awal, onBatal, onSimpan, menyimpan }) {
       </div>
       <div>
         <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Jabatan</label>
-        <input
-          value={form.jabatan}
-          onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
-          className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
-        />
+        {jabatanManual || (daftarJabatan || []).length === 0 ? (
+          <div>
+            <input
+              value={form.jabatan}
+              onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
+              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+            />
+            {(daftarJabatan || []).length > 0 && (
+              <button
+                type="button"
+                onClick={() => { setJabatanManual(false); setForm({ ...form, jabatan: '' }) }}
+                className="text-xs text-moss-700 underline mt-1"
+              >
+                Pilih dari daftar Atasan (Kelompok ASN)
+              </button>
+            )}
+          </div>
+        ) : (
+          <select
+            value={form.jabatan}
+            onChange={(e) => {
+              if (e.target.value === '__lainnya__') { setJabatanManual(true); setForm({ ...form, jabatan: '' }) }
+              else setForm({ ...form, jabatan: e.target.value })
+            }}
+            className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+          >
+            <option value="">— Pilih Jabatan —</option>
+            {daftarJabatan.map((j) => <option key={j} value={j}>{j}</option>)}
+            <option value="__lainnya__">Lainnya (ketik manual)</option>
+          </select>
+        )}
+        <p className="text-xs text-ink/40 mt-1">Pilih persis sama dengan Atasan di Data ASN, supaya cocok dengan Kelompok ASN.</p>
       </div>
       <div>
         <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">
@@ -1882,6 +1910,7 @@ export default function BasedataPage() {
                       onBatal={() => setTambahPimpinanAktif(false)}
                       onSimpan={tambahPimpinan}
                       menyimpan={menyimpanPimpinan}
+                      daftarJabatan={dataPegawai ? [...new Set(dataPegawai.map((p) => p.atasan).filter(Boolean))].sort() : []}
                     />
                   )}
 
@@ -1897,6 +1926,7 @@ export default function BasedataPage() {
                               onBatal={() => setEditPimpinanId(null)}
                               onSimpan={(form) => simpanEditPimpinan(p.id, form)}
                               menyimpan={menyimpanPimpinan}
+                              daftarJabatan={dataPegawai ? [...new Set(dataPegawai.map((p2) => p2.atasan).filter(Boolean))].sort() : []}
                             />
                           </li>
                         ) : (
