@@ -70,5 +70,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Dipakai oleh halaman Basedata (menu e-Kinerja) untuk menyimpan data e-Kinerja
+    // yang diunggah dari file Excel per periode (bulan-tahun).
+    match /eKinerja/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

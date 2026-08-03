@@ -7,6 +7,7 @@ import { db } from '../firebase'
 import { namaBulan } from '../utils/date'
 import { hashPassword } from '../utils/hash'
 import { parseFileSipp } from '../utils/sipp'
+import { parseFileEKinerja } from '../utils/eKinerja'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
 import { DATA_PEGAWAI } from '../data/dataPegawai'
 import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
@@ -36,6 +37,14 @@ function IkonDokumen() {
       <path d="M6 3.5h8l4.5 4.5V20a1 1 0 01-1 1H6a1 1 0 01-1-1V4.5a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
       <path d="M14 3.5V8h4.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
       <path d="M8 12.5h8M8 16h5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+function IkonGrafik() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      <path d="M4 20V4M4 20h16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 16l4-5 3 3 5-7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -367,6 +376,14 @@ const NAV_GROUPS = [
     ],
   },
   {
+    key: 'e-kinerja',
+    label: 'e-Kinerja',
+    items: [
+      { key: 'e-kinerja:utama', label: 'Upload e-Kinerja' },
+      { key: 'e-kinerja:perhitungan', label: 'Perhitungan e-Kinerja' },
+    ],
+  },
+  {
     key: 'penilaian-individu',
     label: 'Penilaian Individu',
     items: [
@@ -389,12 +406,15 @@ export default function BasedataPage() {
   let menuAktif = 'dashboard'
   let subPenilaianAsn = 'utama'
   let subSipp = 'utama'
+  let subEKinerja = 'utama'
   let subPenilaianIndividu = 'nilai'
 
   if (path === 'nilai-asn') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'utama' }
   else if (path === 'nilai-asn/data-asn') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'data-pegawai' }
   else if (path === 'sipp') { menuAktif = 'sipp'; subSipp = 'utama' }
   else if (path === 'sipp/potongan-tpp') { menuAktif = 'sipp'; subSipp = 'potongan-tpp' }
+  else if (path === 'e-kinerja') { menuAktif = 'e-kinerja'; subEKinerja = 'utama' }
+  else if (path === 'e-kinerja/perhitungan') { menuAktif = 'e-kinerja'; subEKinerja = 'perhitungan' }
   else if (path === 'penilaian-individu') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'nilai' }
   else if (path === 'penilaian-individu/kelompok-asn') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'atasan' }
   else if (path === 'penilaian-individu/daftar-pimpinan') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'pimpinan' }
@@ -470,6 +490,15 @@ export default function BasedataPage() {
   const [tahapUpload, setTahapUpload] = useState(null)
   const [tahapGagalDi, setTahapGagalDi] = useState(null)
 
+  const [dataEKinerja, setDataEKinerja] = useState(null)
+  const [memuatEKinerja, setMemuatEKinerja] = useState(false)
+  const [mengunggahEKinerja, setMengunggahEKinerja] = useState(false)
+  const [pesanEKinerja, setPesanEKinerja] = useState('')
+  const [tahapUploadEKinerja, setTahapUploadEKinerja] = useState(null)
+  const [tahapGagalDiEKinerja, setTahapGagalDiEKinerja] = useState(null)
+  const [eKinerjaBulan, setEKinerjaBulan] = useState(now.getMonth())
+  const [eKinerjaTahun, setEKinerjaTahun] = useState(now.getFullYear())
+
   const [dataPegawai, setDataPegawai] = useState(null)
   const [memuatDataPegawai, setMemuatDataPegawai] = useState(false)
   const [cariPegawai, setCariPegawai] = useState('')
@@ -508,6 +537,12 @@ export default function BasedataPage() {
     muatDataSipp(sippBulan, sippTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subSipp, sippBulan, sippTahun])
+
+  useEffect(() => {
+    if (menuAktif !== 'e-kinerja' || subEKinerja !== 'utama') return
+    muatDataEKinerja(eKinerjaBulan, eKinerjaTahun)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subEKinerja, eKinerjaBulan, eKinerjaTahun])
 
   async function muatDataSipp(bulanIdx, tahun) {
     setMemuatSipp(true)
@@ -562,6 +597,54 @@ export default function BasedataPage() {
       setPesanSipp('Gagal mengunggah: ' + err.message)
     } finally {
       setMengunggahSipp(false)
+      e.target.value = ''
+    }
+  }
+
+  async function muatDataEKinerja(bulanIdx, tahun) {
+    setMemuatEKinerja(true)
+    setPesanEKinerja('')
+    setTahapUploadEKinerja(null)
+    setTahapGagalDiEKinerja(null)
+    const id = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+    try {
+      const snap = await getDoc(doc(db, 'eKinerja', id))
+      setDataEKinerja(snap.exists() ? (snap.data().data || []) : null)
+    } catch (err) {
+      setPesanEKinerja('Gagal memuat data: ' + err.message)
+      setDataEKinerja(null)
+    } finally {
+      setMemuatEKinerja(false)
+    }
+  }
+
+  async function handleUploadEKinerja(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setMengunggahEKinerja(true)
+    setPesanEKinerja('')
+    setTahapGagalDiEKinerja(null)
+    let langkahSaatIni = 'membaca'
+    setTahapUploadEKinerja(langkahSaatIni)
+    try {
+      const diparsing = await parseFileEKinerja(file)
+
+      langkahSaatIni = 'menyimpan'
+      setTahapUploadEKinerja(langkahSaatIni)
+      const id = `${eKinerjaTahun}-${String(eKinerjaBulan + 1).padStart(2, '0')}`
+      await setDoc(doc(db, 'eKinerja', id), {
+        bulan: eKinerjaBulan, tahun: eKinerjaTahun, data: diparsing, diunggahPada: serverTimestamp(),
+      })
+
+      setDataEKinerja(diparsing)
+      setTahapUploadEKinerja('sukses')
+      setPesanEKinerja(`Berhasil mengunggah data ${diparsing.length} pegawai untuk ${namaBulan(eKinerjaBulan)} ${eKinerjaTahun}.`)
+    } catch (err) {
+      setTahapGagalDiEKinerja(langkahSaatIni)
+      setTahapUploadEKinerja('gagal')
+      setPesanEKinerja('Gagal mengunggah: ' + err.message)
+    } finally {
+      setMengunggahEKinerja(false)
       e.target.value = ''
     }
   }
@@ -954,6 +1037,9 @@ export default function BasedataPage() {
       sipp: '/basedata/sipp',
       'sipp:utama': '/basedata/sipp',
       'sipp:potongan-tpp': '/basedata/sipp/potongan-tpp',
+      'e-kinerja': '/basedata/e-kinerja',
+      'e-kinerja:utama': '/basedata/e-kinerja',
+      'e-kinerja:perhitungan': '/basedata/e-kinerja/perhitungan',
       'penilaian-individu': '/basedata/penilaian-individu',
       'penilaian-individu:nilai': '/basedata/penilaian-individu',
       'penilaian-individu:atasan': '/basedata/penilaian-individu/kelompok-asn',
@@ -971,6 +1057,7 @@ export default function BasedataPage() {
     dashboard: 'Dashboard',
     'penilaian-asn': 'Nilai ASN',
     sipp: 'SIPP',
+    'e-kinerja': 'e-Kinerja',
     'penilaian-individu': 'Penilaian Individu',
   }[menuAktif] || 'Dashboard'
 
@@ -1014,7 +1101,7 @@ export default function BasedataPage() {
 
           {(menuAktif === 'dashboard' ? NAV_GROUPS : NAV_GROUPS.filter((g) => g.key === menuAktif)).map((group) => {
             const terbuka = menuAktif === group.key ? true : grupTerbuka === group.key
-            const Ikon = group.key === 'penilaian-asn' ? IkonBintang : group.key === 'sipp' ? IkonDokumen : IkonOrang
+            const Ikon = group.key === 'penilaian-asn' ? IkonBintang : group.key === 'sipp' ? IkonDokumen : group.key === 'e-kinerja' ? IkonGrafik : IkonOrang
             return (
               <div key={group.key} className="pt-2">
                 <button
@@ -1034,6 +1121,8 @@ export default function BasedataPage() {
                           || (item.key.endsWith('data-pegawai') && group.key === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
                           || (item.key.endsWith('utama') && group.key === 'sipp' && subSipp === 'utama')
                           || (item.key.endsWith('potongan-tpp') && group.key === 'sipp' && subSipp === 'potongan-tpp')
+                          || (item.key.endsWith('utama') && group.key === 'e-kinerja' && subEKinerja === 'utama')
+                          || (item.key.endsWith('perhitungan') && group.key === 'e-kinerja' && subEKinerja === 'perhitungan')
                           || (item.key.endsWith('nilai') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'nilai')
                           || (item.key.endsWith('atasan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'atasan')
                           || (item.key.endsWith('pimpinan') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'pimpinan'))
@@ -1091,7 +1180,7 @@ export default function BasedataPage() {
           <p className="font-display font-semibold">{menuAktif === 'dashboard' ? 'SiKeren' : judulHalaman}</p>
         </header>
 
-        <main className={`flex-1 w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
+        <main className={`flex-1 w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'e-kinerja' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
           {menuAktif === 'dashboard' ? (
             <div>
               <div className="relative overflow-hidden rounded-xl2 bg-moss-900 text-paper px-6 py-10 sm:py-14 mb-8 text-center">
@@ -1142,6 +1231,13 @@ export default function BasedataPage() {
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi apel.</p>
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-700">Aktif</span>
                 </Link>
+
+                <button type="button" onClick={() => pilihMenu('e-kinerja')} className="text-left bg-white border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-moss-700 text-paper"><IkonGrafik /></div>
+                  <p className="font-display font-semibold text-ink">e-Kinerja</p>
+                  <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Unggah data dan lihat perhitungan e-Kinerja pegawai per periode.</p>
+                  <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-moss-100 text-moss-800">Aktif</span>
+                </button>
 
                 <button type="button" onClick={() => pilihMenu('penilaian-individu')} className="text-left bg-clay/5 border border-clay/20 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-clay text-paper"><IkonOrang /></div>
@@ -1490,6 +1586,88 @@ export default function BasedataPage() {
 
                   <p className="text-xs text-ink/50 bg-white/60 border border-ink/10 rounded-xl2 p-4">
                     <span className="font-semibold text-ink">h.</span> Persentase pengurangan ditiadakan apabila ketentuan sebagaimana dimaksud pada huruf a, huruf b, huruf c, huruf d, huruf e, huruf f, dan huruf g, alasannya diterima dan dapat dipertanggungjawabkan.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : menuAktif === 'e-kinerja' ? (
+            <div>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">
+                {subEKinerja === 'utama' ? 'Upload e-Kinerja' : 'Perhitungan e-Kinerja'}
+              </h1>
+
+              {subEKinerja === 'utama' ? (
+                <div>
+                  <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file e-Kinerja (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
+
+                  <div className="flex flex-wrap items-end gap-3 mb-5">
+                    <div>
+                      <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                      <select
+                        value={eKinerjaBulan}
+                        onChange={(e) => setEKinerjaBulan(Number(e.target.value))}
+                        className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                      >
+                        {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                      <select
+                        value={eKinerjaTahun}
+                        onChange={(e) => setEKinerjaTahun(Number(e.target.value))}
+                        className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                      >
+                        {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    </div>
+                    <label className="inline-flex items-center gap-2 bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 cursor-pointer hover:bg-moss-800 transition-colors">
+                      {mengunggahEKinerja ? 'Mengunggah…' : 'Upload Data'}
+                      <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadEKinerja} disabled={mengunggahEKinerja} />
+                    </label>
+                  </div>
+
+                  <ProgresUpload tahap={tahapUploadEKinerja} tahapGagalDi={tahapGagalDiEKinerja} />
+
+                  {pesanEKinerja && (
+                    <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanEKinerja.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
+                      {pesanEKinerja}
+                    </p>
+                  )}
+
+                  {memuatEKinerja ? (
+                    <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                  ) : dataEKinerja && dataEKinerja.length > 0 ? (
+                    <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                      <table className="w-full text-sm min-w-[520px]">
+                        <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                          <tr>
+                            <th className="px-3 py-3">NIP</th>
+                            <th className="px-3 py-3">Nama</th>
+                            <th className="px-3 py-3 w-32">Nilai e-Kinerja</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-ink/10">
+                          {dataEKinerja.map((p, i) => (
+                            <tr key={`${p.nip}-${i}`}>
+                              <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+                              <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama || '—'}</td>
+                              <td className="px-3 py-2.5 font-semibold text-moss-800">{p.nilai}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                      <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(eKinerjaBulan)} {eKinerjaTahun}. Unggah file e-Kinerja untuk periode ini.</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6">
+                  <p className="text-ink/70 text-sm leading-relaxed">
+                    Halaman ini akan menjelaskan rincian rumus/tata cara perhitungan nilai e-Kinerja yang dipakai. Karena rincian rumusnya belum ditentukan, bagian ini masih berupa halaman kosong — kabari format perhitungannya supaya bisa dilengkapi.
                   </p>
                 </div>
               )}
