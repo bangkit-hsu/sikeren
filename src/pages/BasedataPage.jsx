@@ -10,6 +10,7 @@ import { parseFileSipp } from '../utils/sipp'
 import { SIPP_MEI_2026 } from '../data/sippMei2026'
 import { DATA_PEGAWAI } from '../data/dataPegawai'
 import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
+import { DAFTAR_PIMPINAN_AWAL } from '../data/daftarPimpinan'
 import { unduhExcel } from '../utils/excel'
 import { useAuth } from '../context/AuthContext.jsx'
 
@@ -397,6 +398,7 @@ export default function BasedataPage() {
   const [editPimpinanId, setEditPimpinanId] = useState(null)
   const [menyimpanPimpinan, setMenyimpanPimpinan] = useState(false)
   const [pesanPimpinan, setPesanPimpinan] = useState('')
+  const [mengimporPimpinan, setMengimporPimpinan] = useState(false)
   const [daftarPenetapan, setDaftarPenetapan] = useState(null)
   const [memuatDaftarPenetapan, setMemuatDaftarPenetapan] = useState(false)
   const [editPenetapanId, setEditPenetapanId] = useState(null)
@@ -730,6 +732,35 @@ export default function BasedataPage() {
       setPesanPimpinan('Gagal menambah: ' + err.message)
     } finally {
       setMenyimpanPimpinan(false)
+    }
+  }
+
+  async function imporDaftarPimpinan() {
+    if (!confirm(`Impor ${DAFTAR_PIMPINAN_AWAL.length} data Pimpinan dari file yang sudah disiapkan? NIP yang sudah terdaftar akan dilewati.`)) return
+    setMengimporPimpinan(true)
+    setPesanPimpinan('')
+    try {
+      const nipSudahAda = new Set((daftarPimpinan || []).map((p) => p.nip))
+      const ditambahkan = []
+      let dilewati = 0
+      for (const p of DAFTAR_PIMPINAN_AWAL) {
+        if (nipSudahAda.has(p.nip)) {
+          dilewati += 1
+          continue
+        }
+        const passwordHash = await hashPassword(p.password)
+        const docRef = await addDoc(collection(db, 'pimpinan'), {
+          nip: p.nip, nama: p.nama, jabatan: p.jabatan, passwordHash,
+        })
+        ditambahkan.push({ id: docRef.id, nip: p.nip, nama: p.nama, jabatan: p.jabatan, passwordHash })
+        nipSudahAda.add(p.nip)
+      }
+      setDaftarPimpinan((prev) => [...(prev || []), ...ditambahkan].sort((a, b) => a.nama.localeCompare(b.nama)))
+      setPesanPimpinan(`Selesai: ${ditambahkan.length} Pimpinan baru ditambahkan, ${dilewati} dilewati (NIP sudah terdaftar).`)
+    } catch (err) {
+      setPesanPimpinan('Gagal impor: ' + err.message)
+    } finally {
+      setMengimporPimpinan(false)
     }
   }
 
@@ -1872,6 +1903,14 @@ export default function BasedataPage() {
                       className="bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors"
                     >
                       {tambahPimpinanAktif ? 'Tutup Form' : '+ Tambah Pimpinan'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={imporDaftarPimpinan}
+                      disabled={mengimporPimpinan}
+                      className="text-sm font-medium border border-ink/15 rounded-lg px-4 py-2 hover:bg-ink/5 transition-colors disabled:opacity-50"
+                    >
+                      {mengimporPimpinan ? 'Mengimpor…' : `Impor Data (${DAFTAR_PIMPINAN_AWAL.length})`}
                     </button>
                   </div>
 
