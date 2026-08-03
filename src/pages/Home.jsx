@@ -66,7 +66,7 @@ export default function Home() {
             </div>
             <h2 className="font-display font-semibold text-base sm:text-xl">Pimpinan</h2>
           </div>
-          <p className="text-paper/60 text-xs sm:text-sm flex-1">Portal penilaian ASN, presensi, dan data kepegawaian.</p>
+          <p className="text-paper/60 text-xs sm:text-sm flex-1">Penilaian Individu ASN.</p>
           <Link
             to="/pimpinan"
             className="mt-4 sm:mt-5 inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-gold-500 text-ink text-xs sm:text-base font-medium rounded-lg py-2 sm:py-2.5 px-2 hover:bg-gold-400 transition-colors text-center"
