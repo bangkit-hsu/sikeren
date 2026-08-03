@@ -1136,18 +1136,18 @@ export default function BasedataPage() {
                   <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-moss-100 text-moss-800">Aktif</span>
                 </button>
 
-                <Link to="/login" className="text-left bg-ink text-paper border border-ink/10 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <Link to="/login" className="text-left bg-gold-50 border border-gold-200 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-gold-500 text-ink"><IkonAdmin /></div>
-                  <p className="font-display font-semibold">e-Apel</p>
-                  <p className="text-paper/60 text-xs mt-1.5 leading-relaxed">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi apel.</p>
-                  <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-400">Aktif</span>
+                  <p className="font-display font-semibold text-ink">e-Apel</p>
+                  <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Kelola data pegawai, laporan absensi, dan konfigurasi lokasi apel.</p>
+                  <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-gold-500/20 text-gold-700">Aktif</span>
                 </Link>
 
                 <button type="button" onClick={() => pilihMenu('penilaian-individu')} className="text-left bg-clay/5 border border-clay/20 rounded-xl2 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-clay text-paper"><IkonOrang /></div>
                   <p className="font-display font-semibold text-ink">Penilaian Individu</p>
                   <p className="text-ink/50 text-xs mt-1.5 leading-relaxed">Catatan penilaian dan capaian kerja per individu pegawai.</p>
-                  <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-clay/10 text-clay">Segera Hadir</span>
+                  <span className="inline-block mt-4 text-xs px-2.5 py-1 rounded-full font-medium bg-clay/10 text-clay">Aktif</span>
                 </button>
               </div>
             </div>
