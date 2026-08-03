@@ -960,12 +960,13 @@ export default function BasedataPage() {
             </svg>
           </div>
           <div>
-            <p className="font-display font-semibold leading-tight">SiKeren</p>
+            <p className="font-display font-semibold leading-tight">{menuAktif === 'dashboard' ? 'SiKeren' : judulHalaman}</p>
             <p className="text-xs text-ink/50 font-mono">Portal Admin</p>
           </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {menuAktif === 'dashboard' && (
           <button
             type="button"
             onClick={() => pilihMenu('dashboard')}
@@ -976,6 +977,7 @@ export default function BasedataPage() {
             <IkonDashboard />
             Dashboard
           </button>
+          )}
 
           {(menuAktif === 'dashboard' ? NAV_GROUPS : NAV_GROUPS.filter((g) => g.key === menuAktif)).map((group) => {
             const terbuka = menuAktif === group.key ? true : grupTerbuka === group.key
@@ -1053,7 +1055,7 @@ export default function BasedataPage() {
           >
             <IkonHamburger />
           </button>
-          <p className="font-display font-semibold">SiKeren</p>
+          <p className="font-display font-semibold">{menuAktif === 'dashboard' ? 'SiKeren' : judulHalaman}</p>
         </header>
 
         <main className={`flex-1 w-full mx-auto px-5 sm:px-6 py-8 ${menuAktif === 'dashboard' || menuAktif === 'sipp' || menuAktif === 'penilaian-asn' || menuAktif === 'penilaian-individu' ? 'max-w-5xl' : 'max-w-2xl'}`}>
