@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
 import { unduhExcel } from '../../utils/excel'
@@ -29,8 +29,10 @@ export default function RekapPage() {
       setOverrideHariAbsen(override)
 
       const bulanStr = `${tahun}-${String(bulan + 1).padStart(2, '0')}`
-      const absensiSnap = await getDocs(collection(db, 'absensi'))
-      const data = absensiSnap.docs.map((d) => d.data()).filter((a) => a.tanggal.startsWith(bulanStr))
+      const absensiSnap = await getDocs(
+        query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
+      )
+      const data = absensiSnap.docs.map((d) => d.data())
       setAbsensi(data)
 
       setMemuat(false)

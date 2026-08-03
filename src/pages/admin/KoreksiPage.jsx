@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  collection, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp,
+  collection, getDocs, query, where, doc, updateDoc, deleteDoc, addDoc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan } from '../../utils/date'
@@ -227,10 +227,10 @@ export default function KoreksiPage() {
   async function muatAbsensi() {
     setMemuatAbsensi(true)
     const bulanStr = `${tahun}-${String(bulan + 1).padStart(2, '0')}`
-    const snap = await getDocs(collection(db, 'absensi'))
+    const snap = await getDocs(query(collection(db, 'absensi'), where('uid', '==', pegawaiId)))
     const data = snap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((a) => a.uid === pegawaiId && a.tanggal.startsWith(bulanStr))
+      .filter((a) => a.tanggal.startsWith(bulanStr))
       .sort((a, b) => a.tanggal.localeCompare(b.tanggal))
     setAbsensi(data)
     setMemuatAbsensi(false)

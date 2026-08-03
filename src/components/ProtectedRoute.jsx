@@ -7,7 +7,10 @@ export default function ProtectedRoute({ role, children }) {
   if (loading) return null
   if (!user) return <Navigate to="/login" replace />
   if (role && user.role !== role) {
-    return <Navigate to={user.role === 'admin' ? '/admin/rekap' : '/pegawai/absensi'} replace />
+    if (user.role === 'admin') return <Navigate to="/admin/rekap" replace />
+    if (user.role === 'pegawai') return <Navigate to="/pegawai/absensi" replace />
+    // Peran lain (mis. pimpinan) tidak punya halaman di aplikasi e-Apel ini — kembali ke halaman depan.
+    return <Navigate to="/" replace />
   }
   return children
 }
