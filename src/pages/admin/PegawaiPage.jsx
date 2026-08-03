@@ -3,6 +3,7 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } 
 import { db } from '../../firebase'
 import { hashPassword } from '../../utils/hash'
 import PilihBagian from '../../components/PilihBagian.jsx'
+import { USER_E_APEL } from '../../data/userEApel'
 
 function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
   const [form, setForm] = useState({
@@ -135,6 +136,8 @@ export default function PegawaiPage() {
   const [error, setError] = useState('')
   const [cari, setCari] = useState('')
   const [sedangEdit, setSedangEdit] = useState(null)
+  const [mengimpor, setMengimpor] = useState(false)
+  const [pesanImpor, setPesanImpor] = useState('')
 
   async function muatUlang() {
     setMemuat(true)
@@ -177,6 +180,40 @@ export default function PegawaiPage() {
     }
   }
 
+  async function imporMassal() {
+    if (!confirm(`Impor ${USER_E_APEL.length} akun pegawai dari data yang sudah disiapkan? NIP yang sudah terdaftar akan dilewati.`)) return
+    setMengimpor(true)
+    setPesanImpor('')
+    try {
+      const nipSudahAda = new Set(daftar.map((u) => u.nip))
+      let ditambah = 0
+      let dilewati = 0
+      for (const p of USER_E_APEL) {
+        if (nipSudahAda.has(p.nip)) {
+          dilewati += 1
+          continue
+        }
+        const passwordHash = await hashPassword(p.password)
+        await addDoc(collection(db, 'users'), {
+          nip: p.nip,
+          nama: p.nama,
+          bagian: p.bagian,
+          jabatan: p.jabatan,
+          passwordHash,
+          role: 'pegawai',
+        })
+        nipSudahAda.add(p.nip)
+        ditambah += 1
+      }
+      setPesanImpor(`Selesai: ${ditambah} akun baru ditambahkan, ${dilewati} dilewati (NIP sudah terdaftar).`)
+      await muatUlang()
+    } catch (err) {
+      setPesanImpor('Gagal impor: ' + err.message)
+    } finally {
+      setMengimpor(false)
+    }
+  }
+
   async function hapusAkun(id) {
     if (!confirm('Hapus akun ini?')) return
     await deleteDoc(doc(db, 'users', id))
@@ -198,7 +235,20 @@ export default function PegawaiPage() {
   return (
     <div className="max-w-2xl">
       <h1 className="font-display font-semibold text-2xl mb-1">Kelola Pegawai</h1>
-      <p className="text-ink/60 text-sm mb-6">Buat akun login untuk pegawai baru atau admin lain.</p>
+      <p className="text-ink/60 text-sm mb-4">Buat akun login untuk pegawai baru atau admin lain.</p>
+
+      <div className="bg-moss-50 border border-moss-200 rounded-xl2 p-4 mb-6">
+        <p className="text-sm text-ink/70 mb-2">Ada {USER_E_APEL.length} akun pegawai siap diimpor sekaligus (NIP + password default), supaya pegawai bisa langsung login tanpa Pendaftaran Mandiri.</p>
+        <button
+          type="button"
+          onClick={imporMassal}
+          disabled={mengimpor}
+          className="text-sm font-medium bg-moss-700 text-paper rounded-lg px-4 py-2 hover:bg-moss-800 transition-colors disabled:opacity-50"
+        >
+          {mengimpor ? 'Mengimpor…' : `Impor Massal (${USER_E_APEL.length} Akun)`}
+        </button>
+        {pesanImpor && <p className="text-xs text-ink/70 mt-2">{pesanImpor}</p>}
+      </div>
 
       <form onSubmit={tambahAkun} className="bg-white/60 border border-ink/10 rounded-xl2 p-5 grid sm:grid-cols-2 gap-3 mb-8">
         <div>
