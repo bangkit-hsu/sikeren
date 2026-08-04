@@ -26,6 +26,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
         // Model pengenalan wajah & foto gedung tidak di-precache (cukup besar) —
         // tetap dimuat normal dari jaringan/cache browser biasa saat dibutuhkan.
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],

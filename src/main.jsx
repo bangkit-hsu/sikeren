@@ -8,10 +8,20 @@ import './index.css'
 
 // Begitu versi baru aplikasi terdeteksi (setelah deploy), langsung reload otomatis
 // supaya pengguna tidak perlu menutup-buka ulang tab/aplikasi secara manual.
-registerSW({
+const updateSW = registerSW({
   immediate: true,
   onNeedRefresh() {
-    window.location.reload()
+    updateSW(true)
+  },
+  onRegisteredSW(swUrl, registration) {
+    if (!registration) return
+    // Browser hanya mengecek pembaruan Service Worker secara jarang/pasif secara default,
+    // jadi di sini kita paksa cek berkala + setiap kali tab dibuka/difokuskan lagi,
+    // supaya perubahan baru cepat terdeteksi tanpa perlu bersihkan cache manual.
+    setInterval(() => registration.update(), 30 * 1000)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') registration.update()
+    })
   },
 })
 
