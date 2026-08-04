@@ -12,7 +12,7 @@ export default function PegawaiApp() {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${import.meta.env.BASE_URL}images/kantor-bupati-hsu.jpg)` }}
       />
-      <div className="absolute inset-0 bg-paper/90" />
+      <div className="absolute inset-0 bg-paper/70" />
 
       <div className="relative min-h-screen flex flex-col items-center px-6 pt-12 pb-10 text-center">
         <p className="font-display font-bold text-2xl text-ink">e-Apel</p>
