@@ -1148,10 +1148,11 @@ export default function BasedataPage() {
           {menuAktif === 'dashboard' && (
           <Link
             to="/login"
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-ink/70 hover:bg-moss-100 transition-colors mt-2"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-mono uppercase tracking-wide text-ink/50 hover:bg-moss-50 hover:text-ink/70 transition-colors mt-2"
           >
             <IkonAdmin />
-            e-Apel
+            <span className="flex-1 text-left">e-Apel</span>
+            <IkonChevron terbuka={false} />
           </Link>
           )}
         </nav>
