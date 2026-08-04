@@ -32,6 +32,7 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
   const [descriptorBaru, setDescriptorBaru] = useState(null)
   const [fotoBaru, setFotoBaru] = useState(null)
   const [errorWajah, setErrorWajah] = useState('')
+  const [menghapusWajah, setMenghapusWajah] = useState(false)
 
   useEffect(() => {
     return () => matikanKamera(streamRef.current)
@@ -76,6 +77,19 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
     setJumlahTertangkap(0)
     setDescriptorBaru(null)
     setFotoBaru(null)
+  }
+
+  async function hapusRekamWajah() {
+    if (!confirm(`Hapus data rekam wajah ${pegawai.nama}? ASN ini perlu merekam ulang wajahnya (atau bisa login manual sementara sampai merekam lagi).`)) return
+    setMenghapusWajah(true)
+    try {
+      await updateDoc(doc(db, 'users', pegawai.id), { faceDescriptor: null, foto: null })
+      onSimpan()
+    } catch (err) {
+      setErrorWajah('Gagal menghapus: ' + err.message)
+    } finally {
+      setMenghapusWajah(false)
+    }
   }
 
   async function simpan() {
@@ -178,7 +192,7 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
         <p className="text-xs text-ink/50 mb-3">Dipakai kalau ASN tidak bisa login sendiri (mis. wajah tidak terdeteksi). Merekam ulang otomatis memperbarui foto profilnya juga.</p>
 
         {tahapWajah === 'idle' && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="w-14 h-14 rounded-full overflow-hidden bg-ink border border-ink/10 shrink-0">
               {(fotoBaru || pegawai.foto) ? (
                 <img src={fotoBaru || pegawai.foto} alt={pegawai.nama} className="w-full h-full object-cover" />
@@ -193,6 +207,16 @@ function FormEditPegawai({ pegawai, onBatal, onSimpan }) {
             >
               {descriptorBaru ? 'Rekam Ulang Lagi' : 'Rekam Ulang Wajah'}
             </button>
+            {Array.isArray(pegawai.faceDescriptor) && (
+              <button
+                type="button"
+                onClick={hapusRekamWajah}
+                disabled={menghapusWajah}
+                className="text-sm font-medium border border-clay/40 text-clay rounded-lg px-4 py-2 hover:bg-clay/5 transition-colors disabled:opacity-50"
+              >
+                {menghapusWajah ? 'Menghapus…' : 'Hapus Rekam Wajah'}
+              </button>
+            )}
           </div>
         )}
 
