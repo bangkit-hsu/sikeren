@@ -15,7 +15,7 @@ import { KETERANGAN_LUAR, KETERANGAN_OTOMATIS_SESUAI, LABEL_KETERANGAN } from '.
 import CincinPemindai from '../components/CincinPemindai.jsx'
 import HeroKecil from '../components/HeroKecil.jsx'
 
-const BATAS_WAKTU_MS = 3000
+const BATAS_WAKTU_MS = 5000
 const JEDA_DETEKSI_MS = 350
 
 export default function FaceLogin() {
@@ -234,7 +234,7 @@ export default function FaceLogin() {
       <HeroKecil
         eyebrow="e-Apel · Apel Pagi"
         title="Absensi Wajah"
-        subtitle="Posisikan wajah di dalam bingkai. Kamera mengenali otomatis dalam 3 detik."
+        subtitle="Posisikan wajah di dalam bingkai. Kamera mengenali otomatis dalam 5 detik."
       />
       <div className="flex justify-center px-5 py-8">
       <div className="w-full max-w-sm">
@@ -260,7 +260,7 @@ export default function FaceLogin() {
         {tahap !== 'belum_mulai' && tahap !== 'sudah_selesai' && (
         <>
         {/* Kamera bulat, tetap tampil di bagian atas selama proses berlangsung */}
-        <div className="relative aspect-square w-52 sm:w-60 mx-auto rounded-full overflow-hidden bg-ink border border-ink/10">
+        <div className="relative aspect-square w-72 sm:w-80 mx-auto rounded-full overflow-hidden bg-ink border-[6px] border-gold-500 shadow-xl shadow-gold-900/10 ring-1 ring-ink/5">
           {fotoTertangkap ? (
             <img src={fotoTertangkap} alt="Wajah yang dikenali" className="w-full h-full object-cover rounded-full" />
           ) : (
@@ -291,7 +291,7 @@ export default function FaceLogin() {
         <div className="mt-5">
           {tahap === 'tidak_dikenali' && (
             <div className="bg-clay/10 border border-clay/30 rounded-xl2 p-5 text-center">
-              <p className="text-clay font-medium mb-4">Wajah tidak dikenali dalam 3 detik.</p>
+              <p className="text-clay font-medium mb-4">Wajah tidak dikenali dalam 5 detik.</p>
               <button onClick={cobaLagi} className="w-full bg-ink text-paper font-medium rounded-lg py-2.5 hover:bg-ink/80 transition-colors">
                 Coba Lagi
               </button>
