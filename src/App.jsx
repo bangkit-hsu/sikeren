@@ -4,6 +4,7 @@ import Layout from './components/Layout.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Login from './pages/Login.jsx'
 import Home from './pages/Home.jsx'
+import PegawaiApp from './pages/PegawaiApp.jsx'
 import SetupAwal from './pages/SetupAwal.jsx'
 import FaceLogin from './pages/FaceLogin.jsx'
 import AbsensiPage from './pages/pegawai/AbsensiPage.jsx'
@@ -27,6 +28,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/app" element={<PegawaiApp />} />
       <Route path="/basedata/*" element={<BasedataPage />} />
       <Route path="/pimpinan" element={<PimpinanPage />} />
       <Route path="/pimpinan/portal" element={<PimpinanPortal />} />
