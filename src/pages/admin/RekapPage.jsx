@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, query, where, doc, getDoc, addDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { namaBulan, hitungHariKerja } from '../../utils/date'
 import { unduhExcel } from '../../utils/excel'
+import { parseFileAbsensiImport, templateAbsensiImport } from '../../utils/absensiImport'
 
 export default function RekapPage() {
   const now = new Date()
@@ -14,6 +15,10 @@ export default function RekapPage() {
   const [overrideHariAbsen, setOverrideHariAbsen] = useState({})
   const [memuat, setMemuat] = useState(true)
   const [cari, setCari] = useState('')
+  const [tampilkanUpload, setTampilkanUpload] = useState(false)
+  const [mengunggahImport, setMengunggahImport] = useState(false)
+  const [pesanImport, setPesanImport] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     async function load() {
@@ -39,7 +44,7 @@ export default function RekapPage() {
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tahun, bulan])
+  }, [tahun, bulan, refreshKey])
 
   const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, overrideHariAbsen), [tahun, bulan, overrideHariAbsen])
 
@@ -88,6 +93,45 @@ export default function RekapPage() {
     unduhExcel(`Rekap-Absen-${namaBulan(bulan)}-${tahun}.xlsx`, baris, 'Rekap Absen')
   }
 
+  function downloadTemplate() {
+    unduhExcel('Template-Import-Absensi.xlsx', templateAbsensiImport(), 'Absensi')
+  }
+
+  async function handleUploadImport(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setMengunggahImport(true)
+    setPesanImport('')
+    try {
+      const baris = await parseFileAbsensiImport(file)
+      const petaNip = new Map(pegawai.map((p) => [p.nip, p.id]))
+      let ditambah = 0
+      const nipTidakDitemukan = new Set()
+      for (const b of baris) {
+        const uid = petaNip.get(b.nip)
+        if (!uid) {
+          nipTidakDitemukan.add(b.nip)
+          continue
+        }
+        const data = { uid, tanggal: b.tanggal, jam: b.jam, status: b.status }
+        if (b.keterangan) data.keterangan = b.keterangan
+        await addDoc(collection(db, 'absensi'), data)
+        ditambah += 1
+      }
+      let pesan = `Berhasil mengimpor ${ditambah} dari ${baris.length} baris.`
+      if (nipTidakDitemukan.size > 0) {
+        pesan += ` NIP tidak ditemukan (dilewati): ${[...nipTidakDitemukan].join(', ')}.`
+      }
+      setPesanImport(pesan)
+      setRefreshKey((k) => k + 1)
+    } catch (err) {
+      setPesanImport('Gagal mengimpor: ' + err.message)
+    } finally {
+      setMengunggahImport(false)
+      e.target.value = ''
+    }
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
@@ -109,8 +153,43 @@ export default function RekapPage() {
           >
             Download Excel
           </button>
+          <button
+            onClick={() => setTampilkanUpload((v) => !v)}
+            className="rounded-lg border border-ink/15 text-sm font-medium px-4 py-2 hover:bg-ink/5 transition-colors"
+          >
+            {tampilkanUpload ? 'Tutup' : 'Upload Data Lama'}
+          </button>
         </div>
       </div>
+
+      {tampilkanUpload && (
+        <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 mb-5">
+          <p className="font-display font-semibold mb-1">Upload Data Absensi Lama</p>
+          <p className="text-ink/60 text-sm mb-4">
+            Buat pengisian bulan-bulan sebelumnya yang belum tercatat lewat aplikasi. Unduh dulu template-nya,
+            isi sesuai format (kolom <span className="font-medium text-ink">NIP, Tanggal, Jam, Status, Keterangan</span>),
+            lalu unggah lagi file yang sudah diisi. Status yang valid: <span className="font-mono">sesuai</span>, <span className="font-mono">luar</span>, <span className="font-mono">tidak_apel</span>.
+            Keterangan boleh dikosongkan atau diisi <span className="font-mono">gabungan</span> / <span className="font-mono">hari_besar</span> / <span className="font-mono">wfh</span>.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={downloadTemplate}
+              className="rounded-lg border border-moss-600 text-moss-700 text-sm font-medium px-4 py-2 hover:bg-moss-50 transition-colors"
+            >
+              Unduh Template
+            </button>
+            <label className="inline-flex items-center gap-2 bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2 cursor-pointer hover:bg-moss-800 transition-colors">
+              {mengunggahImport ? 'Mengunggah…' : 'Upload File Terisi'}
+              <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadImport} disabled={mengunggahImport} />
+            </label>
+          </div>
+          {pesanImport && (
+            <p className={`text-sm rounded-lg px-3 py-2 mt-4 ${pesanImport.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
+              {pesanImport}
+            </p>
+          )}
+        </div>
+      )}
 
       <input
         value={cari}
