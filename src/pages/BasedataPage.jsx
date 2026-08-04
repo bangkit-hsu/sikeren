@@ -1308,40 +1308,43 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[1040px]">
+                            <table className="w-full text-sm min-w-[1100px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
-                                  <th className="px-4 py-3" rowSpan={2}>NIP</th>
-                                  <th className="px-4 py-3" rowSpan={2}>Nama</th>
-                                  <th className="px-4 py-3" rowSpan={2}>Jabatan</th>
-                                  <th className="px-4 py-2 text-center border-b border-ink/10" colSpan={3}>Presensi ASN</th>
-                                  <th className="px-4 py-3 w-36" rowSpan={2}>Penilaian Individu</th>
-                                  <th className="px-4 py-3 w-32" rowSpan={2}>e-Kinerja</th>
+                                  <th className="px-3 py-3" rowSpan={2}>NIP</th>
+                                  <th className="px-3 py-3" rowSpan={2}>Nama</th>
+                                  <th className="px-3 py-3" rowSpan={2}>Jabatan</th>
+                                  <th className="px-3 py-2 text-center border-b border-ink/10" colSpan={3}>Presensi ASN</th>
+                                  <th className="px-3 py-3 w-24" rowSpan={2}>e-Kinerja</th>
+                                  <th className="px-3 py-3 w-28" rowSpan={2}>Penilaian Individu</th>
+                                  <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Akhir</th>
                                 </tr>
                                 <tr>
-                                  <th className="px-4 py-2 w-32">Pot. Presensi Kehadiran</th>
-                                  <th className="px-4 py-2 w-28">Pot. Absensi Apel</th>
-                                  <th className="px-4 py-2 w-24">Nilai Presensi</th>
+                                  <th className="px-3 py-2 w-24">Pot. Presensi</th>
+                                  <th className="px-3 py-2 w-24">Pot. Apel</th>
+                                  <th className="px-3 py-2 w-24">Nilai Presensi</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
                                 {tersaring.map((p, i) => {
-                                  const nilaiAkhir = p.presensiKehadiran != null ? Math.round((100 - p.presensiKehadiran - p.kehadiranApel) * 100) / 100 : null
+                                  const nilaiPresensi = p.presensiKehadiran != null ? Math.round((100 - p.presensiKehadiran - p.kehadiranApel) * 100) / 100 : null
+                                  const nilaiAkhirTotal = nilaiPresensi != null && p.eKinerja != null ? Math.round((nilaiPresensi + p.eKinerja) * 100) / 100 : null
                                   return (
                                     <tr key={`${p.nip}-${i}`}>
-                                      <td className="px-4 py-3 font-mono whitespace-nowrap">{p.nip}</td>
-                                      <td className="px-4 py-3 font-medium whitespace-nowrap">{p.nama}</td>
-                                      <td className="px-4 py-3">{p.jabatan}</td>
-                                      <td className="px-4 py-3">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
-                                      <td className="px-4 py-3">{p.kehadiranApel}%</td>
-                                      <td className="px-4 py-3 font-semibold text-moss-800">{nilaiAkhir != null ? `${nilaiAkhir}%` : <span className="text-ink/30 font-normal">—</span>}</td>
-                                      <td className="px-4 py-3 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
-                                      <td className="px-4 py-3">{p.eKinerjaHasilAkhir ? p.eKinerjaHasilAkhir : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 font-mono whitespace-nowrap">{p.nip}</td>
+                                      <td className="px-3 py-3 font-medium whitespace-nowrap">{p.nama}</td>
+                                      <td className="px-3 py-3">{p.jabatan}</td>
+                                      <td className="px-3 py-3">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3">{p.kehadiranApel}%</td>
+                                      <td className="px-3 py-3 font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                      <td className="px-3 py-3">{p.eKinerjaHasilAkhir ? p.eKinerjaHasilAkhir : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                      <td className="px-3 py-3 font-semibold text-moss-800">{nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                     </tr>
                                   )
                                 })}
                                 {tersaring.length === 0 && (
-                                  <tr><td colSpan={8} className="px-4 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                  <tr><td colSpan={9} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
                               </tbody>
                             </table>
