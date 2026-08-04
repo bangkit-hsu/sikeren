@@ -1271,7 +1271,6 @@ export default function BasedataPage() {
                   )
                   return (
                     <div>
-                      <p className="text-ink/60 text-sm mb-4">Rekap gabungan per pegawai untuk periode yang dipilih: Presensi ASN (Pot. Presensi Kehadiran dari SIPP, Pot. Absensi Apel dari e-Apel, dan Nilai Akhir = 100% − keduanya), dan Penilaian Individu (Pot. Penilaian dari menu Penilaian Individu).</p>
 
                       <div className="flex flex-wrap items-end gap-3 mb-4">
                         <div>
@@ -1308,13 +1307,12 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[1100px]">
-                              <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+                            <table className="w-full text-sm min-w-[980px]">
+                              <thead className="bg-ink/5 text-center text-xs font-mono uppercase text-ink/50">
                                 <tr>
-                                  <th className="px-3 py-3" rowSpan={2}>NIP</th>
-                                  <th className="px-3 py-3" rowSpan={2}>Nama</th>
-                                  <th className="px-3 py-3" rowSpan={2}>Jabatan</th>
-                                  <th className="px-3 py-2 text-center border-b border-ink/10" colSpan={3}>Presensi ASN</th>
+                                  <th className="px-3 py-3 text-left" rowSpan={2}>NIP</th>
+                                  <th className="px-3 py-3 text-left" rowSpan={2}>Nama</th>
+                                  <th className="px-3 py-2 border-b border-ink/10" colSpan={3}>Presensi ASN</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>e-Kinerja</th>
                                   <th className="px-3 py-3 w-28" rowSpan={2}>Penilaian Individu</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Akhir</th>
@@ -1333,18 +1331,17 @@ export default function BasedataPage() {
                                     <tr key={`${p.nip}-${i}`}>
                                       <td className="px-3 py-3 font-mono whitespace-nowrap">{p.nip}</td>
                                       <td className="px-3 py-3 font-medium whitespace-nowrap">{p.nama}</td>
-                                      <td className="px-3 py-3">{p.jabatan}</td>
-                                      <td className="px-3 py-3">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
-                                      <td className="px-3 py-3">{p.kehadiranApel}%</td>
-                                      <td className="px-3 py-3 font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
-                                      <td className="px-3 py-3">{p.eKinerjaHasilAkhir ? p.eKinerjaHasilAkhir : <span className="text-ink/30">—</span>}</td>
-                                      <td className="px-3 py-3 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
-                                      <td className="px-3 py-3 font-semibold text-moss-800">{nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.kehadiranApel}%</td>
+                                      <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.eKinerjaHasilAkhir ? p.eKinerjaHasilAkhir : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                      <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                     </tr>
                                   )
                                 })}
                                 {tersaring.length === 0 && (
-                                  <tr><td colSpan={9} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                  <tr><td colSpan={8} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
                               </tbody>
                             </table>
