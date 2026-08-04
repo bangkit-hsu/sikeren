@@ -302,26 +302,35 @@ export default function PimpinanPortal() {
                 <p className="text-ink/50 font-mono text-sm">Memuat…</p>
               ) : (
                 <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                  <table className="w-full text-sm min-w-[660px]">
+                  <table className="w-full text-sm min-w-[760px]">
                     <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                       <tr>
-                        <th className="px-3 py-3">NIP</th>
-                        <th className="px-3 py-3">Nama</th>
-                        <th className="px-3 py-3 w-24">Nilai Presensi</th>
-                        <th className="px-3 py-3 w-24">Pot. Penilaian</th>
-                        <th className="px-3 py-3 w-28">Aksi</th>
+                        <th className="px-3 py-3" rowSpan={2}>NIP</th>
+                        <th className="px-3 py-3" rowSpan={2}>Nama</th>
+                        <th className="px-3 py-2 text-center border-b border-ink/10" colSpan={3}>Presensi ASN</th>
+                        <th className="px-3 py-3 w-24" rowSpan={2}>Pot. Penilaian</th>
+                        <th className="px-3 py-3 w-28" rowSpan={2}>Aksi</th>
+                      </tr>
+                      <tr>
+                        <th className="px-3 py-2 w-24">Pot. Presensi</th>
+                        <th className="px-3 py-2 w-24">Pot. Apel</th>
+                        <th className="px-3 py-2 w-24">Nilai Presensi</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-ink/10">
                       {daftarUntukDinilai.map((p, i) => {
                         const sudah = nilaiTersimpanMap[p.nip]
-                        const nilaiPresensi = petaNilaiPresensi[p.nip] ?? null
+                        const { potPresensi, potApel, nilaiPresensi } = petaNilaiPresensi[p.nip] || { potPresensi: null, potApel: 0, nilaiPresensi: null }
                         return (
                           <tr key={`${p.nip}-${i}`}>
                             <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
                             <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
                             <td className="px-3 py-2.5">
-                              {nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30">—</span>}
+                              {potPresensi != null ? `${potPresensi}%` : <span className="text-ink/30">—</span>}
+                            </td>
+                            <td className="px-3 py-2.5">{potApel}%</td>
+                            <td className="px-3 py-2.5 font-semibold text-moss-800">
+                              {nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}
                             </td>
                             <td className="px-3 py-2.5">
                               {sudah ? `${sudah.skorAkhir}%` : <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Belum</span>}
@@ -335,7 +344,7 @@ export default function PimpinanPortal() {
                         )
                       })}
                       {daftarUntukDinilai.length === 0 && (
-                        <tr><td colSpan={5} className="px-3 py-4 text-center text-ink/40">Belum ada pegawai binaan untuk periode ini.</td></tr>
+                        <tr><td colSpan={7} className="px-3 py-4 text-center text-ink/40">Belum ada pegawai binaan untuk periode ini.</td></tr>
                       )}
                     </tbody>
                   </table>
