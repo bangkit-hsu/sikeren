@@ -947,6 +947,13 @@ export default function BasedataPage() {
       const petaKinerja = {}
       penilaianSnap.docs.forEach((d) => { const p = d.data(); petaKinerja[p.nip] = p.skorAkhir })
 
+      // Data dari menu e-Kinerja (Hasil Akhir) untuk bulan-tahun ini
+      const eKinerjaSnap = await getDoc(doc(db, 'eKinerja', sippId))
+      const petaEKinerja = {}
+      if (eKinerjaSnap.exists()) {
+        (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[p.nip] = p.hasilAkhir })
+      }
+
       const gabungan = dataPegawai.map((p) => ({
         nip: p.nip,
         nama: p.nama,
@@ -955,6 +962,7 @@ export default function BasedataPage() {
         presensiKehadiran: petaPresensi[p.nip] ?? null,
         kehadiranApel: jumlahTidakApel[p.nip] != null ? Math.round(jumlahTidakApel[p.nip] * 0.5 * 100) / 100 : 0,
         eKinerja: petaKinerja[p.nip] ?? null,
+        eKinerjaHasilAkhir: petaEKinerja[p.nip] ?? null,
       }))
       setNilaiAsnData(gabungan)
     } catch (err) {
@@ -1300,7 +1308,7 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[940px]">
+                            <table className="w-full text-sm min-w-[1040px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-4 py-3" rowSpan={2}>NIP</th>
@@ -1308,11 +1316,12 @@ export default function BasedataPage() {
                                   <th className="px-4 py-3" rowSpan={2}>Jabatan</th>
                                   <th className="px-4 py-2 text-center border-b border-ink/10" colSpan={3}>Presensi ASN</th>
                                   <th className="px-4 py-3 w-36" rowSpan={2}>Penilaian Individu</th>
+                                  <th className="px-4 py-3 w-32" rowSpan={2}>e-Kinerja</th>
                                 </tr>
                                 <tr>
                                   <th className="px-4 py-2 w-32">Pot. Presensi Kehadiran</th>
                                   <th className="px-4 py-2 w-28">Pot. Absensi Apel</th>
-                                  <th className="px-4 py-2 w-24">Nilai Akhir</th>
+                                  <th className="px-4 py-2 w-24">Nilai Presensi</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
@@ -1327,11 +1336,12 @@ export default function BasedataPage() {
                                       <td className="px-4 py-3">{p.kehadiranApel}%</td>
                                       <td className="px-4 py-3 font-semibold text-moss-800">{nilaiAkhir != null ? `${nilaiAkhir}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                       <td className="px-4 py-3 font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
+                                      <td className="px-4 py-3">{p.eKinerjaHasilAkhir ? p.eKinerjaHasilAkhir : <span className="text-ink/30">—</span>}</td>
                                     </tr>
                                   )
                                 })}
                                 {tersaring.length === 0 && (
-                                  <tr><td colSpan={7} className="px-4 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                  <tr><td colSpan={8} className="px-4 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
                               </tbody>
                             </table>
