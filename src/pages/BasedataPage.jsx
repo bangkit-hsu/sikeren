@@ -751,7 +751,7 @@ export default function BasedataPage() {
     }
     if (daftar.length > 0) muatPetaNilai(daftar, atasanBulan, atasanTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuAktif, subPenilaianIndividu, atasanTerpilih, atasanBulan, atasanTahun, dataPegawai, penetapanTersimpan])
+  }, [menuAktif, subPenilaianIndividu, atasanTerpilih, atasanBulan, atasanTahun, !!dataPegawai, penetapanTersimpan])
 
   async function simpanPenetapanAtasan(daftarPegawaiBinaan) {
     setMenyimpanPenetapan(true)
@@ -915,7 +915,7 @@ export default function BasedataPage() {
     if (menuAktif !== 'penilaian-asn' || subPenilaianAsn !== 'utama' || !dataPegawai) return
     muatNilaiAsn(nilaiAsnBulan, nilaiAsnTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuAktif, subPenilaianAsn, nilaiAsnBulan, nilaiAsnTahun, dataPegawai])
+  }, [menuAktif, subPenilaianAsn, nilaiAsnBulan, nilaiAsnTahun, !!dataPegawai])
 
   async function muatNilaiAsn(bulanIdx, tahun) {
     setMemuatNilaiAsn(true)
