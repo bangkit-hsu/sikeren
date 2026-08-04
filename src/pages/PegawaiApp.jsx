@@ -26,13 +26,13 @@ export default function PegawaiApp() {
           to="/absen"
           className="block w-full bg-moss-700 text-paper font-semibold rounded-full py-3.5 hover:bg-moss-800 transition-colors"
         >
-          Gunakan Face ID
+          Absen Sekarang
         </Link>
         <Link
-          to="/login"
+          to="/absen"
           className="block w-full bg-white text-moss-700 font-semibold rounded-full py-3.5 border-2 border-moss-700 hover:bg-moss-50 transition-colors"
         >
-          Masuk dengan NIP &amp; Password
+          Riwayat &amp; Profil Saya
         </Link>
       </div>
     </div>
