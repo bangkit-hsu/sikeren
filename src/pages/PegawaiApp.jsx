@@ -43,7 +43,7 @@ export default function PegawaiApp() {
           </Link>
         </div>
 
-        <p className="text-xs text-ink/50 font-mono mt-6">Developed by Bagian Umum Setda HSU</p>
+        <p className="text-xs text-ink/50 font-mono mt-6">Developed by Bagian Umum Sekda HSU</p>
       </div>
     </div>
   )
