@@ -6,6 +6,12 @@ import { hashPassword } from '../utils/hash'
 
 // Halaman ini hanya bisa dipakai selagi koleksi 'users' masih kosong,
 // untuk membuat akun admin pertama. Setelah itu admin membuat akun lain lewat menu Kelola Pegawai.
+//
+// CATATAN SEMENTARA: pengecekan "koleksi masih kosong" di bawah ini untuk sementara
+// dinonaktifkan (dipaksa false) sebagai jalur pemulihan darurat karena akun admin lama
+// tidak bisa login. Ini HARUS dikembalikan (diaktifkan lagi) setelah akun admin baru
+// berhasil dibuat, supaya halaman ini tidak bisa dipakai sembarang orang untuk membuat
+// akun admin baru kapan saja.
 export default function SetupAwal() {
   const navigate = useNavigate()
   const [mengecek, setMengecek] = useState(true)
@@ -17,7 +23,7 @@ export default function SetupAwal() {
   useEffect(() => {
     async function cek() {
       const snap = await getDocs(collection(db, 'users'))
-      setSudahAdaUser(!snap.empty)
+      setSudahAdaUser(false) // <-- sementara dipaksa false, lihat catatan di atas
       setMengecek(false)
     }
     cek()
