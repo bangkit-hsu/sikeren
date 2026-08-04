@@ -12,6 +12,7 @@ import { SIPP_MEI_2026 } from '../data/sippMei2026'
 import { DATA_PEGAWAI } from '../data/dataPegawai'
 import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
 import { unduhExcel } from '../utils/excel'
+import { muatPetaNilaiPresensi } from '../utils/nilaiPresensi'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonDashboard() {
@@ -457,6 +458,7 @@ export default function BasedataPage() {
   const [menyimpanNilai, setMenyimpanNilai] = useState(false)
   const [pesanNilai, setPesanNilai] = useState('')
   const [nilaiTersimpanMap, setNilaiTersimpanMap] = useState({}) // nip -> { skorAkhir, jawaban }
+  const [petaNilaiPresensiIndividu, setPetaNilaiPresensiIndividu] = useState({})
   const [memuatNilaiMap, setMemuatNilaiMap] = useState(false)
 
   const [nilaiAsnBulan, setNilaiAsnBulan] = useState(new Date().getMonth())
@@ -752,6 +754,11 @@ export default function BasedataPage() {
     if (daftar.length > 0) muatPetaNilai(daftar, atasanBulan, atasanTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subPenilaianIndividu, atasanTerpilih, atasanBulan, atasanTahun, !!dataPegawai, penetapanTersimpan])
+
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-individu' || subPenilaianIndividu !== 'nilai') return
+    muatPetaNilaiPresensi(atasanBulan, atasanTahun).then(setPetaNilaiPresensiIndividu).catch(() => setPetaNilaiPresensiIndividu({}))
+  }, [menuAktif, subPenilaianIndividu, atasanBulan, atasanTahun])
 
   async function simpanPenetapanAtasan(daftarPegawaiBinaan) {
     setMenyimpanPenetapan(true)
@@ -1792,10 +1799,12 @@ export default function BasedataPage() {
                   function downloadExcelNilai() {
                     const baris = daftarUntukDinilai.map((p) => {
                       const sudah = nilaiTersimpanMap[p.nip]
+                      const nilaiPresensi = petaNilaiPresensiIndividu[p.nip] ?? null
                       return {
                         NIP: p.nip,
                         Nama: p.nama,
-                        Skor: sudah ? sudah.skorTotal : '',
+                        'Nilai Presensi': nilaiPresensi != null ? `${nilaiPresensi}%` : '',
+                        'Skor Penilaian': sudah ? sudah.skorTotal : '',
                         'Pot. Penilaian': sudah ? `${sudah.skorAkhir}%` : '0%',
                       }
                     })
@@ -1864,12 +1873,13 @@ export default function BasedataPage() {
                             {memuatNilaiMap ? ' · memuat status nilai…' : ''}
                           </p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[620px]">
+                            <table className="w-full text-sm min-w-[720px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3">NIP</th>
                                   <th className="px-3 py-3">Nama</th>
-                                  <th className="px-3 py-3 w-24">Skor</th>
+                                  <th className="px-3 py-3 w-24">Nilai Presensi</th>
+                                  <th className="px-3 py-3 w-24">Skor Penilaian</th>
                                   <th className="px-3 py-3 w-32">Pot. Penilaian</th>
                                   <th className="px-3 py-3 w-28">Aksi</th>
                                 </tr>
@@ -1877,10 +1887,14 @@ export default function BasedataPage() {
                               <tbody className="divide-y divide-ink/10">
                                 {daftarUntukDinilai.map((p, i) => {
                                   const sudah = nilaiTersimpanMap[p.nip]
+                                  const nilaiPresensi = petaNilaiPresensiIndividu[p.nip] ?? null
                                   return (
                                     <tr key={`${p.nip}-${i}`}>
                                       <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
                                       <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                                      <td className="px-3 py-2.5">
+                                        {nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30">—</span>}
+                                      </td>
                                       <td className="px-3 py-2.5">
                                         {sudah ? (
                                           <span className="font-semibold text-moss-800">{sudah.skorTotal}</span>

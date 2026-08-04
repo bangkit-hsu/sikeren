@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { hashPassword } from '../utils/hash'
 import { namaBulan } from '../utils/date'
 import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
+import { muatPetaNilaiPresensi } from '../utils/nilaiPresensi'
 
 function idPenetapan(bulanIdx, tahun, atasan) {
   return `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}_${atasan.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}`
@@ -27,6 +28,7 @@ export default function PimpinanPortal() {
   const [dataPegawai, setDataPegawai] = useState(null)
   const [penetapanTersimpan, setPenetapanTersimpan] = useState(null)
   const [nilaiTersimpanMap, setNilaiTersimpanMap] = useState({})
+  const [petaNilaiPresensi, setPetaNilaiPresensi] = useState({})
   const [memuat, setMemuat] = useState(false)
 
   const [pegawaiDinilai, setPegawaiDinilai] = useState(null)
@@ -66,6 +68,8 @@ export default function PimpinanPortal() {
         if (snap.exists()) peta[p.nip] = snap.data()
       }))
       setNilaiTersimpanMap(peta)
+
+      muatPetaNilaiPresensi(bulan, tahun).then(setPetaNilaiPresensi).catch(() => setPetaNilaiPresensi({}))
     } catch {
       setDataPegawai([])
     } finally {
@@ -298,11 +302,12 @@ export default function PimpinanPortal() {
                 <p className="text-ink/50 font-mono text-sm">Memuat…</p>
               ) : (
                 <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                  <table className="w-full text-sm min-w-[560px]">
+                  <table className="w-full text-sm min-w-[660px]">
                     <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                       <tr>
                         <th className="px-3 py-3">NIP</th>
                         <th className="px-3 py-3">Nama</th>
+                        <th className="px-3 py-3 w-24">Nilai Presensi</th>
                         <th className="px-3 py-3 w-24">Pot. Penilaian</th>
                         <th className="px-3 py-3 w-28">Aksi</th>
                       </tr>
@@ -310,10 +315,14 @@ export default function PimpinanPortal() {
                     <tbody className="divide-y divide-ink/10">
                       {daftarUntukDinilai.map((p, i) => {
                         const sudah = nilaiTersimpanMap[p.nip]
+                        const nilaiPresensi = petaNilaiPresensi[p.nip] ?? null
                         return (
                           <tr key={`${p.nip}-${i}`}>
                             <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
                             <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama}</td>
+                            <td className="px-3 py-2.5">
+                              {nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30">—</span>}
+                            </td>
                             <td className="px-3 py-2.5">
                               {sudah ? `${sudah.skorAkhir}%` : <span className="text-xs px-2 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Belum</span>}
                             </td>
@@ -326,7 +335,7 @@ export default function PimpinanPortal() {
                         )
                       })}
                       {daftarUntukDinilai.length === 0 && (
-                        <tr><td colSpan={4} className="px-3 py-4 text-center text-ink/40">Belum ada pegawai binaan untuk periode ini.</td></tr>
+                        <tr><td colSpan={5} className="px-3 py-4 text-center text-ink/40">Belum ada pegawai binaan untuk periode ini.</td></tr>
                       )}
                     </tbody>
                   </table>
