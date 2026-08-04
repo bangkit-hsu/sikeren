@@ -1875,19 +1875,19 @@ export default function BasedataPage() {
                             {memuatNilaiMap ? ' · memuat status nilai…' : ''}
                           </p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[860px]">
+                            <table className="w-full text-sm min-w-[820px]">
                               <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
                                 <tr>
-                                  <th className="px-3 py-3" rowSpan={2}>NIP</th>
-                                  <th className="px-3 py-3" rowSpan={2}>Nama</th>
+                                  <th className="px-3 py-3 w-36" rowSpan={2}>NIP</th>
+                                  <th className="px-3 py-3 w-40" rowSpan={2}>Nama</th>
                                   <th className="px-3 py-2 text-center border-b border-ink/10" colSpan={3}>Presensi ASN</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Skor Penilaian</th>
-                                  <th className="px-3 py-3 w-32" rowSpan={2}>Pot. Penilaian</th>
-                                  <th className="px-3 py-3 w-28" rowSpan={2}>Aksi</th>
+                                  <th className="px-3 py-3 w-24" rowSpan={2}>Pot. Penilaian</th>
+                                  <th className="px-3 py-3 w-24" rowSpan={2}>Aksi</th>
                                 </tr>
                                 <tr>
-                                  <th className="px-3 py-2 w-24">Pot. Presensi</th>
-                                  <th className="px-3 py-2 w-24">Pot. Apel</th>
+                                  <th className="px-3 py-2 w-20">Pot. Presensi</th>
+                                  <th className="px-3 py-2 w-20">Pot. Apel</th>
                                   <th className="px-3 py-2 w-24">Nilai Presensi</th>
                                 </tr>
                               </thead>
