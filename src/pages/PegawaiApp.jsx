@@ -41,6 +41,12 @@ export default function PegawaiApp() {
           >
             Riwayat &amp; Profil Saya
           </Link>
+          <Link
+            to="/pimpinan"
+            className="block w-full bg-gold-500 text-ink font-semibold rounded-full py-3.5 hover:bg-gold-600 transition-colors"
+          >
+            Login Pimpinan
+          </Link>
         </div>
 
         <p className="text-xs text-ink/50 font-mono mt-6">Developed by Bagian Umum Setda HSU</p>
