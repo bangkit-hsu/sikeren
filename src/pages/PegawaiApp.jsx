@@ -14,6 +14,13 @@ export default function PegawaiApp() {
       />
       <div className="absolute inset-0 bg-paper/70" />
 
+      <Link
+        to="/pimpinan"
+        className="absolute top-4 right-4 z-10 bg-gold-500 text-ink text-xs font-semibold rounded-full px-3 py-1.5 shadow-sm hover:bg-gold-600 transition-colors"
+      >
+        Login Pimpinan
+      </Link>
+
       <div className="relative min-h-screen flex flex-col items-center px-6 pt-12 pb-10 text-center">
         <p className="font-display font-bold text-2xl text-ink">e-Apel</p>
 
@@ -40,12 +47,6 @@ export default function PegawaiApp() {
             className="block w-full bg-white text-moss-700 font-semibold rounded-full py-3.5 border-2 border-moss-700 hover:bg-moss-50 transition-colors"
           >
             Riwayat &amp; Profil Saya
-          </Link>
-          <Link
-            to="/pimpinan"
-            className="block w-full bg-gold-500 text-ink font-semibold rounded-full py-3.5 hover:bg-gold-600 transition-colors"
-          >
-            Login Pimpinan
           </Link>
         </div>
 
