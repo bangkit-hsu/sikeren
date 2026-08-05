@@ -3,7 +3,7 @@
 // Penilaian Individu > Daftar Pimpinan). Setelah berhasil, diarahkan ke Portal Pimpinan
 // yang hanya berisi menu Penilaian Individu dan Update Password.
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import HeroKecil from '../components/HeroKecil.jsx'
 
@@ -78,10 +78,7 @@ export default function PimpinanPage() {
             </button>
             <p className="text-xs text-ink/50 text-center">Jika belum mendapatkan password atau terkendala Login, hubungi Admin.</p>
           </form>
-          <p className="text-sm text-ink/70 text-center mt-6 font-mono">
-            <Link to="/" className="underline text-moss-700 font-medium">Kembali ke Halaman Depan</Link>
-          </p>
-          <p className="text-sm text-ink/60 text-center mt-3 font-mono">
+          <p className="text-sm text-ink/60 text-center mt-6 font-mono">
             Developed by Bagian Umum — Sekretariat Daerah - Kab. Hulu Sungai Utara
           </p>
         </div>
