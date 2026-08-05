@@ -13,6 +13,7 @@ import { DATA_PEGAWAI } from '../data/dataPegawai'
 import { KRITERIA_PENILAIAN } from '../data/kriteriaPenilaian'
 import { unduhExcel } from '../utils/excel'
 import { muatPetaNilaiPresensi } from '../utils/nilaiPresensi'
+import { persenHasilAkhirEKinerja } from '../utils/eKinerjaKriteria'
 import { useAuth } from '../context/AuthContext.jsx'
 
 function IkonDashboard() {
@@ -1341,7 +1342,14 @@ export default function BasedataPage() {
                                       <td className="px-3 py-3 text-center">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
                                       <td className="px-3 py-3 text-center">{p.kehadiranApel}%</td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
-                                      <td className="px-3 py-3 text-center">{p.eKinerjaHasilAkhir ? p.eKinerjaHasilAkhir : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">
+                                        {p.eKinerjaHasilAkhir ? (
+                                          <div>
+                                            <span className="font-semibold text-moss-800">{persenHasilAkhirEKinerja(p.eKinerjaHasilAkhir)}%</span>
+                                            <p className="text-[10px] text-ink/40 uppercase">{p.eKinerjaHasilAkhir}</p>
+                                          </div>
+                                        ) : <span className="text-ink/30">—</span>}
+                                      </td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                     </tr>
