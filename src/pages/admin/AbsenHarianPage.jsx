@@ -13,6 +13,8 @@ export default function AbsenHarianPage() {
   const [hasil, setHasil] = useState(null) // { dilewati, pegawaiDitandai } | null
   const [error, setError] = useState('')
   const [overrideHariAbsen, setOverrideHariAbsen] = useState(null) // null = belum dimuat
+  const [daftarHadir, setDaftarHadir] = useState(null)
+  const [memuatHadir, setMemuatHadir] = useState(false)
 
   useEffect(() => {
     async function muat() {
@@ -21,6 +23,26 @@ export default function AbsenHarianPage() {
     }
     muat()
   }, [])
+
+  useEffect(() => {
+    if (!tanggal) return
+    async function muatHadir() {
+      setMemuatHadir(true)
+      try {
+        const snap = await getDocs(query(collection(db, 'absensi'), where('tanggal', '==', tanggal)))
+        const data = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .filter((a) => a.status === 'sesuai' || a.status === 'luar')
+          .sort((a, b) => (a.jam || '').localeCompare(b.jam || ''))
+        setDaftarHadir(data)
+      } catch {
+        setDaftarHadir([])
+      } finally {
+        setMemuatHadir(false)
+      }
+    }
+    muatHadir()
+  }, [tanggal])
 
   const tanggalAdalahHariAbsen = overrideHariAbsen !== null && tanggal
     ? apakahHariAbsen(tanggal, overrideHariAbsen)
@@ -87,12 +109,7 @@ export default function AbsenHarianPage() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="font-display font-semibold text-2xl mb-1">Absen Harian</h1>
-      <p className="text-ink/60 text-sm mb-6">
-        Pilih tanggal, lalu klik <span className="font-medium text-ink">Closing Apel</span> untuk menandai pegawai
-        yang belum melakukan absen apel pada tanggal itu sebagai <span className="font-medium text-ink">Tidak Apel</span>.
-        Tanggal yang bisa di-generate mengikuti pengaturan di menu Hari Absensi Apel.
-      </p>
+      <h1 className="font-display font-semibold text-2xl mb-1">Apel Harian</h1>
       <p className="text-xs text-ink/40 mb-6 font-mono">
         Pegawai baru bisa absen mulai pukul 07:50 WITA. Klik Closing Apel menutup sesi absen apel untuk tanggal yang dipilih — pegawai yang belum absen setelah itu akan melihat "Jam Absen Apel Sudah Selesai".
       </p>
@@ -163,6 +180,38 @@ export default function AbsenHarianPage() {
         </div>
       )}
 
+      <div className="mt-8">
+        <p className="font-display font-semibold mb-1">ASN yang Sudah Apel — {tanggal}</p>
+        <p className="text-ink/60 text-sm mb-3">Foto diambil otomatis dari kamera saat pemindaian wajah, untuk verifikasi keaslian orang yang absen.</p>
+        {memuatHadir ? (
+          <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+        ) : daftarHadir && daftarHadir.length > 0 ? (
+          <ul className="border border-ink/10 rounded-xl2 divide-y divide-ink/10 overflow-hidden">
+            {daftarHadir.map((a) => (
+              <li key={a.id} className="flex items-center gap-3 px-4 py-3 bg-white/60">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-ink border border-ink/10 shrink-0">
+                  {a.foto ? (
+                    <img src={a.foto} alt={a.nama} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-paper/50 text-[9px] font-mono text-center leading-tight">Belum ada</div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{a.nama}</p>
+                  <p className="text-xs text-ink/50 font-mono truncate">NIP {a.nip || '—'} · {a.bagian || '—'} · Jam {a.jam || '—'}</p>
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${a.status === 'sesuai' ? 'bg-moss-100 text-moss-800' : 'bg-clay/10 text-clay'}`}>
+                  {a.status === 'sesuai' ? 'Sesuai Lokasi' : 'Diluar Lokasi'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="bg-white/60 border border-ink/10 rounded-xl2 p-5 text-center text-ink/50 text-sm">
+            Belum ada ASN yang apel pada tanggal {tanggal}.
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -199,6 +199,7 @@ export default function FaceLogin() {
         lat: posisi.lat,
         lng: posisi.lng,
         jarakMeter: jarak !== null ? Math.round(jarak) : null,
+        foto: fotoTertangkap || null,
         dibuat: serverTimestamp(),
       }
       await addDoc(collection(db, 'absensi'), data)
