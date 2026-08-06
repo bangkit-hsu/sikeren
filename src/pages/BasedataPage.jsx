@@ -42,6 +42,13 @@ function IkonDokumen() {
     </svg>
   )
 }
+// Beberapa koleksi (dataPegawai, sipp, absensi/users) diisi lewat impor Excel terpisah,
+// jadi format NIP-nya bisa beda tipis (spasi, dsb). Normalisasi ini dipakai supaya
+// pencocokan antar-koleksi berdasarkan NIP tidak gagal cuma karena beda format kecil.
+function normNip(v) {
+  return (v ?? '').toString().trim()
+}
+
 function badgeKategoriEKinerja(nilai) {
   const v = (nilai || '').toString().toUpperCase()
   if (!v || v.includes('BELUM')) return <span className="text-ink/30 text-xs">—</span>
@@ -1050,7 +1057,7 @@ export default function BasedataPage() {
       const sippSnap = await getDoc(doc(db, 'sipp', sippId))
       const petaSipp = {}
       if (sippSnap.exists()) {
-        (sippSnap.data().data || []).forEach((p) => { petaSipp[p.nip] = p })
+        (sippSnap.data().data || []).forEach((p) => { petaSipp[normNip(p.nip)] = p })
       }
 
       // Hari Apel (jumlah Hari Absen dalam sebulan) berlaku sama untuk semua pegawai
@@ -1067,9 +1074,10 @@ export default function BasedataPage() {
       const jumlahHadirApel = {}
       absensiSnap.docs.forEach((d) => {
         const a = d.data()
-        if (!a.nip) return
-        if (a.status === 'tidak_apel') jumlahTidakApel[a.nip] = (jumlahTidakApel[a.nip] || 0) + 1
-        else if (a.status === 'sesuai' || a.status === 'luar') jumlahHadirApel[a.nip] = (jumlahHadirApel[a.nip] || 0) + 1
+        const nip = normNip(a.nip)
+        if (!nip) return
+        if (a.status === 'tidak_apel') jumlahTidakApel[nip] = (jumlahTidakApel[nip] || 0) + 1
+        else if (a.status === 'sesuai' || a.status === 'luar') jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
       })
 
       // e-Kinerja (skor akhir) dari menu Penilaian Individu untuk bulan-tahun ini
@@ -1078,17 +1086,18 @@ export default function BasedataPage() {
       )
       // e-Kinerja diambil dari Pot. Penilaian (skorAkhir) di menu Penilaian Individu untuk bulan-tahun ini
       const petaKinerja = {}
-      penilaianSnap.docs.forEach((d) => { const p = d.data(); petaKinerja[p.nip] = p.skorAkhir })
+      penilaianSnap.docs.forEach((d) => { const p = d.data(); petaKinerja[normNip(p.nip)] = p.skorAkhir })
 
       // Data dari menu e-Kinerja untuk TPP (Hasil Akhir) untuk bulan-tahun ini
       const eKinerjaSnap = await getDoc(doc(db, 'eKinerjaTpp', sippId))
       const petaEKinerja = {}
       if (eKinerjaSnap.exists()) {
-        (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[p.nip] = p.hasilAkhir })
+        (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[normNip(p.nip)] = p.hasilAkhir })
       }
 
       const gabungan = dataPegawai.map((p) => {
-        const sipp = petaSipp[p.nip]
+        const nip = normNip(p.nip)
+        const sipp = petaSipp[nip]
         return {
           nip: p.nip,
           nama: p.nama,
@@ -1100,10 +1109,10 @@ export default function BasedataPage() {
           sippTl: sipp ? sipp.tl : null,
           presensiKehadiran: sipp ? sipp.penguranganPresensi : null,
           hariApel,
-          hadirApel: jumlahHadirApel[p.nip] || 0,
-          kehadiranApel: jumlahTidakApel[p.nip] != null ? Math.round(jumlahTidakApel[p.nip] * 0.5 * 100) / 100 : 0,
-          eKinerja: petaKinerja[p.nip] ?? null,
-          eKinerjaHasilAkhir: petaEKinerja[p.nip] ?? null,
+          hadirApel: jumlahHadirApel[nip] || 0,
+          kehadiranApel: jumlahTidakApel[nip] != null ? Math.round(jumlahTidakApel[nip] * 0.5 * 100) / 100 : 0,
+          eKinerja: petaKinerja[nip] ?? null,
+          eKinerjaHasilAkhir: petaEKinerja[nip] ?? null,
         }
       })
       setNilaiAsnData(gabungan)
