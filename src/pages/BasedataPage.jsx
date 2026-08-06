@@ -366,8 +366,8 @@ const NAV_GROUPS = [
     label: 'Nilai ASN',
     items: [
       { key: 'penilaian-asn:utama', label: 'TPP' },
-      { key: 'penilaian-asn:data-pegawai', label: 'Data ASN' },
       { key: 'penilaian-asn:reward-punishment', label: 'Reward & Punishment' },
+      { key: 'penilaian-asn:data-pegawai', label: 'Data ASN' },
     ],
   },
   {
