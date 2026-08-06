@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { doc, getDoc, getDocs, collection, query, where, addDoc, updateDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
-import { namaBulan } from '../utils/date'
+import { namaBulan, hitungHariKerja } from '../utils/date'
 import { hashPassword } from '../utils/hash'
 import { parseFileSipp } from '../utils/sipp'
 import { parseFileEKinerja } from '../utils/eKinerja'
@@ -1045,23 +1045,31 @@ export default function BasedataPage() {
   async function muatNilaiAsn(bulanIdx, tahun) {
     setMemuatNilaiAsn(true)
     try {
-      // Pot. Presensi dari menu SIPP untuk bulan-tahun ini
+      // Data Presensi SIPP (Hari Kerja, Hadir, Cuti, TL, Pt. Presensi) untuk bulan-tahun ini
       const sippId = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
       const sippSnap = await getDoc(doc(db, 'sipp', sippId))
-      const petaPresensi = {}
+      const petaSipp = {}
       if (sippSnap.exists()) {
-        (sippSnap.data().data || []).forEach((p) => { petaPresensi[p.nip] = p.penguranganPresensi })
+        (sippSnap.data().data || []).forEach((p) => { petaSipp[p.nip] = p })
       }
 
-      // Pot. Apel dari data absensi e-Apel untuk bulan-tahun ini (jumlah Tidak Apel x 0,5%)
+      // Hari Apel (jumlah Hari Absen dalam sebulan) berlaku sama untuk semua pegawai
+      const hariAbsenSnap = await getDoc(doc(db, 'settings', 'hariAbsen'))
+      const overrideHariAbsenIni = hariAbsenSnap.exists() ? hariAbsenSnap.data().override || {} : {}
+      const hariApel = hitungHariKerja(tahun, bulanIdx, overrideHariAbsenIni)
+
+      // Hadir Apel & Pot. Apel dari data absensi e-Apel untuk bulan-tahun ini
       const bulanStr = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
       const absensiSnap = await getDocs(
         query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
       )
       const jumlahTidakApel = {}
+      const jumlahHadirApel = {}
       absensiSnap.docs.forEach((d) => {
         const a = d.data()
-        if (a.status === 'tidak_apel' && a.nip) jumlahTidakApel[a.nip] = (jumlahTidakApel[a.nip] || 0) + 1
+        if (!a.nip) return
+        if (a.status === 'tidak_apel') jumlahTidakApel[a.nip] = (jumlahTidakApel[a.nip] || 0) + 1
+        else if (a.status === 'sesuai' || a.status === 'luar') jumlahHadirApel[a.nip] = (jumlahHadirApel[a.nip] || 0) + 1
       })
 
       // e-Kinerja (skor akhir) dari menu Penilaian Individu untuk bulan-tahun ini
@@ -1079,16 +1087,25 @@ export default function BasedataPage() {
         (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[p.nip] = p.hasilAkhir })
       }
 
-      const gabungan = dataPegawai.map((p) => ({
-        nip: p.nip,
-        nama: p.nama,
-        unitKerja: p.unitKerja,
-        jabatan: p.jabatan,
-        presensiKehadiran: petaPresensi[p.nip] ?? null,
-        kehadiranApel: jumlahTidakApel[p.nip] != null ? Math.round(jumlahTidakApel[p.nip] * 0.5 * 100) / 100 : 0,
-        eKinerja: petaKinerja[p.nip] ?? null,
-        eKinerjaHasilAkhir: petaEKinerja[p.nip] ?? null,
-      }))
+      const gabungan = dataPegawai.map((p) => {
+        const sipp = petaSipp[p.nip]
+        return {
+          nip: p.nip,
+          nama: p.nama,
+          unitKerja: p.unitKerja,
+          jabatan: p.jabatan,
+          sippHariKerja: sipp ? sipp.jumlahHariKerja : null,
+          sippHadir: sipp ? sipp.hadir : null,
+          sippCuti: sipp ? sipp.cuti : null,
+          sippTl: sipp ? sipp.tl : null,
+          presensiKehadiran: sipp ? sipp.penguranganPresensi : null,
+          hariApel,
+          hadirApel: jumlahHadirApel[p.nip] || 0,
+          kehadiranApel: jumlahTidakApel[p.nip] != null ? Math.round(jumlahTidakApel[p.nip] * 0.5 * 100) / 100 : 0,
+          eKinerja: petaKinerja[p.nip] ?? null,
+          eKinerjaHasilAkhir: petaEKinerja[p.nip] ?? null,
+        }
+      })
       setNilaiAsnData(gabungan)
     } catch (err) {
       setNilaiAsnData([])
@@ -1498,11 +1515,16 @@ export default function BasedataPage() {
                               return {
                                 NIP: p.nip,
                                 Nama: p.nama,
-                                'Pot. Presensi': p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : '',
+                                'Hari Kerja': p.sippHariKerja ?? '',
+                                Hadir: p.sippHadir ?? '',
+                                Cuti: p.sippCuti ?? '',
+                                TL: p.sippTl ?? '',
+                                'Pt. Presensi': p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : '',
+                                'Hari Apel': p.hariApel,
+                                'Hadir Apel': p.hadirApel,
                                 'Pot. Apel': `${p.kehadiranApel}%`,
-                                'Nilai Presensi (20%)': nilaiPresensi != null ? `${nilaiPresensi}%` : '',
-                                'e-Kinerja (60%)': eKinerjaPersen != null ? `${eKinerjaPersen}%` : '',
-                                'Penilaian Individu (20%)': p.eKinerja != null ? `${p.eKinerja}%` : '',
+                                'Nilai Presensi': nilaiPresensi != null ? `${nilaiPresensi}%` : '',
+                                'Nilai e-Kinerja': eKinerjaPersen != null ? `${eKinerjaPersen}%` : '',
                                 'Nilai Akhir': nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : '',
                               }
                             })
@@ -1520,20 +1542,26 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[1040px]">
+                            <table className="w-full text-sm min-w-[1240px]">
                               <thead className="bg-ink/5 text-center text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3 text-left" rowSpan={2}>NIP</th>
                                   <th className="px-3 py-3 text-left" rowSpan={2}>Nama</th>
-                                  <th className="px-3 py-2 border-b border-ink/10" colSpan={3}>Presensi ASN</th>
-                                  <th className="px-3 py-3 w-28" rowSpan={2}>e-Kinerja (60%)</th>
-                                  <th className="px-3 py-3 w-28" rowSpan={2}>Penilaian Individu (20%)</th>
+                                  <th className="px-3 py-2 border-b border-ink/10" colSpan={5}>Presensi SIPP</th>
+                                  <th className="px-3 py-2 border-b border-ink/10" colSpan={3}>Presensi e-Apel</th>
+                                  <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Presensi</th>
+                                  <th className="px-3 py-3 w-24" rowSpan={2}>Nilai e-Kinerja</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Akhir</th>
                                 </tr>
                                 <tr>
-                                  <th className="px-3 py-2 w-24">Pot. Presensi</th>
-                                  <th className="px-3 py-2 w-24">Pot. Apel</th>
-                                  <th className="px-3 py-2 w-28">Nilai Presensi (20%)</th>
+                                  <th className="px-3 py-2 w-20">Hari Kerja</th>
+                                  <th className="px-3 py-2 w-20">Hadir</th>
+                                  <th className="px-3 py-2 w-20">Cuti</th>
+                                  <th className="px-3 py-2 w-16">TL</th>
+                                  <th className="px-3 py-2 w-24">Pt. Presensi</th>
+                                  <th className="px-3 py-2 w-20">Hari Apel</th>
+                                  <th className="px-3 py-2 w-20">Hadir Apel</th>
+                                  <th className="px-3 py-2 w-20">Pot. Apel</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
@@ -1547,7 +1575,13 @@ export default function BasedataPage() {
                                     <tr key={`${p.nip}-${i}`}>
                                       <td className="px-3 py-3 font-mono whitespace-nowrap">{p.nip}</td>
                                       <td className="px-3 py-3 font-medium whitespace-nowrap">{p.nama}</td>
+                                      <td className="px-3 py-3 text-center">{p.sippHariKerja ?? <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.sippHadir ?? <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.sippCuti ?? <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.sippTl ?? <span className="text-ink/30">—</span>}</td>
                                       <td className="px-3 py-3 text-center">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
+                                      <td className="px-3 py-3 text-center">{p.hariApel}</td>
+                                      <td className="px-3 py-3 text-center">{p.hadirApel}</td>
                                       <td className="px-3 py-3 text-center">{p.kehadiranApel}%</td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                       <td className="px-3 py-3 text-center">
@@ -1558,13 +1592,12 @@ export default function BasedataPage() {
                                           </div>
                                         ) : <span className="text-ink/30">—</span>}
                                       </td>
-                                      <td className="px-3 py-3 text-center font-semibold text-moss-800">{p.eKinerja != null ? `${p.eKinerja}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                     </tr>
                                   )
                                 })}
                                 {tersaring.length === 0 && (
-                                  <tr><td colSpan={8} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                  <tr><td colSpan={13} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
                               </tbody>
                             </table>
