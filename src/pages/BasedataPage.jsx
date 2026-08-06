@@ -365,7 +365,7 @@ const NAV_GROUPS = [
     key: 'penilaian-asn',
     label: 'Nilai ASN',
     items: [
-      { key: 'penilaian-asn:utama', label: 'Nilai ASN' },
+      { key: 'penilaian-asn:utama', label: 'TPP' },
       { key: 'penilaian-asn:data-pegawai', label: 'Data ASN' },
       { key: 'penilaian-asn:reward-punishment', label: 'Reward & Punishment' },
     ],
@@ -1334,7 +1334,7 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-asn' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : subPenilaianAsn === 'reward-punishment' ? 'Reward & Punishment' : 'Data ASN'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'TPP' : subPenilaianAsn === 'reward-punishment' ? 'Reward & Punishment' : 'Data ASN'}</h1>
               {subPenilaianAsn === 'utama' ? (
                 (() => {
                   const q = cariNilaiAsn.toLowerCase()
