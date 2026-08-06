@@ -367,6 +367,7 @@ const NAV_GROUPS = [
     items: [
       { key: 'penilaian-asn:utama', label: 'Nilai ASN' },
       { key: 'penilaian-asn:data-pegawai', label: 'Data ASN' },
+      { key: 'penilaian-asn:reward-punishment', label: 'Reward & Punishment' },
     ],
   },
   {
@@ -413,6 +414,7 @@ export default function BasedataPage() {
 
   if (path === 'nilai-asn') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'utama' }
   else if (path === 'nilai-asn/data-asn') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'data-pegawai' }
+  else if (path === 'nilai-asn/reward-punishment') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'reward-punishment' }
   else if (path === 'sipp') { menuAktif = 'sipp'; subSipp = 'utama' }
   else if (path === 'sipp/potongan-tpp') { menuAktif = 'sipp'; subSipp = 'potongan-tpp' }
   else if (path === 'e-kinerja') { menuAktif = 'e-kinerja'; subEKinerja = 'utama' }
@@ -467,6 +469,12 @@ export default function BasedataPage() {
   const [nilaiAsnData, setNilaiAsnData] = useState(null)
   const [memuatNilaiAsn, setMemuatNilaiAsn] = useState(false)
   const [cariNilaiAsn, setCariNilaiAsn] = useState('')
+
+  const [rewardBulan, setRewardBulan] = useState(new Date().getMonth())
+  const [rewardTahun, setRewardTahun] = useState(new Date().getFullYear())
+  const [rewardData, setRewardData] = useState(null)
+  const [memuatReward, setMemuatReward] = useState(false)
+  const [cariReward, setCariReward] = useState('')
   const [menuTerbuka, setMenuTerbuka] = useState(false)
   const [grupTerbuka, setGrupTerbuka] = useState(() => {
     if (menuAktif === 'penilaian-asn') return 'penilaian-asn'
@@ -980,6 +988,64 @@ export default function BasedataPage() {
     }
   }
 
+  useEffect(() => {
+    if (menuAktif !== 'penilaian-asn' || subPenilaianAsn !== 'reward-punishment' || !dataPegawai) return
+    muatDataReward(rewardBulan, rewardTahun)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subPenilaianAsn, rewardBulan, rewardTahun, !!dataPegawai])
+
+  async function muatDataReward(bulanIdx, tahun) {
+    setMemuatReward(true)
+    try {
+      const petaPresensiApel = await muatPetaNilaiPresensi(bulanIdx, tahun)
+
+      const penilaianSnap = await getDocs(
+        query(collection(db, 'penilaianIndividu'), where('bulan', '==', bulanIdx), where('tahun', '==', tahun)),
+      )
+      const petaPenilaian = {}
+      penilaianSnap.docs.forEach((d) => { const p = d.data(); petaPenilaian[p.nip] = p.skorAkhir })
+
+      const eKinerjaId = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+      const eKinerjaSnap = await getDoc(doc(db, 'eKinerja', eKinerjaId))
+      const petaEKinerja = {}
+      if (eKinerjaSnap.exists()) {
+        (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[p.nip] = p.hasilAkhir })
+      }
+
+      const gabungan = dataPegawai.map((p) => {
+        const infoPresensi = petaPresensiApel[p.nip] || { potPresensi: null, potApel: 0 }
+        const presensiHadir = infoPresensi.potPresensi != null ? Math.round((100 - infoPresensi.potPresensi) * 100) / 100 : null
+        const presensiApel = Math.round((100 - infoPresensi.potApel) * 100) / 100
+        const eKinerjaPersen = persenHasilAkhirEKinerja(petaEKinerja[p.nip])
+        const penilaianIndividu = petaPenilaian[p.nip] ?? null
+        const skorTotal = Math.round((
+          (presensiHadir ?? 0) * 0.3
+          + presensiApel * 0.2
+          + (eKinerjaPersen ?? 0) * 0.3
+          + (penilaianIndividu ?? 0)
+        ) * 100) / 100
+        return {
+          nip: p.nip,
+          nama: p.nama,
+          unitKerja: p.unitKerja,
+          jabatan: p.jabatan,
+          presensiHadir,
+          presensiApel,
+          eKinerjaPersen,
+          eKinerjaHasilAkhir: petaEKinerja[p.nip] ?? null,
+          penilaianIndividu,
+          skorTotal,
+        }
+      })
+      gabungan.sort((a, b) => b.skorTotal - a.skorTotal)
+      setRewardData(gabungan)
+    } catch (err) {
+      setRewardData([])
+    } finally {
+      setMemuatReward(false)
+    }
+  }
+
   async function muatPetaNilai(daftarPegawai, bulanIdx, tahun) {
     setMemuatNilaiMap(true)
     try {
@@ -1050,6 +1116,7 @@ export default function BasedataPage() {
       'penilaian-asn': '/basedata/nilai-asn',
       'penilaian-asn:utama': '/basedata/nilai-asn',
       'penilaian-asn:data-pegawai': '/basedata/nilai-asn/data-asn',
+      'penilaian-asn:reward-punishment': '/basedata/nilai-asn/reward-punishment',
       sipp: '/basedata/sipp',
       'sipp:utama': '/basedata/sipp',
       'sipp:potongan-tpp': '/basedata/sipp/potongan-tpp',
@@ -1135,6 +1202,7 @@ export default function BasedataPage() {
                       const aktif = menuAktif === group.key
                         && ((item.key.endsWith('utama') && group.key === 'penilaian-asn' && subPenilaianAsn === 'utama')
                           || (item.key.endsWith('data-pegawai') && group.key === 'penilaian-asn' && subPenilaianAsn === 'data-pegawai')
+                          || (item.key.endsWith('reward-punishment') && group.key === 'penilaian-asn' && subPenilaianAsn === 'reward-punishment')
                           || (item.key.endsWith('utama') && group.key === 'sipp' && subSipp === 'utama')
                           || (item.key.endsWith('potongan-tpp') && group.key === 'sipp' && subSipp === 'potongan-tpp')
                           || (item.key.endsWith('utama') && group.key === 'e-kinerja' && subEKinerja === 'utama')
@@ -1266,7 +1334,7 @@ export default function BasedataPage() {
             </div>
           ) : menuAktif === 'penilaian-asn' ? (
             <div>
-              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : 'Data ASN'}</h1>
+              <h1 className="font-display font-bold text-2xl text-ink mb-4">{subPenilaianAsn === 'utama' ? 'Nilai ASN' : subPenilaianAsn === 'reward-punishment' ? 'Reward & Punishment' : 'Data ASN'}</h1>
               {subPenilaianAsn === 'utama' ? (
                 (() => {
                   const q = cariNilaiAsn.toLowerCase()
@@ -1384,6 +1452,116 @@ export default function BasedataPage() {
                                     </tr>
                                   )
                                 })}
+                                {tersaring.length === 0 && (
+                                  <tr><td colSpan={8} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )
+                })()
+              ) : subPenilaianAsn === 'reward-punishment' ? (
+                (() => {
+                  const q = cariReward.toLowerCase()
+                  const tersaring = (rewardData || []).filter((p) =>
+                    !q
+                    || p.nip.includes(q)
+                    || p.nama.toLowerCase().includes(q)
+                    || (p.unitKerja || '').toLowerCase().includes(q)
+                    || (p.jabatan || '').toLowerCase().includes(q),
+                  )
+                  return (
+                    <div>
+                      <div className="flex flex-wrap items-end gap-3 mb-4">
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                          <select
+                            value={rewardBulan}
+                            onChange={(e) => setRewardBulan(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                          <select
+                            value={rewardTahun}
+                            onChange={(e) => setRewardTahun(Number(e.target.value))}
+                            className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                          >
+                            {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                          </select>
+                        </div>
+                        <input
+                          value={cariReward}
+                          onChange={(e) => setCariReward(e.target.value)}
+                          placeholder="Cari NIP, nama, bagian, atau jabatan…"
+                          className="rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm w-full max-w-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const baris = tersaring.map((p, i) => ({
+                              Peringkat: i + 1,
+                              NIP: p.nip,
+                              Nama: p.nama,
+                              'Presensi Hadir (30%)': p.presensiHadir != null ? `${p.presensiHadir}%` : '',
+                              'Presensi Apel (20%)': `${p.presensiApel}%`,
+                              'e-Kinerja (30%)': p.eKinerjaPersen != null ? `${p.eKinerjaPersen}%` : '',
+                              'Penilaian Individu (20%)': p.penilaianIndividu != null ? `${p.penilaianIndividu}%` : '',
+                              'Skor Total': `${p.skorTotal}%`,
+                            }))
+                            unduhExcel(`Reward-Punishment-${namaBulan(rewardBulan)}-${rewardTahun}.xlsx`, baris, 'Reward Punishment')
+                          }}
+                          className="ml-auto bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-moss-800 transition-colors"
+                        >
+                          Download Excel
+                        </button>
+                      </div>
+
+                      {memuatReward ? (
+                        <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                      ) : (
+                        <>
+                          <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(rewardData || []).length} pegawai — {namaBulan(rewardBulan)} {rewardTahun}, diurutkan dari nilai terbaik</p>
+                          <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+                            <table className="w-full text-sm min-w-[900px]">
+                              <thead className="bg-ink/5 text-center text-xs font-mono uppercase text-ink/50">
+                                <tr>
+                                  <th className="px-3 py-3 w-14">#</th>
+                                  <th className="px-3 py-3 text-left">NIP</th>
+                                  <th className="px-3 py-3 text-left">Nama</th>
+                                  <th className="px-3 py-3 w-28">Presensi Hadir (30%)</th>
+                                  <th className="px-3 py-3 w-28">Presensi Apel (20%)</th>
+                                  <th className="px-3 py-3 w-28">e-Kinerja (30%)</th>
+                                  <th className="px-3 py-3 w-28">Penilaian Individu (20%)</th>
+                                  <th className="px-3 py-3 w-24">Skor Total</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-ink/10">
+                                {tersaring.map((p, i) => (
+                                  <tr key={`${p.nip}-${i}`}>
+                                    <td className="px-3 py-3 text-center font-mono text-ink/50">{i + 1}</td>
+                                    <td className="px-3 py-3 font-mono whitespace-nowrap">{p.nip}</td>
+                                    <td className="px-3 py-3 font-medium whitespace-nowrap">{p.nama}</td>
+                                    <td className="px-3 py-3 text-center">{p.presensiHadir != null ? `${p.presensiHadir}%` : <span className="text-ink/30">—</span>}</td>
+                                    <td className="px-3 py-3 text-center">{p.presensiApel}%</td>
+                                    <td className="px-3 py-3 text-center">
+                                      {p.eKinerjaPersen != null ? (
+                                        <div>
+                                          <span>{p.eKinerjaPersen}%</span>
+                                          <p className="text-[10px] text-ink/40 uppercase">{p.eKinerjaHasilAkhir}</p>
+                                        </div>
+                                      ) : <span className="text-ink/30">—</span>}
+                                    </td>
+                                    <td className="px-3 py-3 text-center">{p.penilaianIndividu != null ? `${p.penilaianIndividu}%` : <span className="text-ink/30">—</span>}</td>
+                                    <td className="px-3 py-3 text-center font-semibold text-moss-800">{p.skorTotal}%</td>
+                                  </tr>
+                                ))}
                                 {tersaring.length === 0 && (
                                   <tr><td colSpan={8} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
