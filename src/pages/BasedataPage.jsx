@@ -46,7 +46,7 @@ function IkonDokumen() {
 // jadi format NIP-nya bisa beda tipis (spasi, dsb). Normalisasi ini dipakai supaya
 // pencocokan antar-koleksi berdasarkan NIP tidak gagal cuma karena beda format kecil.
 function normNip(v) {
-  return (v ?? '').toString().trim()
+  return (v ?? '').toString().replace(/\D/g, '')
 }
 
 function badgeKategoriEKinerja(nilai) {
