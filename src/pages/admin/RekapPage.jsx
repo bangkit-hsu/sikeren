@@ -12,7 +12,6 @@ export default function RekapPage() {
   const [bulan, setBulan] = useState(now.getMonth())
   const [pegawai, setPegawai] = useState([])
   const [absensi, setAbsensi] = useState([])
-  const [dataSipp, setDataSipp] = useState([])
   const [overrideHariAbsen, setOverrideHariAbsen] = useState({})
   const [memuat, setMemuat] = useState(true)
   const [cari, setCari] = useState('')
@@ -41,9 +40,6 @@ export default function RekapPage() {
       const data = absensiSnap.docs.map((d) => d.data())
       setAbsensi(data)
 
-      const sippSnap = await getDoc(doc(db, 'sipp', bulanStr))
-      setDataSipp(sippSnap.exists() ? (sippSnap.data().data || []) : [])
-
       setMemuat(false)
     }
     load()
@@ -53,16 +49,12 @@ export default function RekapPage() {
   const hariKerja = useMemo(() => hitungHariKerja(tahun, bulan, overrideHariAbsen), [tahun, bulan, overrideHariAbsen])
 
   const rekap = useMemo(() => {
-    const petaSipp = new Map(dataSipp.map((s) => [s.nip, s]))
     return pegawai
       .map((p) => {
         const milik = absensi.filter((a) => a.uid === p.id)
         const hadir = milik.filter((a) => a.status !== 'tidak_apel')
-        const sipp = petaSipp.get(p.nip)
         return {
           ...p,
-          cuti: sipp ? sipp.cuti : null,
-          tl: sipp ? sipp.tl : null,
           sesuai: milik.filter((a) => a.status === 'sesuai').length,
           luar: milik.filter((a) => a.status === 'luar').length,
           tidakApel: milik.filter((a) => a.status === 'tidak_apel').length,
@@ -79,7 +71,7 @@ export default function RekapPage() {
         (p.bagian || '').toLowerCase().includes(cari.toLowerCase()) ||
         (p.jabatan || '').toLowerCase().includes(cari.toLowerCase()),
       )
-  }, [pegawai, absensi, dataSipp, cari])
+  }, [pegawai, absensi, cari])
 
   function downloadExcel() {
     const baris = rekap.map((p) => ({
@@ -87,8 +79,6 @@ export default function RekapPage() {
       Nama: p.nama,
       Bagian: p.bagian,
       Jabatan: p.jabatan,
-      Cuti: p.cuti ?? '',
-      TL: p.tl ?? '',
       'Sesuai Lokasi': p.sesuai,
       'Diluar Lokasi': p.luar,
       'Tidak Apel': p.tidakApel,
@@ -212,15 +202,13 @@ export default function RekapPage() {
         <p className="text-ink/50 font-mono text-sm">Memuat…</p>
       ) : (
         <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-          <table className="w-full text-sm min-w-[1280px]">
+          <table className="w-full text-sm min-w-[1160px]">
             <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
               <tr>
                 <th className="px-4 py-3">NIP</th>
                 <th className="px-4 py-3">Nama</th>
                 <th className="px-4 py-3">Bagian</th>
                 <th className="px-4 py-3">Jabatan</th>
-                <th className="px-4 py-3">Cuti</th>
-                <th className="px-4 py-3">TL</th>
                 <th className="px-4 py-3">Sesuai Lokasi</th>
                 <th className="px-4 py-3">Diluar Lokasi</th>
                 <th className="px-4 py-3">Tidak Apel</th>
@@ -240,8 +228,6 @@ export default function RekapPage() {
                   <td className="px-4 py-3 font-medium">{p.nama}</td>
                   <td className="px-4 py-3">{p.bagian}</td>
                   <td className="px-4 py-3">{p.jabatan}</td>
-                  <td className="px-4 py-3">{p.cuti ?? <span className="text-ink/30">—</span>}</td>
-                  <td className="px-4 py-3">{p.tl ?? <span className="text-ink/30">—</span>}</td>
                   <td className="px-4 py-3">{p.sesuai}</td>
                   <td className="px-4 py-3">{p.luar}</td>
                   <td className="px-4 py-3">
@@ -265,7 +251,7 @@ export default function RekapPage() {
                 </tr>
               ))}
               {rekap.length === 0 && (
-                <tr><td colSpan={16} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
+                <tr><td colSpan={14} className="px-4 py-6 text-center text-ink/40">Belum ada pegawai / data.</td></tr>
               )}
             </tbody>
           </table>
