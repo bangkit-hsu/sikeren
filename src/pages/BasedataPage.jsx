@@ -1083,7 +1083,7 @@ export default function BasedataPage() {
         const nip = petaUidKeNip[a.uid] || normNip(a.nip)
         if (!nip) return
         if (a.status === 'tidak_apel') jumlahTidakApel[nip] = (jumlahTidakApel[nip] || 0) + 1
-        else if (a.status === 'sesuai' || a.status === 'luar') jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
+        else jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
       })
 
       // e-Kinerja (skor akhir) dari menu Penilaian Individu untuk bulan-tahun ini
