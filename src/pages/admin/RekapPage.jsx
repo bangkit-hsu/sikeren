@@ -113,7 +113,7 @@ export default function RekapPage() {
           nipTidakDitemukan.add(b.nip)
           continue
         }
-        const data = { uid, tanggal: b.tanggal, jam: b.jam, status: b.status }
+        const data = { uid, nip: b.nip, tanggal: b.tanggal, jam: b.jam, status: b.status }
         if (b.keterangan) data.keterangan = b.keterangan
         await addDoc(collection(db, 'absensi'), data)
         ditambah += 1

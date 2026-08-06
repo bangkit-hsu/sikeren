@@ -1067,8 +1067,12 @@ export default function BasedataPage() {
       const hariApel = hitungHariKerja(tahun, bulanIdx, overrideHariAbsenIni)
 
       // Hadir Apel & Pot. Apel dari data absensi e-Apel untuk bulan-tahun ini —
-      // dicocokkan langsung lewat field nip yang tersimpan di setiap dokumen absensi
-      // (selalu diisi saat absen, baik lewat pemindaian wajah maupun login manual).
+      // dicocokkan lewat field nip di dokumen absensi; kalau tidak ada (mis. data
+      // impor lama sebelum field nip ditambahkan), dicocokkan lewat uid sebagai cadangan.
+      const usersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'pegawai')))
+      const petaUidKeNip = {}
+      usersSnap.docs.forEach((d) => { petaUidKeNip[d.id] = normNip(d.data().nip) })
+
       const bulanStr = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
       const absensiSnap = await getDocs(
         query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
@@ -1077,7 +1081,7 @@ export default function BasedataPage() {
       setJumlahAbsensiDitemukan(absensiSnap.docs.length)
       absensiSnap.docs.forEach((d) => {
         const a = d.data()
-        const nip = normNip(a.nip)
+        const nip = normNip(a.nip) || petaUidKeNip[a.uid] || ''
         if (!nip) return
         if (a.status !== 'tidak_apel') jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
       })
