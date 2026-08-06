@@ -1307,6 +1307,32 @@ export default function BasedataPage() {
                           placeholder="Cari NIP, nama, bagian, atau jabatan…"
                           className="rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm w-full max-w-xs"
                         />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const baris = tersaring.map((p) => {
+                              const nilaiPresensi = p.presensiKehadiran != null ? Math.round((100 - p.presensiKehadiran - p.kehadiranApel) * 100) / 100 : null
+                              const eKinerjaPersen = persenHasilAkhirEKinerja(p.eKinerjaHasilAkhir)
+                              const nilaiAkhirTotal = nilaiPresensi != null && eKinerjaPersen != null && p.eKinerja != null
+                                ? Math.round((nilaiPresensi * 0.2 + eKinerjaPersen * 0.6 + p.eKinerja * 0.2) * 100) / 100
+                                : null
+                              return {
+                                NIP: p.nip,
+                                Nama: p.nama,
+                                'Pot. Presensi': p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : '',
+                                'Pot. Apel': `${p.kehadiranApel}%`,
+                                'Nilai Presensi (20%)': nilaiPresensi != null ? `${nilaiPresensi}%` : '',
+                                'e-Kinerja (60%)': eKinerjaPersen != null ? `${eKinerjaPersen}%` : '',
+                                'Penilaian Individu (20%)': p.eKinerja != null ? `${p.eKinerja}%` : '',
+                                'Nilai Akhir': nilaiAkhirTotal != null ? `${nilaiAkhirTotal}%` : '',
+                              }
+                            })
+                            unduhExcel(`Nilai-ASN-${namaBulan(nilaiAsnBulan)}-${nilaiAsnTahun}.xlsx`, baris, 'Nilai ASN')
+                          }}
+                          className="ml-auto bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-moss-800 transition-colors"
+                        >
+                          Download Excel
+                        </button>
                       </div>
 
                       {memuatNilaiAsn ? (
@@ -1315,26 +1341,29 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[980px]">
+                            <table className="w-full text-sm min-w-[1040px]">
                               <thead className="bg-ink/5 text-center text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3 text-left" rowSpan={2}>NIP</th>
                                   <th className="px-3 py-3 text-left" rowSpan={2}>Nama</th>
                                   <th className="px-3 py-2 border-b border-ink/10" colSpan={3}>Presensi ASN</th>
-                                  <th className="px-3 py-3 w-24" rowSpan={2}>e-Kinerja</th>
-                                  <th className="px-3 py-3 w-28" rowSpan={2}>Penilaian Individu</th>
+                                  <th className="px-3 py-3 w-28" rowSpan={2}>e-Kinerja (60%)</th>
+                                  <th className="px-3 py-3 w-28" rowSpan={2}>Penilaian Individu (20%)</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Akhir</th>
                                 </tr>
                                 <tr>
                                   <th className="px-3 py-2 w-24">Pot. Presensi</th>
                                   <th className="px-3 py-2 w-24">Pot. Apel</th>
-                                  <th className="px-3 py-2 w-24">Nilai Presensi</th>
+                                  <th className="px-3 py-2 w-28">Nilai Presensi (20%)</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-ink/10">
                                 {tersaring.map((p, i) => {
                                   const nilaiPresensi = p.presensiKehadiran != null ? Math.round((100 - p.presensiKehadiran - p.kehadiranApel) * 100) / 100 : null
-                                  const nilaiAkhirTotal = nilaiPresensi != null && p.eKinerja != null ? Math.round((nilaiPresensi + p.eKinerja) * 100) / 100 : null
+                                  const eKinerjaPersen = persenHasilAkhirEKinerja(p.eKinerjaHasilAkhir)
+                                  const nilaiAkhirTotal = nilaiPresensi != null && eKinerjaPersen != null && p.eKinerja != null
+                                    ? Math.round((nilaiPresensi * 0.2 + eKinerjaPersen * 0.6 + p.eKinerja * 0.2) * 100) / 100
+                                    : null
                                   return (
                                     <tr key={`${p.nip}-${i}`}>
                                       <td className="px-3 py-3 font-mono whitespace-nowrap">{p.nip}</td>
@@ -1343,9 +1372,9 @@ export default function BasedataPage() {
                                       <td className="px-3 py-3 text-center">{p.kehadiranApel}%</td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
                                       <td className="px-3 py-3 text-center">
-                                        {p.eKinerjaHasilAkhir ? (
+                                        {eKinerjaPersen != null ? (
                                           <div>
-                                            <span className="font-semibold text-moss-800">{persenHasilAkhirEKinerja(p.eKinerjaHasilAkhir)}%</span>
+                                            <span className="font-semibold text-moss-800">{eKinerjaPersen}%</span>
                                             <p className="text-[10px] text-ink/40 uppercase">{p.eKinerjaHasilAkhir}</p>
                                           </div>
                                         ) : <span className="text-ink/30">—</span>}
