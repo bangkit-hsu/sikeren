@@ -1072,14 +1072,12 @@ export default function BasedataPage() {
       const absensiSnap = await getDocs(
         query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
       )
-      const jumlahTidakApel = {}
       const jumlahHadirApel = {}
       absensiSnap.docs.forEach((d) => {
         const a = d.data()
         const nip = normNip(a.nip)
         if (!nip) return
-        if (a.status === 'tidak_apel') jumlahTidakApel[nip] = (jumlahTidakApel[nip] || 0) + 1
-        else jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
+        if (a.status !== 'tidak_apel') jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
       })
 
       // e-Kinerja (skor akhir) dari menu Penilaian Individu untuk bulan-tahun ini
@@ -1100,6 +1098,10 @@ export default function BasedataPage() {
       const gabungan = dataPegawai.map((p) => {
         const nip = normNip(p.nip)
         const sipp = petaSipp[nip]
+        const hadirApelNilai = jumlahHadirApel[nip] || 0
+        const cutiNilai = sipp && sipp.cuti != null ? sipp.cuti : 0
+        const tlNilai = sipp && sipp.tl != null ? sipp.tl : 0
+        const kekuranganApel = hariApel - (hadirApelNilai + cutiNilai + tlNilai)
         return {
           nip: p.nip,
           nama: p.nama,
@@ -1111,8 +1113,8 @@ export default function BasedataPage() {
           sippTl: sipp ? sipp.tl : null,
           presensiKehadiran: sipp ? sipp.penguranganPresensi : null,
           hariApel,
-          hadirApel: jumlahHadirApel[nip] || 0,
-          kehadiranApel: jumlahTidakApel[nip] != null ? Math.round(jumlahTidakApel[nip] * 0.5 * 100) / 100 : 0,
+          hadirApel: hadirApelNilai,
+          kehadiranApel: kekuranganApel > 0 ? Math.round(kekuranganApel * 0.5 * 100) / 100 : 0,
           eKinerja: petaKinerja[nip] ?? null,
           eKinerjaHasilAkhir: petaEKinerja[nip] ?? null,
         }
