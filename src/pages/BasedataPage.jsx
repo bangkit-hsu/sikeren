@@ -42,6 +42,50 @@ function IkonDokumen() {
     </svg>
   )
 }
+function badgeKategoriEKinerja(nilai) {
+  const v = (nilai || '').toString().toUpperCase()
+  if (!v || v.includes('BELUM')) return <span className="text-ink/30 text-xs">—</span>
+  const warna = v.includes('DIATAS') || v.includes('SANGAT BAIK')
+    ? 'bg-moss-100 text-moss-800'
+    : v.includes('SESUAI') || (v === 'BAIK')
+      ? 'bg-moss-50 text-moss-700'
+      : v.includes('DIBAWAH') || v.includes('KURANG')
+        ? 'bg-clay/10 text-clay'
+        : 'bg-ink/10 text-ink/60'
+  return <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${warna}`}>{nilai}</span>
+}
+
+function TabelEKinerja({ data }) {
+  return (
+    <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
+      <table className="w-full text-sm min-w-[820px]">
+        <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
+          <tr>
+            <th className="px-3 py-3">NIP</th>
+            <th className="px-3 py-3">Nama</th>
+            <th className="px-3 py-3">Jabatan</th>
+            <th className="px-3 py-3 w-28">Hasil Kerja</th>
+            <th className="px-3 py-3 w-28">Perilaku Kerja</th>
+            <th className="px-3 py-3 w-28">Hasil Akhir</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-ink/10">
+          {data.map((p, i) => (
+            <tr key={`${p.nip}-${i}`}>
+              <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
+              <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama || '—'}</td>
+              <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan || '—'}</td>
+              <td className="px-3 py-2.5">{badgeKategoriEKinerja(p.hasilKerja)}</td>
+              <td className="px-3 py-2.5">{badgeKategoriEKinerja(p.perilakuKerja)}</td>
+              <td className="px-3 py-2.5">{badgeKategoriEKinerja(p.hasilAkhir)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function IkonGrafik() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
@@ -382,7 +426,8 @@ const NAV_GROUPS = [
     key: 'e-kinerja',
     label: 'e-Kinerja',
     items: [
-      { key: 'e-kinerja:utama', label: 'Upload e-Kinerja' },
+      { key: 'e-kinerja:tpp', label: 'e-Kinerja untuk TPP' },
+      { key: 'e-kinerja:utama', label: 'e-Kinerja untuk Reward' },
       { key: 'e-kinerja:perhitungan', label: 'Perhitungan e-Kinerja' },
     ],
   },
@@ -417,6 +462,7 @@ export default function BasedataPage() {
   else if (path === 'nilai-asn/reward-punishment') { menuAktif = 'penilaian-asn'; subPenilaianAsn = 'reward-punishment' }
   else if (path === 'sipp') { menuAktif = 'sipp'; subSipp = 'utama' }
   else if (path === 'sipp/potongan-tpp') { menuAktif = 'sipp'; subSipp = 'potongan-tpp' }
+  else if (path === 'e-kinerja/tpp') { menuAktif = 'e-kinerja'; subEKinerja = 'tpp' }
   else if (path === 'e-kinerja') { menuAktif = 'e-kinerja'; subEKinerja = 'utama' }
   else if (path === 'e-kinerja/perhitungan') { menuAktif = 'e-kinerja'; subEKinerja = 'perhitungan' }
   else if (path === 'penilaian-individu') { menuAktif = 'penilaian-individu'; subPenilaianIndividu = 'nilai' }
@@ -510,6 +556,15 @@ export default function BasedataPage() {
   const [eKinerjaBulan, setEKinerjaBulan] = useState(now.getMonth())
   const [eKinerjaTahun, setEKinerjaTahun] = useState(now.getFullYear())
 
+  const [dataEKinerjaTpp, setDataEKinerjaTpp] = useState(null)
+  const [memuatEKinerjaTpp, setMemuatEKinerjaTpp] = useState(false)
+  const [mengunggahEKinerjaTpp, setMengunggahEKinerjaTpp] = useState(false)
+  const [pesanEKinerjaTpp, setPesanEKinerjaTpp] = useState('')
+  const [tahapUploadEKinerjaTpp, setTahapUploadEKinerjaTpp] = useState(null)
+  const [tahapGagalDiEKinerjaTpp, setTahapGagalDiEKinerjaTpp] = useState(null)
+  const [eKinerjaTppBulan, setEKinerjaTppBulan] = useState(now.getMonth())
+  const [eKinerjaTppTahun, setEKinerjaTppTahun] = useState(now.getFullYear())
+
   const [dataPegawai, setDataPegawai] = useState(null)
   const [memuatDataPegawai, setMemuatDataPegawai] = useState(false)
   const [cariPegawai, setCariPegawai] = useState('')
@@ -554,6 +609,12 @@ export default function BasedataPage() {
     muatDataEKinerja(eKinerjaBulan, eKinerjaTahun)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuAktif, subEKinerja, eKinerjaBulan, eKinerjaTahun])
+
+  useEffect(() => {
+    if (menuAktif !== 'e-kinerja' || subEKinerja !== 'tpp') return
+    muatDataEKinerjaTpp(eKinerjaTppBulan, eKinerjaTppTahun)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuAktif, subEKinerja, eKinerjaTppBulan, eKinerjaTppTahun])
 
   async function muatDataSipp(bulanIdx, tahun) {
     setMemuatSipp(true)
@@ -656,6 +717,54 @@ export default function BasedataPage() {
       setPesanEKinerja('Gagal mengunggah: ' + err.message)
     } finally {
       setMengunggahEKinerja(false)
+      e.target.value = ''
+    }
+  }
+
+  async function muatDataEKinerjaTpp(bulanIdx, tahun) {
+    setMemuatEKinerjaTpp(true)
+    setPesanEKinerjaTpp('')
+    setTahapUploadEKinerjaTpp(null)
+    setTahapGagalDiEKinerjaTpp(null)
+    const id = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
+    try {
+      const snap = await getDoc(doc(db, 'eKinerjaTpp', id))
+      setDataEKinerjaTpp(snap.exists() ? (snap.data().data || []) : null)
+    } catch (err) {
+      setPesanEKinerjaTpp('Gagal memuat data: ' + err.message)
+      setDataEKinerjaTpp(null)
+    } finally {
+      setMemuatEKinerjaTpp(false)
+    }
+  }
+
+  async function handleUploadEKinerjaTpp(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setMengunggahEKinerjaTpp(true)
+    setPesanEKinerjaTpp('')
+    setTahapGagalDiEKinerjaTpp(null)
+    let langkahSaatIni = 'membaca'
+    setTahapUploadEKinerjaTpp(langkahSaatIni)
+    try {
+      const diparsing = await parseFileEKinerja(file)
+
+      langkahSaatIni = 'menyimpan'
+      setTahapUploadEKinerjaTpp(langkahSaatIni)
+      const id = `${eKinerjaTppTahun}-${String(eKinerjaTppBulan + 1).padStart(2, '0')}`
+      await setDoc(doc(db, 'eKinerjaTpp', id), {
+        bulan: eKinerjaTppBulan, tahun: eKinerjaTppTahun, data: diparsing, diunggahPada: serverTimestamp(),
+      })
+
+      setDataEKinerjaTpp(diparsing)
+      setTahapUploadEKinerjaTpp('sukses')
+      setPesanEKinerjaTpp(`Berhasil mengunggah data ${diparsing.length} pegawai untuk ${namaBulan(eKinerjaTppBulan)} ${eKinerjaTppTahun}.`)
+    } catch (err) {
+      setTahapGagalDiEKinerjaTpp(langkahSaatIni)
+      setTahapUploadEKinerjaTpp('gagal')
+      setPesanEKinerjaTpp('Gagal mengunggah: ' + err.message)
+    } finally {
+      setMengunggahEKinerjaTpp(false)
       e.target.value = ''
     }
   }
@@ -963,8 +1072,8 @@ export default function BasedataPage() {
       const petaKinerja = {}
       penilaianSnap.docs.forEach((d) => { const p = d.data(); petaKinerja[p.nip] = p.skorAkhir })
 
-      // Data dari menu e-Kinerja (Hasil Akhir) untuk bulan-tahun ini
-      const eKinerjaSnap = await getDoc(doc(db, 'eKinerja', sippId))
+      // Data dari menu e-Kinerja untuk TPP (Hasil Akhir) untuk bulan-tahun ini
+      const eKinerjaSnap = await getDoc(doc(db, 'eKinerjaTpp', sippId))
       const petaEKinerja = {}
       if (eKinerjaSnap.exists()) {
         (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[p.nip] = p.hasilAkhir })
@@ -1121,6 +1230,7 @@ export default function BasedataPage() {
       'sipp:utama': '/basedata/sipp',
       'sipp:potongan-tpp': '/basedata/sipp/potongan-tpp',
       'e-kinerja': '/basedata/e-kinerja',
+      'e-kinerja:tpp': '/basedata/e-kinerja/tpp',
       'e-kinerja:utama': '/basedata/e-kinerja',
       'e-kinerja:perhitungan': '/basedata/e-kinerja/perhitungan',
       'penilaian-individu': '/basedata/penilaian-individu',
@@ -1205,6 +1315,7 @@ export default function BasedataPage() {
                           || (item.key.endsWith('reward-punishment') && group.key === 'penilaian-asn' && subPenilaianAsn === 'reward-punishment')
                           || (item.key.endsWith('utama') && group.key === 'sipp' && subSipp === 'utama')
                           || (item.key.endsWith('potongan-tpp') && group.key === 'sipp' && subSipp === 'potongan-tpp')
+                          || (item.key.endsWith('tpp') && group.key === 'e-kinerja' && subEKinerja === 'tpp')
                           || (item.key.endsWith('utama') && group.key === 'e-kinerja' && subEKinerja === 'utama')
                           || (item.key.endsWith('perhitungan') && group.key === 'e-kinerja' && subEKinerja === 'perhitungan')
                           || (item.key.endsWith('nilai') && group.key === 'penilaian-individu' && subPenilaianIndividu === 'nilai')
@@ -1834,12 +1945,61 @@ export default function BasedataPage() {
           ) : menuAktif === 'e-kinerja' ? (
             <div>
               <h1 className="font-display font-bold text-2xl text-ink mb-4">
-                {subEKinerja === 'utama' ? 'Upload e-Kinerja' : 'Perhitungan e-Kinerja'}
+                {subEKinerja === 'tpp' ? 'e-Kinerja untuk TPP' : subEKinerja === 'utama' ? 'e-Kinerja untuk Reward' : 'Perhitungan e-Kinerja'}
               </h1>
 
-              {subEKinerja === 'utama' ? (
+              {subEKinerja === 'tpp' ? (
                 <div>
-                  <p className="text-ink/60 text-sm mb-4">Pilih bulan, lalu unggah file e-Kinerja (.xlsx) untuk periode itu. Kalau data untuk bulan yang dipilih sudah pernah diunggah, hasilnya langsung tampil.</p>
+                  <p className="text-ink/60 text-sm mb-4">Data e-Kinerja ini dipakai untuk perhitungan TPP (menu Nilai ASN). Pilih bulan, lalu unggah file e-Kinerja (.xlsx) untuk periode itu.</p>
+
+                  <div className="flex flex-wrap items-end gap-3 mb-5">
+                    <div>
+                      <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Bulan</label>
+                      <select
+                        value={eKinerjaTppBulan}
+                        onChange={(e) => setEKinerjaTppBulan(Number(e.target.value))}
+                        className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                      >
+                        {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i}>{namaBulan(i)}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-ink/60 uppercase tracking-wide font-mono">Tahun</label>
+                      <select
+                        value={eKinerjaTppTahun}
+                        onChange={(e) => setEKinerjaTppTahun(Number(e.target.value))}
+                        className="mt-1 rounded-lg border border-ink/15 px-3 py-2 bg-white text-sm"
+                      >
+                        {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map((y) => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    </div>
+                    <label className="inline-flex items-center gap-2 bg-moss-700 text-paper text-sm font-medium rounded-lg px-4 py-2.5 cursor-pointer hover:bg-moss-800 transition-colors">
+                      {mengunggahEKinerjaTpp ? 'Mengunggah…' : 'Upload Data'}
+                      <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadEKinerjaTpp} disabled={mengunggahEKinerjaTpp} />
+                    </label>
+                  </div>
+
+                  <ProgresUpload tahap={tahapUploadEKinerjaTpp} tahapGagalDi={tahapGagalDiEKinerjaTpp} />
+
+                  {pesanEKinerjaTpp && (
+                    <p className={`text-sm rounded-lg px-3 py-2 mb-4 ${pesanEKinerjaTpp.startsWith('Gagal') ? 'text-clay bg-clay/10' : 'text-moss-800 bg-moss-50'}`}>
+                      {pesanEKinerjaTpp}
+                    </p>
+                  )}
+
+                  {memuatEKinerjaTpp ? (
+                    <p className="text-ink/50 font-mono text-sm">Memuat…</p>
+                  ) : dataEKinerjaTpp && dataEKinerjaTpp.length > 0 ? (
+                    <TabelEKinerja data={dataEKinerjaTpp} />
+                  ) : (
+                    <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
+                      <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(eKinerjaTppBulan)} {eKinerjaTppTahun}. Unggah file e-Kinerja untuk periode ini.</p>
+                    </div>
+                  )}
+                </div>
+              ) : subEKinerja === 'utama' ? (
+                <div>
+                  <p className="text-ink/60 text-sm mb-4">Data e-Kinerja ini dipakai untuk perhitungan Reward & Punishment (menu Nilai ASN). Pilih bulan, lalu unggah file e-Kinerja (.xlsx) untuk periode itu.</p>
 
                   <div className="flex flex-wrap items-end gap-3 mb-5">
                     <div>
@@ -1879,48 +2039,7 @@ export default function BasedataPage() {
                   {memuatEKinerja ? (
                     <p className="text-ink/50 font-mono text-sm">Memuat…</p>
                   ) : dataEKinerja && dataEKinerja.length > 0 ? (
-                    (() => {
-                      function badgeKategori(nilai) {
-                        const v = (nilai || '').toString().toUpperCase()
-                        if (!v || v.includes('BELUM')) return <span className="text-ink/30 text-xs">—</span>
-                        const warna = v.includes('DIATAS') || v.includes('SANGAT BAIK')
-                          ? 'bg-moss-100 text-moss-800'
-                          : v.includes('SESUAI') || (v === 'BAIK')
-                            ? 'bg-moss-50 text-moss-700'
-                            : v.includes('DIBAWAH') || v.includes('KURANG')
-                              ? 'bg-clay/10 text-clay'
-                              : 'bg-ink/10 text-ink/60'
-                        return <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${warna}`}>{nilai}</span>
-                      }
-                      return (
-                        <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                          <table className="w-full text-sm min-w-[820px]">
-                            <thead className="bg-ink/5 text-left text-xs font-mono uppercase text-ink/50">
-                              <tr>
-                                <th className="px-3 py-3">NIP</th>
-                                <th className="px-3 py-3">Nama</th>
-                                <th className="px-3 py-3">Jabatan</th>
-                                <th className="px-3 py-3 w-28">Hasil Kerja</th>
-                                <th className="px-3 py-3 w-28">Perilaku Kerja</th>
-                                <th className="px-3 py-3 w-28">Hasil Akhir</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-ink/10">
-                              {dataEKinerja.map((p, i) => (
-                                <tr key={`${p.nip}-${i}`}>
-                                  <td className="px-3 py-2.5 font-mono whitespace-nowrap">{p.nip}</td>
-                                  <td className="px-3 py-2.5 font-medium whitespace-nowrap">{p.nama || '—'}</td>
-                                  <td className="px-3 py-2.5 whitespace-nowrap">{p.jabatan || '—'}</td>
-                                  <td className="px-3 py-2.5">{badgeKategori(p.hasilKerja)}</td>
-                                  <td className="px-3 py-2.5">{badgeKategori(p.perilakuKerja)}</td>
-                                  <td className="px-3 py-2.5">{badgeKategori(p.hasilAkhir)}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )
-                    })()
+                    <TabelEKinerja data={dataEKinerja} />
                   ) : (
                     <div className="bg-white/60 border border-ink/10 rounded-xl2 p-6 text-center">
                       <p className="text-ink/60 text-sm">Belum ada data untuk {namaBulan(eKinerjaBulan)} {eKinerjaTahun}. Unggah file e-Kinerja untuk periode ini.</p>
