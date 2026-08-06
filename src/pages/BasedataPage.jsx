@@ -520,6 +520,7 @@ export default function BasedataPage() {
   const [nilaiAsnBulan, setNilaiAsnBulan] = useState(new Date().getMonth())
   const [nilaiAsnTahun, setNilaiAsnTahun] = useState(new Date().getFullYear())
   const [nilaiAsnData, setNilaiAsnData] = useState(null)
+  const [jumlahAbsensiDitemukan, setJumlahAbsensiDitemukan] = useState(null)
   const [memuatNilaiAsn, setMemuatNilaiAsn] = useState(false)
   const [cariNilaiAsn, setCariNilaiAsn] = useState('')
 
@@ -1073,6 +1074,7 @@ export default function BasedataPage() {
         query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
       )
       const jumlahHadirApel = {}
+      setJumlahAbsensiDitemukan(absensiSnap.docs.length)
       absensiSnap.docs.forEach((d) => {
         const a = d.data()
         const nip = normNip(a.nip)
@@ -1553,7 +1555,7 @@ export default function BasedataPage() {
                         <p className="text-ink/50 font-mono text-sm">Memuat…</p>
                       ) : (
                         <>
-                          <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun}</p>
+                          <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun} · {jumlahAbsensiDitemukan ?? 0} data absensi ditemukan untuk periode ini</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
                             <table className="w-full text-sm min-w-[1240px]">
                               <thead className="bg-ink/5 text-center text-xs font-mono uppercase text-ink/50">
