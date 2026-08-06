@@ -1065,7 +1065,13 @@ export default function BasedataPage() {
       const overrideHariAbsenIni = hariAbsenSnap.exists() ? hariAbsenSnap.data().override || {} : {}
       const hariApel = hitungHariKerja(tahun, bulanIdx, overrideHariAbsenIni)
 
-      // Hadir Apel & Pot. Apel dari data absensi e-Apel untuk bulan-tahun ini
+      // Hadir Apel & Pot. Apel dari data absensi e-Apel untuk bulan-tahun ini —
+      // dicocokkan lewat uid (persis seperti "Total Hadir" di Rekap Absen), bukan field nip
+      // di dokumen absensi, supaya hasilnya selalu sama dengan Rekap Absen.
+      const usersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'pegawai')))
+      const petaUidKeNip = {}
+      usersSnap.docs.forEach((d) => { petaUidKeNip[d.id] = normNip(d.data().nip) })
+
       const bulanStr = `${tahun}-${String(bulanIdx + 1).padStart(2, '0')}`
       const absensiSnap = await getDocs(
         query(collection(db, 'absensi'), where('tanggal', '>=', `${bulanStr}-01`), where('tanggal', '<=', `${bulanStr}-31`)),
@@ -1074,7 +1080,7 @@ export default function BasedataPage() {
       const jumlahHadirApel = {}
       absensiSnap.docs.forEach((d) => {
         const a = d.data()
-        const nip = normNip(a.nip)
+        const nip = petaUidKeNip[a.uid] || normNip(a.nip)
         if (!nip) return
         if (a.status === 'tidak_apel') jumlahTidakApel[nip] = (jumlahTidakApel[nip] || 0) + 1
         else if (a.status === 'sesuai' || a.status === 'luar') jumlahHadirApel[nip] = (jumlahHadirApel[nip] || 0) + 1
