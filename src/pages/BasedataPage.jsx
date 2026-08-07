@@ -1113,7 +1113,7 @@ export default function BasedataPage() {
         const tlNilai = sipp && sipp.tl != null ? sipp.tl : 0
         const ctTlDefault = cutiNilai + tlNilai
         const ctTlHariApel = petaKoreksi[nip] != null ? petaKoreksi[nip] : ctTlDefault
-        const kekuranganApel = hariApel - (hadirApelNilai + ctTlHariApel)
+        const kekuranganApel = hariApel - ctTlHariApel
         return {
           nip: p.nip,
           nama: p.nama,
@@ -1150,7 +1150,7 @@ export default function BasedataPage() {
     await setDoc(ref, { bulan: nilaiAsnBulan, tahun: nilaiAsnTahun, data: dataSekarang })
     setNilaiAsnData((prev) => (prev || []).map((p) => {
       if (normNip(p.nip) !== normNip(nip)) return p
-      const kekuranganApel = p.hariApel - (p.hadirApel + nilaiBaru)
+      const kekuranganApel = p.hariApel - nilaiBaru
       return {
         ...p,
         ctTlHariApel: nilaiBaru,
