@@ -84,5 +84,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // Koreksi manual CT/TL Hari Apel per NIP per periode di menu TPP
+    match /koreksiCutiTlApel/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

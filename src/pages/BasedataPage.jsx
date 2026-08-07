@@ -1101,13 +1101,19 @@ export default function BasedataPage() {
         (eKinerjaSnap.data().data || []).forEach((p) => { petaEKinerja[normNip(p.nip)] = p.hasilAkhir })
       }
 
+      // Koreksi manual CT/TL Hari Apel per NIP untuk bulan-tahun ini (kalau admin pernah menyesuaikan)
+      const koreksiSnap = await getDoc(doc(db, 'koreksiCutiTlApel', sippId))
+      const petaKoreksi = koreksiSnap.exists() ? koreksiSnap.data().data || {} : {}
+
       const gabungan = dataPegawai.map((p) => {
         const nip = normNip(p.nip)
         const sipp = petaSipp[nip]
         const hadirApelNilai = jumlahHadirApel[nip] || 0
         const cutiNilai = sipp && sipp.cuti != null ? sipp.cuti : 0
         const tlNilai = sipp && sipp.tl != null ? sipp.tl : 0
-        const kekuranganApel = hariApel - (hadirApelNilai + cutiNilai + tlNilai)
+        const ctTlDefault = cutiNilai + tlNilai
+        const ctTlHariApel = petaKoreksi[nip] != null ? petaKoreksi[nip] : ctTlDefault
+        const kekuranganApel = hariApel - (hadirApelNilai + ctTlHariApel)
         return {
           nip: p.nip,
           nama: p.nama,
@@ -1119,6 +1125,8 @@ export default function BasedataPage() {
           sippTl: sipp ? sipp.tl : null,
           presensiKehadiran: sipp ? sipp.penguranganPresensi : null,
           hariApel,
+          ctTlHariApel,
+          ctTlDikoreksi: petaKoreksi[nip] != null,
           hadirApel: hadirApelNilai,
           kehadiranApel: kekuranganApel > 0 ? Math.round(kekuranganApel * 0.5 * 100) / 100 : 0,
           eKinerja: petaKinerja[nip] ?? null,
@@ -1131,6 +1139,25 @@ export default function BasedataPage() {
     } finally {
       setMemuatNilaiAsn(false)
     }
+  }
+
+  async function simpanKoreksiCtTl(nip, nilaiBaru) {
+    const sippId = `${nilaiAsnTahun}-${String(nilaiAsnBulan + 1).padStart(2, '0')}`
+    const ref = doc(db, 'koreksiCutiTlApel', sippId)
+    const snap = await getDoc(ref)
+    const dataSekarang = snap.exists() ? snap.data().data || {} : {}
+    dataSekarang[normNip(nip)] = nilaiBaru
+    await setDoc(ref, { bulan: nilaiAsnBulan, tahun: nilaiAsnTahun, data: dataSekarang })
+    setNilaiAsnData((prev) => (prev || []).map((p) => {
+      if (normNip(p.nip) !== normNip(nip)) return p
+      const kekuranganApel = p.hariApel - (p.hadirApel + nilaiBaru)
+      return {
+        ...p,
+        ctTlHariApel: nilaiBaru,
+        ctTlDikoreksi: true,
+        kehadiranApel: kekuranganApel > 0 ? Math.round(kekuranganApel * 0.5 * 100) / 100 : 0,
+      }
+    }))
   }
 
   useEffect(() => {
@@ -1540,6 +1567,7 @@ export default function BasedataPage() {
                                 TL: p.sippTl ?? '',
                                 'Pt. Presensi': p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : '',
                                 'Hari Apel': p.hariApel,
+                                'CT/TL Hari Apel': p.ctTlHariApel,
                                 'Hadir Apel': p.hadirApel,
                                 'Pot. Apel': `${p.kehadiranApel}%`,
                                 'Nilai Presensi': nilaiPresensi != null ? `${nilaiPresensi}%` : '',
@@ -1561,13 +1589,13 @@ export default function BasedataPage() {
                         <>
                           <p className="text-ink/50 text-xs font-mono mb-3">{tersaring.length} dari {(nilaiAsnData || []).length} pegawai — {namaBulan(nilaiAsnBulan)} {nilaiAsnTahun} · {jumlahAbsensiDitemukan ?? 0} data absensi ditemukan untuk periode ini</p>
                           <div className="border border-ink/10 rounded-xl2 overflow-x-auto">
-                            <table className="w-full text-sm min-w-[1240px]">
+                            <table className="w-full text-sm min-w-[1320px]">
                               <thead className="bg-ink/5 text-center text-xs font-mono uppercase text-ink/50">
                                 <tr>
                                   <th className="px-3 py-3 text-left" rowSpan={2}>NIP</th>
                                   <th className="px-3 py-3 text-left" rowSpan={2}>Nama</th>
                                   <th className="px-3 py-2 border-b border-ink/10" colSpan={5}>Presensi SIPP</th>
-                                  <th className="px-3 py-2 border-b border-ink/10" colSpan={3}>Presensi e-Apel</th>
+                                  <th className="px-3 py-2 border-b border-ink/10" colSpan={4}>Presensi e-Apel</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Presensi</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Nilai e-Kinerja</th>
                                   <th className="px-3 py-3 w-24" rowSpan={2}>Nilai Akhir</th>
@@ -1579,6 +1607,7 @@ export default function BasedataPage() {
                                   <th className="px-3 py-2 w-16">TL</th>
                                   <th className="px-3 py-2 w-24">Pt. Presensi</th>
                                   <th className="px-3 py-2 w-20">Hari Apel</th>
+                                  <th className="px-3 py-2 w-24">CT/TL Hari Apel</th>
                                   <th className="px-3 py-2 w-20">Hadir Apel</th>
                                   <th className="px-3 py-2 w-20">Pot. Apel</th>
                                 </tr>
@@ -1600,6 +1629,19 @@ export default function BasedataPage() {
                                       <td className="px-3 py-3 text-center">{p.sippTl ?? <span className="text-ink/30">—</span>}</td>
                                       <td className="px-3 py-3 text-center">{p.presensiKehadiran != null ? `${p.presensiKehadiran}%` : <span className="text-ink/30">—</span>}</td>
                                       <td className="px-3 py-3 text-center">{p.hariApel}</td>
+                                      <td className="px-3 py-3 text-center">
+                                        <input
+                                          type="number"
+                                          key={`${p.nip}-${p.ctTlHariApel}`}
+                                          defaultValue={p.ctTlHariApel}
+                                          onBlur={(e) => {
+                                            const nilaiBaru = Number(e.target.value)
+                                            if (!Number.isNaN(nilaiBaru) && nilaiBaru !== p.ctTlHariApel) simpanKoreksiCtTl(p.nip, nilaiBaru)
+                                          }}
+                                          className={`w-16 text-center rounded border px-1 py-1 text-sm ${p.ctTlDikoreksi ? 'border-gold-500 bg-gold-50 font-medium' : 'border-ink/15 bg-white'}`}
+                                          title={p.ctTlDikoreksi ? 'Sudah dikoreksi manual dari nilai asal Cuti+TL SIPP' : 'Otomatis dari Cuti+TL SIPP — bisa diedit'}
+                                        />
+                                      </td>
                                       <td className="px-3 py-3 text-center">{p.hadirApel}</td>
                                       <td className="px-3 py-3 text-center">{p.kehadiranApel}%</td>
                                       <td className="px-3 py-3 text-center font-semibold text-moss-800">{nilaiPresensi != null ? `${nilaiPresensi}%` : <span className="text-ink/30 font-normal">—</span>}</td>
@@ -1616,7 +1658,7 @@ export default function BasedataPage() {
                                   )
                                 })}
                                 {tersaring.length === 0 && (
-                                  <tr><td colSpan={13} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
+                                  <tr><td colSpan={14} className="px-3 py-4 text-center text-ink/40">Tidak ada data.</td></tr>
                                 )}
                               </tbody>
                             </table>
